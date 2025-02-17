@@ -8,5 +8,5 @@ Team from C4 :
 - Fatimah Hawwa 241511074
 - Varian Abi 241511
 
-**Project From Bandung Polytechnic**\n
+**Project From Bandung Polytechnic**
 **Informatics engineering department**
