@@ -9,8 +9,7 @@ Team from C4 :
 - Varian Abi 241511091
 
 **Project From Bandung Polytechnic**
+
 **Informatics engineering department**
 
-**Abi**
-**Bapak Roh Kudus Yudhis ium**
 
