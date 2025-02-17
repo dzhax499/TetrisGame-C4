@@ -7,3 +7,6 @@ Team from C2 :
 - Rizky Satria 241511
 - Fatimah Hawa 241511
 - Varian Abi 241511
+
+**Project From Bandung Polytechnic**
+**Informatics engineering department**
