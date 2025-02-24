@@ -13,6 +13,6 @@
 void update_settings(Level *level, int mode, int new_speed)
 {
   // update level dan speed
-  settings->mode = mode;
-  settings->speed = new_speed;
+  level->mode = mode;
+  level->speed = new_speed;
 }
