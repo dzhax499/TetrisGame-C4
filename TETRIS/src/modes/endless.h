@@ -1,6 +1,7 @@
 // Nama program : scoretetris.h
-// Deskripsi    : header untuk pengelolaan mode endless
-// Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2024, 8:40]
+// Deskripsi    : header untuk pengelolaan mode endless (tanpa batas), yang akan berhenti bila kondisi
+//                tertentu terpenuhi.
+// Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 8:40]
 
 #ifndef ENDLESS_H
 #define ENDLESS_H

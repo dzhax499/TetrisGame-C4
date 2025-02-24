@@ -2,12 +2,13 @@
 // Deskripsi    : Header file untuk pengaturan permainan,
 //                mendefinisikan struktur Settings dan fungsi-fungsi terkait untuk
 //                memperbarui dan mengelola pengaturan permainan seperti level dan kecepatan.
-// Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2024, 8:09]
+// Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 8:09]
 
 #ifndef LEVEL_H
 #define LEVEL_H
 
 // frame delay berdasarkan level (dalam microsecond)
+// ini untuk mendefinisikan kecepatan berdasarkan level, semakin tinggi level,semakin cepat permainan
 #define SPEED_1 200000
 #define SPEED_2 180000
 #define SPEED_3 160000
