@@ -10,14 +10,14 @@
 // frame delay berdasarkan level (dalam microsecond)
 #define SPEED_1 200000
 #define SPEED_2 180000
-#define SPEED_3 170000
-#define SPEED_4 150000
-#define SPEED_5 140000
-#define SPEED_6 130000
-#define SPEED_7 120000
-#define SPEED_8 100000
-#define SPEED_9 90000
-#define SPEED_10 80000
+#define SPEED_3 160000
+#define SPEED_4 140000
+#define SPEED_5 120000
+#define SPEED_6 100000
+#define SPEED_7 90000
+#define SPEED_8 80000
+#define SPEED_9 70000
+#define SPEED_10 60000
 
 
 // struct untuk menyimpan pengaturan permainan
