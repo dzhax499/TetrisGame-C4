@@ -6,27 +6,13 @@
 #ifndef ENDLESS_H
 #define ENDLESS_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include "level.h" // Mengimpor pengaturan permainan
 
-#define BOARD_WIDTH 10
-#define BOARD_HEIGHT 20
-
-typedef struct {
-    int shape;
-    int x, y;
-} Tetromino;
-
-extern int board[BOARD_HEIGHT][BOARD_WIDTH];
-extern Tetromino currentTetromino;
-
-void initEndlessMode();
-void spawnTetromino();
-void updateGame();
-int canMoveDown();
-void placeTetromino();
-void clearFullRows();
-int checkGameOver();
+/**
+ * Mode Endless: Setelah menyelesaikan 30 lines, level kesulitan meningkat.
+ * - settings: Pointer ke objek Settings yang akan diperbarui.
+ * - lines_cleared: Jumlah lines yang berhasil diselesaikan.
+ */
+void endless_mode(Settings *settings, int lines_cleared);
 
 #endif // ENDLESS_H

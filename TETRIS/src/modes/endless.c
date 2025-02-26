@@ -5,94 +5,24 @@
 
 
 #include "endless.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-#define BOARD_WIDTH 10
-#define BOARD_HEIGHT 20
+// Jumlah lines yang harus diselesaikan untuk meningkatkan level
+#define LINES_TO_INCREASE_LEVEL 30
 
-int board[BOARD_HEIGHT][BOARD_WIDTH];
-Tetromino currentTetromino;
-
-void initEndlessMode() {
-    // Mengatur seed untuk angka acak
-    srand(time(NULL));
-    
-    // Mengosongkan papan permainan
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            board[i][j] = 0;
-        }
-    }
-    
-    // Memunculkan tetromino pertama
-    spawnTetromino();
-}
-
-void spawnTetromino() {
-    // Memilih bentuk tetromino secara acak
-    currentTetromino.shape = rand() % 7; // Misal ada 7 jenis tetromino
-    currentTetromino.x = BOARD_WIDTH / 2;
-    currentTetromino.y = 0;
-}
-
-void updateGame() {
-    // Cek jika tetromino bisa turun
-    if (canMoveDown()) {
-        currentTetromino.y++;
-    } else {
-        placeTetromino();
-        clearFullRows();
-        spawnTetromino();
-    }
-    
-    if (checkGameOver()) {
-        printf("Game Over!\n");
-        initEndlessMode(); // Restart game
-    }
-}
-
-int canMoveDown() {
-    // Cek apakah tetromino bisa turun tanpa keluar batas atau menabrak blok lain
-    return (currentTetromino.y + 1 < BOARD_HEIGHT);
-}
-
-void placeTetromino() {
-    // Simpan tetromino di papan
-    board[currentTetromino.y][currentTetromino.x] = 1; // Sederhana, harus diperbaiki untuk bentuk yang lebih kompleks
-}
-
-void clearFullRows() {
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        int full = 1;
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            if (board[i][j] == 0) {
-                full = 0;
-                break;
+/**
+ * Mode Endless: Setelah menyelesaikan 30 lines, level kesulitan meningkat.
+ * - settings: Pointer ke objek Settings yang akan diperbarui.
+ * - lines_cleared: Jumlah lines yang berhasil diselesaikan.
+ */
+void endless_mode(Settings *settings, int lines_cleared) {
+    if (lines_cleared >= LINES_TO_INCREASE_LEVEL) {
+        int level_increase = lines_cleared / LINES_TO_INCREASE_LEVEL;
+        for (int i = 0; i < level_increase; i++) {
+            if (settings->mode < 10) {
+                settings->mode++;
+                settings->speed = SPEEDS[settings->mode - 1];
             }
         }
-        if (full) {
-            // Geser semua baris di atas ke bawah
-            for (int k = i; k > 0; k--) {
-                for (int j = 0; j < BOARD_WIDTH; j++) {
-                    board[k][j] = board[k - 1][j];
-                }
-            }
-            // Kosongkan baris teratas
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                board[0][j] = 0;
-            }
-        }
+        settings->lines_cleared = lines_cleared % LINES_TO_INCREASE_LEVEL;
     }
-}
-
-int checkGameOver() {
-    // Jika ada blok di bagian atas setelah menempatkan tetromino, game over
-    for (int j = 0; j < BOARD_WIDTH; j++) {
-        if (board[0][j] != 0) {
-            return 1;
-        }
-    }
-    return 0;
 }

@@ -29,12 +29,12 @@ const int SPEEDS[] =
  * - score: Skor saat ini.
  * - high_score: Skor tertinggi yang pernah dicapai.
  */
-typedef struct 
-{
-    int mode;
-    int speed;
-    int score;
-    int high_score;
+typedef struct {
+  int mode;          // Level 1-10
+  int speed;         // Kecepatan permainan
+  int score;         // Skor saat ini
+  int high_score;    // Skor tertinggi
+  int lines_cleared; // Jumlah lines yang berhasil diselesaikan
 } Settings;
 
 /**

@@ -10,9 +10,11 @@
 // mode : parameter input passing by value, tipe integer, level permainan
 // new_speed: parameter input passing by value, tipe integer, kecepatan permainan baru
 
-void update_settings(Settings *settings, int mode, int new_speed)
+void init_settings(Settings *settings) 
 {
-  // update level dan speed
-  settings->mode = mode;
-  settings->speed = new_speed;
+  settings->mode = 1;
+  settings->speed = SPEEDS[0];
+  settings->score = 0;
+  settings->high_score = 0;
+  settings->lines_cleared = 0;
 }
