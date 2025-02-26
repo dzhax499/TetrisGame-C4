@@ -1,11 +1,11 @@
-// Nama Program : settings.h
+// Nama Program : level.h
 // Deskripsi    : Header file untuk pengaturan permainan,
 //                mendefinisikan struktur Settings dan fungsi-fungsi terkait untuk
 //                memperbarui dan mengelola pengaturan permainan seperti level dan kecepatan.
 // Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 8:09]
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef LEVEL_H
+#define LEVEL_H
 
 // Kecepatan berdasarkan level (dalam mikrodetik)
 const int SPEEDS[] = 
@@ -64,4 +64,4 @@ void increase_level(Settings *settings);
  */
 void update_score(Settings *settings, int points);
 
-#endif // SETTINGS_H
+#endif // LEVEL_H
