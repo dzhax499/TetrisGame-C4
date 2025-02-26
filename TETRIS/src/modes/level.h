@@ -4,34 +4,64 @@
 //                memperbarui dan mengelola pengaturan permainan seperti level dan kecepatan.
 // Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 8:09]
 
-#ifndef LEVEL_H
-#define LEVEL_H
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-// frame delay berdasarkan level (dalam microsecond)
-// ini untuk mendefinisikan kecepatan berdasarkan level, semakin tinggi level,semakin cepat permainan
-#define SPEED_1 200000
-#define SPEED_2 180000
-#define SPEED_3 160000
-#define SPEED_4 140000
-#define SPEED_5 120000
-#define SPEED_6 100000
-#define SPEED_7 90000
-#define SPEED_8 80000
-#define SPEED_9 70000
-#define SPEED_10 60000
-
-
-// struct untuk menyimpan pengaturan permainan
-typedef struct
+// Kecepatan berdasarkan level (dalam mikrodetik)
+const int SPEEDS[] = 
 {
-  int mode; // level 1-10
-  int speed; // Kecepatan permainan
-} Level;
+    200000, // Level 1
+    180000, // Level 2
+    160000, // Level 3
+    140000, // Level 4
+    120000, // Level 5
+    100000, // Level 6
+    90000,  // Level 7
+    80000,  // Level 8
+    70000,  // Level 9
+    60000   // Level 10
+};
 
-// Prosedur untuk memperbarui pengaturan permainan (kecepatan turunnya block di permainan tetris)
-// settings: parameter output passing by reference, tipe Settings, alamat dari objek yang akan diperbarui
-// level: parameter input passing by value, tipe integer, level permainan
-// new_speed: parameter input passing by value, tipe integer, kecepatan permainan baru
-void update_settings(Level *level, int mode, int new_speed);
+/**
+ * Struct untuk menyimpan pengaturan permainan.
+ * - mode: Level permainan (1-10).
+ * - speed: Kecepatan permainan (dalam mikrodetik).
+ * - score: Skor saat ini.
+ * - high_score: Skor tertinggi yang pernah dicapai.
+ */
+typedef struct 
+{
+    int mode;
+    int speed;
+    int score;
+    int high_score;
+} Settings;
 
-#endif // LEVEL_H
+/**
+ * Menginisialisasi pengaturan permainan dengan nilai default.
+ * - settings: Pointer ke objek Settings yang akan diinisialisasi.
+ */
+void init_settings(Settings *settings);
+
+/**
+ * Memperbarui pengaturan permainan berdasarkan level dan kecepatan baru.
+ * - settings: Pointer ke objek Settings yang akan diperbarui.
+ * - mode: Level baru (1-10).
+ * - new_speed: Kecepatan baru (dalam mikrodetik).
+ */
+void update_settings(Settings *settings, int mode, int new_speed);
+
+/**
+ * Meningkatkan level permainan.
+ * - settings: Pointer ke objek Settings yang akan diperbarui.
+ */
+void increase_level(Settings *settings);
+
+/**
+ * Memperbarui skor permainan.
+ * - settings: Pointer ke objek Settings yang akan diperbarui.
+ * - points: Poin yang akan ditambahkan ke skor.
+ */
+void update_score(Settings *settings, int points);
+
+#endif // SETTINGS_H
