@@ -1,4 +1,4 @@
-// Nama Program : settings.c
+// Nama Program : level.c
 // Deskripsi    : Implementasi pengaturan permainan,
 //                bertujuan untuk memperbarui dan mengelola pengaturan permainan seperti level dan kecepatan.
 // Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 8:09]
