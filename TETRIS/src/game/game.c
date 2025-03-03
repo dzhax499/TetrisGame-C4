@@ -32,11 +32,11 @@ void run_game() {
         }
 
         // Tampilkan informasi level dan kecepatan
-        printf("Level: %d\n", game_settings.level);
-        printf("Speed: %d microseconds\n", game_settings.speed);
+        printf("Level: %d\n", settings.mode);
+        printf("Speed: %d microseconds\n", settings.speed);
 
         // Tunggu sesuai kecepatan permainan
-        usleep(game_settings.speed);
+        usleep(settings.speed);
 
         // Bersihkan layar (untuk terminal yang mendukung)
         printf("\033[H\033[J");
@@ -47,8 +47,8 @@ void run_game() {
         static int lines_cleared = 0;
         lines_cleared++;
         if (lines_cleared % 10 == 0) {
-            game_settings.level++;
-            update_settings(&game_settings, game_settings.level, SPEEDS[1] - (game_settings.level - 1) * 20000);
+            settings.mode++;
+            update_settings(&settings, settings.mode, SPEEDS[1] - (settings.mode - 1) * 20000);
         }
     }
 }
