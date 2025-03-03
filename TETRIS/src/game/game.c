@@ -9,9 +9,9 @@
 
 // Fungsi untuk menjalankan permainan Tetris
 void run_game() {
-    Settings game_settings;
-    game_settings.level = 1; // Mulai dari level 1
-    game_settings.speed = SPEED_1; // Kecepatan awal
+    Settings settings;
+    settings.mode = 1; // Mulai dari level 1
+    settings.speed = SPEEDS[1]; // Kecepatan awal
 
     initEndlessMode(); // Inisialisasi mode endless
 
@@ -48,7 +48,7 @@ void run_game() {
         lines_cleared++;
         if (lines_cleared % 10 == 0) {
             game_settings.level++;
-            update_settings(&game_settings, game_settings.level, SPEED_1 - (game_settings.level - 1) * 20000);
+            update_settings(&game_settings, game_settings.level, SPEEDS[1] - (game_settings.level - 1) * 20000);
         }
     }
 }

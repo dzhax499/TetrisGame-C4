@@ -5,7 +5,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "settings.h"
+#include "level.h"
 #include "endless.h"
 
 // Fungsi untuk menjalankan permainan Tetris
