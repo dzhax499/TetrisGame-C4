@@ -2,7 +2,7 @@
 #ifndef SETTING_H
 #define SETTING_H
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #define DEFAULT_VOLUME 50
 #define DEFAULT_SPEED 5
