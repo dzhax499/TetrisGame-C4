@@ -3,24 +3,57 @@
 //                bertujuan mengelola siklus dan aturan dasar permainan
 // Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 10:52]
 
-// game.c
 #include "game.h"
-#include "modes/endless.h"
-#include "modes/level.h"
-#include <SDL2/SDL.h>
+#include <stdio.h>
+#include <unistd.h> // Untuk usleep
 
-GameState gameState = MENU;
+// Fungsi untuk menjalankan permainan Tetris
+void run_game() {
+    Settings game_settings;
+    game_settings.level = 1; // Mulai dari level 1
+    game_settings.speed = SPEED_1; // Kecepatan awal
 
-void handleGameState() {
-    switch (gameState) {
-        case MENU:
-            // Tampilkan menu utama
-            break;
-        case PLAYING:
-            // Jalankan game mode
-            break;
-        case PAUSED:
-            // Pause menu
-            break;
+    initEndlessMode(); // Inisialisasi mode endless
+
+    while (1) {
+        // Update game state
+        updateGame();
+
+        // Tampilkan papan permainan
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                if (board[i][j] == 1) {
+                    printf("[]");
+                } else {
+                    printf(" .");
+                }
+            }
+            printf("\n");
+        }
+
+        // Tampilkan informasi level dan kecepatan
+        printf("Level: %d\n", game_settings.level);
+        printf("Speed: %d microseconds\n", game_settings.speed);
+
+        // Tunggu sesuai kecepatan permainan
+        usleep(game_settings.speed);
+
+        // Bersihkan layar (untuk terminal yang mendukung)
+        printf("\033[H\033[J");
+
+        // Cek jika level perlu ditingkatkan
+        // Misalnya, setiap 10 baris yang dihapus, naikkan level
+        // Ini hanya contoh sederhana, Anda bisa menyesuaikan logikanya
+        static int lines_cleared = 0;
+        lines_cleared++;
+        if (lines_cleared % 10 == 0) {
+            game_settings.level++;
+            update_settings(&game_settings, game_settings.level, SPEED_1 - (game_settings.level - 1) * 20000);
+        }
     }
+}
+
+int main() {
+    run_game();
+    return 0;
 }
