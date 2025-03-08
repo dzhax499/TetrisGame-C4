@@ -1,10 +1,9 @@
-// main_menu.h
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
 
 #include <SDL3/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
+#include "font.h"
 
 typedef enum {
     MENU_STATE_MAIN,
@@ -16,8 +15,8 @@ typedef enum {
 typedef struct {
     SDL_Window* window;
     SDL_Renderer* renderer;
-    TTF_Font* titleFont;
-    TTF_Font* menuFont;
+    Font titleFont;
+    Font menuFont;
     MenuState currentState;
     int selectedItem;
     bool isRunning;
