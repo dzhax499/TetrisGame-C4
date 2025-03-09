@@ -1,7 +1,7 @@
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
 
-#include <SDL3/SDL.h>
+#include "C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/TETRIS/include/SDL3/SDL.h"
 #include <stdbool.h>
 #include "font.h"
 
