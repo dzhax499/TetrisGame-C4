@@ -1,4 +1,4 @@
-// pause_menu.c
+/*// pause_menu.c
 #include "pause_menu.h"
 
 void initPauseMenu(PauseMenu *menu, SDL_Renderer *renderer) {
@@ -35,3 +35,4 @@ void renderPauseMenu(PauseMenu *menu) {
 void destroyPauseMenu(PauseMenu *menu) {
     SDL_DestroyTexture(menu->pauseTexture);
 }
+*/

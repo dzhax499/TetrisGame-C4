@@ -7,8 +7,7 @@
 
 typedef enum {
     MENU_STATE_MAIN,
-    MENU_STATE_MODE_SELECT,
-    MENU_STATE_HIGH_SCORES,
+    MENU_STATE_GAME,
     MENU_STATE_EXIT
 } MenuState;
 
@@ -20,11 +19,18 @@ typedef struct {
     MenuState currentState;
     int selectedItem;
     bool isRunning;
+    
+    // Key state tracking
+    bool upPressed;
+    bool downPressed;
+    bool enterPressed;
+    bool escapePressed;
 } MainMenu;
 
 bool initMainMenu(MainMenu* menu);
 void cleanupMainMenu(MainMenu* menu);
-void handleMainMenuInput(MainMenu* menu, SDL_Event* e);
+void handleMainMenuEvent(MainMenu* menu, SDL_Event* e);
+void handleMainMenuInput(MainMenu* menu);
 void renderMainMenu(MainMenu* menu);
 MenuState runMainMenu(void);
 
