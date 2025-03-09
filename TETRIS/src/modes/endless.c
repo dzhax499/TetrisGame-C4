@@ -6,14 +6,8 @@
 
 #include "endless.h"
 
-// Jumlah lines yang harus diselesaikan untuk meningkatkan level
 #define LINES_TO_INCREASE_LEVEL 30
 
-/**
- * Mode Endless: Setelah menyelesaikan 30 lines, level kesulitan meningkat.
- * - settings: Pointer ke objek Settings yang akan diperbarui.
- * - lines_cleared: Jumlah lines yang berhasil diselesaikan.
- */
 void endless_mode(Settings *settings, int lines_cleared) {
     if (lines_cleared >= LINES_TO_INCREASE_LEVEL) {
         int level_increase = lines_cleared / LINES_TO_INCREASE_LEVEL;
