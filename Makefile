@@ -42,3 +42,4 @@ clean:
 
 run: $(TARGET)
 	./$(TARGET)
+
