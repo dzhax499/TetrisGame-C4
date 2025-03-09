@@ -141,7 +141,7 @@ void handleMainMenuEvent(MainMenu* menu, SDL_Event* e) {
     }
 }
 
-void handleMainMenuInput(MainMenu* menu) {
+void handleMainMenuInput(MainMenu* menu, SDL_Event* e) {
     // Process key states
     if (menu->upPressed) {
         menu->selectedItem = (menu->selectedItem - 1 + MENU_ITEMS) % MENU_ITEMS;
@@ -197,7 +197,7 @@ MenuState runMainMenu(void) {
         }
         
         // Process input based on current key states
-        handleMainMenuInput(&menu);
+        void handleMainMenuInput(MainMenu* menu, SDL_Event* e);
         
         renderMainMenu(&menu);
         SDL_Delay(16);

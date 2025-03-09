@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
             if (e.type == SDL_EVENT_QUIT) {
                 menu.isRunning = false;
             }
-            handleMainMenuInput(&menu, &e);
+            void handleMainMenuInput(MainMenu* menu, SDL_Event* e);
         }
         
         // Render current menu state

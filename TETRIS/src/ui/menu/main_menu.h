@@ -30,7 +30,7 @@ typedef struct {
 bool initMainMenu(MainMenu* menu);
 void cleanupMainMenu(MainMenu* menu);
 void handleMainMenuEvent(MainMenu* menu, SDL_Event* e);
-void handleMainMenuInput(MainMenu* menu);
+void handleMainMenuInput(MainMenu* menu, SDL_Event* e);
 void renderMainMenu(MainMenu* menu);
 MenuState runMainMenu(void);
 
