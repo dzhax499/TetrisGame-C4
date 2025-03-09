@@ -5,16 +5,29 @@
 
 #include "level.h"
 
-// Prosedur untuk memperbarui pengaturan permainan (kecepatan permainan)
-// settings: parameter output passing by reference, tipe Settings, alamat dari objek yang akan diperbarui
-// mode : parameter input passing by value, tipe integer, level permainan
-// new_speed: parameter input passing by value, tipe integer, kecepatan permainan baru
+void init_settings(Settings *settings) {
+    settings->mode = 1;
+    settings->speed = SPEEDS[0];
+    settings->score = 0;
+    settings->high_score = 0;
+    settings->lines_cleared = 0;
+}
 
-void init_settings(Settings *settings) 
-{
-  settings->mode = 1;
-  settings->speed = SPEEDS[0];
-  settings->score = 0;
-  settings->high_score = 0;
-  settings->lines_cleared = 0;
+void update_settings(Settings *settings, int mode, int new_speed) {
+    settings->mode = mode;
+    settings->speed = new_speed;
+}
+
+void increase_level(Settings *settings) {
+    if (settings->mode < 10) {
+        settings->mode++;
+        settings->speed = SPEEDS[settings->mode - 1];
+    }
+}
+
+void update_score(Settings *settings, int points) {
+    settings->score += points;
+    if (settings->score > settings->high_score) {
+        settings->high_score = settings->score;
+    }
 }

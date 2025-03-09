@@ -7,9 +7,7 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-// Kecepatan berdasarkan level (dalam mikrodetik)
-const int SPEEDS[] = 
-{
+const int SPEEDS[] = {
     200000, // Level 1
     180000, // Level 2
     160000, // Level 3
@@ -22,46 +20,17 @@ const int SPEEDS[] =
     60000   // Level 10
 };
 
-/**
- * Struct untuk menyimpan pengaturan permainan.
- * - mode: Level permainan (1-10).
- * - speed: Kecepatan permainan (dalam mikrodetik).
- * - score: Skor saat ini.
- * - high_score: Skor tertinggi yang pernah dicapai.
- */
 typedef struct {
-  int mode;          // Level 1-10
-  int speed;         // Kecepatan permainan
-  int score;         // Skor saat ini
-  int high_score;    // Skor tertinggi
-  int lines_cleared; // Jumlah lines yang berhasil diselesaikan
+    int mode;
+    int speed;
+    int score;
+    int high_score;
+    int lines_cleared;
 } Settings;
 
-/**
- * Menginisialisasi pengaturan permainan dengan nilai default.
- * - settings: Pointer ke objek Settings yang akan diinisialisasi.
- */
 void init_settings(Settings *settings);
-
-/**
- * Memperbarui pengaturan permainan berdasarkan level dan kecepatan baru.
- * - settings: Pointer ke objek Settings yang akan diperbarui.
- * - mode: Level baru (1-10).
- * - new_speed: Kecepatan baru (dalam mikrodetik).
- */
 void update_settings(Settings *settings, int mode, int new_speed);
-
-/**
- * Meningkatkan level permainan.
- * - settings: Pointer ke objek Settings yang akan diperbarui.
- */
 void increase_level(Settings *settings);
-
-/**
- * Memperbarui skor permainan.
- * - settings: Pointer ke objek Settings yang akan diperbarui.
- * - points: Poin yang akan ditambahkan ke skor.
- */
 void update_score(Settings *settings, int points);
 
 #endif // LEVEL_H
