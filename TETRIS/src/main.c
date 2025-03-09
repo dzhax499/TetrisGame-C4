@@ -2,11 +2,9 @@
 // Deskripsi    : 
 // Pembuat      : [Rizky Satria Gunawan, 241511089, 3 Maret 2025, 8:52]
 
-#include "game/game.h"
+#include "game.h"  // Mengimpor header file game.h
 
 int main() {
-    GameState game;
-    game_init(&game); // Inisialisasi game
-    game_run(&game);  // Jalankan game loop
+    run_game();  // Memanggil fungsi run_game() untuk menjalankan game loop
     return 0;
 }
