@@ -8,7 +8,14 @@
 #include "level.h"
 #include "endless.h"
 
-// Fungsi untuk menjalankan permainan Tetris
+#define BOARD_WIDTH 10
+#define BOARD_HEIGHT 20
+
+extern int board[BOARD_HEIGHT][BOARD_WIDTH];
+
+void init_board();
+void display_board();
+void update_game(Settings *settings);
 void run_game();
 
 #endif // GAME_H

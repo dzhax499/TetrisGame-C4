@@ -3,57 +3,63 @@
 //                bertujuan mengelola siklus dan aturan dasar permainan
 // Pembuat      : [Rizky Satria Gunawan, 241511089, 24 February 2025, 10:52]
 
+
 #include "game.h"
 #include <stdio.h>
-#include <unistd.h> // Untuk usleep
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
-// Fungsi untuk menjalankan permainan Tetris
-void run_game() {
-    Settings settings;
-    settings.mode = 1; // Mulai dari level 1
-    settings.speed = SPEEDS[1]; // Kecepatan awal
+#define BOARD_WIDTH 10
+#define BOARD_HEIGHT 20
 
-    initEndlessMode(); // Inisialisasi mode endless
+int board[BOARD_HEIGHT][BOARD_WIDTH] = {0};
 
-    while (1) {
-        // Update game state
-        updateGame();
-
-        // Tampilkan papan permainan
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                if (board[i][j] == 1) {
-                    printf("[]");
-                } else {
-                    printf(" .");
-                }
-            }
-            printf("\n");
-        }
-
-        // Tampilkan informasi level dan kecepatan
-        printf("Level: %d\n", settings.mode);
-        printf("Speed: %d microseconds\n", settings.speed);
-
-        // Tunggu sesuai kecepatan permainan
-        usleep(settings.speed);
-
-        // Bersihkan layar (untuk terminal yang mendukung)
-        printf("\033[H\033[J");
-
-        // Cek jika level perlu ditingkatkan
-        // Misalnya, setiap 10 baris yang dihapus, naikkan level
-        // Ini hanya contoh sederhana, Anda bisa menyesuaikan logikanya
-        static int lines_cleared = 0;
-        lines_cleared++;
-        if (lines_cleared % 10 == 0) {
-            settings.mode++;
-            update_settings(&settings, settings.mode, SPEEDS[1] - (settings.mode - 1) * 20000);
+void init_board() {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            board[i][j] = 0;
         }
     }
 }
 
+void display_board() {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            if (board[i][j] == 1) {
+                printf("[]");
+            } else {
+                printf(" .");
+            }
+        }
+        printf("\n");
+    }
+}
+
+void update_game(Settings *settings) {
+    // Logika untuk mengupdate game state
+    // Misalnya, menurunkan blok, mengecek garis yang terisi, dll.
+}
+
+void run_game() {
+    Settings settings;
+    init_settings(&settings);
+    init_board();
+
+    while (1) {
+        display_board();
+        printf("Level: %d\n", settings.mode);
+        printf("Speed: %d microseconds\n", settings.speed);
+
+        update_game(&settings);
+
+        usleep(settings.speed);
+        printf("\033[H\033[J");
+    }
+}
+
 int main() {
+    srand(time(NULL));
     run_game();
     return 0;
 }
