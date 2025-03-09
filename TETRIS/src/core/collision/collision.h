@@ -8,9 +8,10 @@
  */
 
  #ifndef COLLISION_H
- #define COLLISION_H
- 
- #include "../tetromino/blocks.h"
- #include <stdbool.h>
- 
- #endif
+#define COLLISION_H
+
+#include "blocks.h"
+
+bool check_collision(Tetromino* tetromino, int grid[GRID_HEIGHT][GRID_WIDTH]);
+
+#endif
