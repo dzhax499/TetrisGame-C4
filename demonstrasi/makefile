@@ -6,15 +6,15 @@ CFLAGS = -Wall -Wextra -g -Dmain=SDL_main
 
 # Directories
 SRC_DIR = .
-INC_DIR = src/include
-LIB_DIR = src/lib
+INC_DIR = include
+LIB_DIR = lib
 
 # SDL2 configuration
 SDL_CFLAGS = -I$(INC_DIR)
 SDL_LDFLAGS = -L$(LIB_DIR) -lmingw32 -lSDL2main -lSDL2 -mwindows
 
 # Target executable
-TARGET = tetris1
+TARGET = DemoTetris1.0.exe
 
 # Source files
 SRC = $(SRC_DIR)/demo.c
