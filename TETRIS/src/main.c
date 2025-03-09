@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "main_menu.h"
 
+//main//
 int main(int argc, char* argv[]) {
     MainMenu menu;
     
