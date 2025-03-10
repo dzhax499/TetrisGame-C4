@@ -9,28 +9,28 @@
  
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_mixer.h>
- #include "../settings/settings.h"
+ #include "../settings_menu/settings_menu.h"
  
  /**
   * @brief Enum untuk jenis efek suara dalam permainan
   */
  typedef enum {
-     SFX_BLOCK_MOVE,      /< Efek suara saat blok bergerak */
-     SFX_BLOCK_ROTATE,    /< Efek suara saat blok diputar */
-     SFX_LINE_CLEAR,      /< Efek suara saat garis dihapus */
-     SFX_TETRIS,          /< Efek suara saat tetris */
-     SFX_HARD_DROP,       /< Efek suara saat hard drop */
-     SFX_GAME_OVER,       /< Efek suara game over */
-     SFX_LEVEL_UP,        /< Efek suara naik level */
-     SFX_COUNT            /< Jumlah total efek suara */
+     SFX_BLOCK_MOVE,      //< Efek suara saat blok bergerak */
+     SFX_BLOCK_ROTATE,    //< Efek suara saat blok diputar */
+     SFX_LINE_CLEAR,      //< Efek suara saat garis dihapus */
+     SFX_TETRIS,          //< Efek suara saat tetris */
+     SFX_HARD_DROP,       //< Efek suara saat hard drop */
+     SFX_GAME_OVER,       //< Efek suara game over */
+     SFX_LEVEL_UP,        //< Efek suara naik level */
+     SFX_COUNT            //< Jumlah total efek suara */
  } SfxType;
  
  /**
   * @brief Struktur untuk manajemen efek suara permainan
   */
  typedef struct {
-     Mix_Chunk* sounds[SFX_COUNT];  /< Array chunk efek suara */
-     GameSettings* settings;         /< Pengaturan permainan */
+     Mix_Chunk* sounds[SFX_COUNT];  //< Array chunk efek suara */
+     GameSettings* settings;         //< Pengaturan permainan */
  } SfxManager;
  
  /**

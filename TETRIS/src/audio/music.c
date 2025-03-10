@@ -7,7 +7,7 @@
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_mixer.h>
  #include "music.h"
- #include "../settings/settings.h"
+ #include "../settings/settings_menu.h"
  
  /**
   * @brief Inisialisasi manajer musik

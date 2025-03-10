@@ -9,7 +9,7 @@
  
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_mixer.h>
- #include "settings.h"
+ #include "settings_menu.h"
  
  /** 
   * @brief Struktur untuk mengelola elemen audio permainan 

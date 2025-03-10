@@ -9,7 +9,7 @@
  
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_mixer.h>
- #include "../settings/settings.h"
+ #include "../settings/settings_menu.h"
  
  /**
   * @brief Enum untuk jenis musik dalam permainan

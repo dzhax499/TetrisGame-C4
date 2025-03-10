@@ -7,7 +7,7 @@
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_mixer.h>
  #include "sfx.h"
- #include "../settings/settings.h"
+ #include "../settings_menu/settings_menu.h"
  
  /**
   * @brief Jumlah channel audio maksimum untuk efek suara

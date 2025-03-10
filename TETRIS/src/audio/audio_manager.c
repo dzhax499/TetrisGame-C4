@@ -7,7 +7,7 @@
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_mixer.h>
  #include "audio_manager.h"
- #include "settings.h"
+ #include "settings_menu.h"
  
  /** 
   * @brief Jumlah maksimum efek suara yang dapat dimuat 
