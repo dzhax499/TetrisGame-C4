@@ -1,27 +1,34 @@
 // audio_manager.c
 #include "audio_manager.h"
+#include <SDL3/SDL_audio.h>
 #include <stdio.h>
 
-static int is_muted = 0;
+// Variabel statis untuk menyimpan status audio
+static int volume = SDL_MIX_MAXVOLUME; // Menyimpan volume saat ini
+static int isMuted = 0; // Status mute (0: tidak mute, 1: mute)
 
-void init_audio() {
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        printf("SDL_mixer error: %s\n", Mix_GetError());
+// Inisialisasi sistem audio SDL3
+void InitAudio() {
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        printf("SDL Audio init failed: %s\n", SDL_GetError());
     }
 }
 
-void set_volume(int volume) {
-    if (!is_muted) {
-        Mix_VolumeMusic(volume);
-        Mix_Volume(-1, volume);
+// Mengatur volume dengan mempertimbangkan mute
+void SetVolume(int vol) {
+    volume = vol;
+    if (isMuted) {
+        volume = 0; // Jika mute aktif, volume diatur ke 0
     }
 }
 
-void mute_audio(int mute) {
-    is_muted = mute;
-    Mix_VolumeMusic(mute ? 0 : MIX_MAX_VOLUME);
+// Mengaktifkan/mematikan suara
+void ToggleMute() {
+    isMuted = !isMuted; // Toggle status mute
+    SetVolume(volume); // Perbarui volume sesuai dengan status mute
 }
 
-void close_audio() {
-    Mix_CloseAudio();
+// Membersihkan sistem audio sebelum keluar
+void CleanupAudio() {
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }

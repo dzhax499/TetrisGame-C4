@@ -2,6 +2,7 @@
 #ifndef SETTINGS_MENU_H
 #define SETTINGS_MENU_H
 
-void open_settings_menu();
+// Menampilkan menu pengaturan
+void ShowSettingsMenu();
 
-#endif
+#endif // SETTINGS_MENU_H

@@ -1,21 +1,34 @@
 // music.c
 #include "music.h"
+#include <SDL3/SDL_mixer.h>
 #include <stdio.h>
 
-static Mix_Music *bg_music = NULL;
+// Variabel statis untuk menyimpan musik latar
+static Mix_Music *bgMusic = NULL;
 
-void play_music(const char *file) {
-    if (bg_music) {
-        Mix_FreeMusic(bg_music);
+// Memuat dan memainkan musik latar dari file
+void PlayMusic(const char *filename) {
+    if (bgMusic) {
+        Mix_FreeMusic(bgMusic);
     }
-    bg_music = Mix_LoadMUS(file);
-    if (!bg_music) {
+    bgMusic = Mix_LoadMUS(filename);
+    if (!bgMusic) {
         printf("Failed to load music: %s\n", Mix_GetError());
         return;
     }
-    Mix_PlayMusic(bg_music, -1);
+    Mix_PlayMusic(bgMusic, -1); // Loop musik tanpa henti
 }
 
-void stop_music() {
+// Menjeda musik yang sedang dimainkan
+void PauseMusic() {
+    Mix_PauseMusic();
+}
+
+// Menghentikan dan membebaskan musik yang sedang dimainkan
+void StopMusic() {
     Mix_HaltMusic();
+    if (bgMusic) {
+        Mix_FreeMusic(bgMusic);
+        bgMusic = NULL;
+    }
 }

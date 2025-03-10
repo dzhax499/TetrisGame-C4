@@ -2,9 +2,13 @@
 #ifndef MUSIC_H
 #define MUSIC_H
 
-#include <SDL2/SDL_mixer.h>
+// Memutar musik latar dari file
+void PlayMusic(const char *filename);
 
-void play_music(const char *file);
-void stop_music();
+// Menjeda musik yang sedang dimainkan
+void PauseMusic();
 
-#endif
+// Menghentikan musik yang sedang dimainkan
+void StopMusic();
+
+#endif // MUSIC_H

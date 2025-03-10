@@ -2,8 +2,13 @@
 #ifndef SFX_H
 #define SFX_H
 
-#include <SDL2/SDL_mixer.h>
+// Memuat efek suara dari file
+void LoadSFX(const char *filename);
 
-void play_sfx(const char *file);
+// Memainkan efek suara yang telah dimuat
+void PlaySFX();
 
-#endif
+// Membersihkan efek suara yang dimuat
+void FreeSFX();
+
+#endif // SFX_H

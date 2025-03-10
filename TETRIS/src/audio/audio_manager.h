@@ -2,11 +2,18 @@
 #ifndef AUDIO_MANAGER_H
 #define AUDIO_MANAGER_H
 
-#include <SDL2/SDL_mixer.h>
+#include <SDL3/SDL.h>
 
-void init_audio();
-void set_volume(int volume);
-void mute_audio(int mute);
-void close_audio();
+// Inisialisasi sistem audio
+void InitAudio();
 
-#endif
+// Mengatur volume audio
+void SetVolume(int volume);
+
+// Mengaktifkan/mematikan suara
+void ToggleMute();
+
+// Membersihkan sistem audio saat keluar
+void CleanupAudio();
+
+#endif // AUDIO_MANAGER_H
