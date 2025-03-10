@@ -75,7 +75,7 @@ void renderText(MainMenu* menu, Font* font, const char* text, int x, int y, SDL_
     
     // Draw border for all items
     SDL_SetRenderDrawColor(menu->renderer, color.r, color.g, color.b, color.a);
-    SDL_RenderDrawRect(menu->renderer, &rect);
+    SDL_RenderRect(menu->renderer, &rect);
     
     // In a real implementation, you would render the text here
 }
@@ -109,7 +109,7 @@ void handleMainMenuEvent(MainMenu* menu, SDL_Event* e) {
     // Mendeteksi key press dan release tanpa mengakses field spesifik event
     if (e->type == SDL_EVENT_KEY_DOWN) {
         // Berdasarkan scancode, update state
-        int scancode = SDL_GetScancodeName(e->key.scancode);
+        const char *scancode = SDL_GetScancodeName(e->key.scancode);
         if (strcmp(scancode, "Up") == 0 || strcmp(scancode, "W") == 0) {
             menu->upPressed = true;
         }
@@ -125,7 +125,7 @@ void handleMainMenuEvent(MainMenu* menu, SDL_Event* e) {
     }
     else if (e->type == SDL_EVENT_KEY_UP) {
         // Reset state saat key dilepas
-        int scancode = SDL_GetScancodeName(e->key.scancode);
+        const char *scancode = SDL_GetScancodeName(e->key.scancode);
         if (strcmp(scancode, "Up") == 0 || strcmp(scancode, "W") == 0) {
             menu->upPressed = false;
         }

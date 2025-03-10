@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "main_menu.h"
+#include "ui/menu/main_menu.h"
 
 //main.c//
 int main(int argc, char* argv[]) {
