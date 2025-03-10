@@ -1,325 +1,396 @@
 /**
- * @file blocks.c
- * @brief Implementasi operasi blok Tetromino dengan SDL3
- * @author Dzakit Tsabit Assyafiq
+ * blocks.c
+ * Implementasi sistem Tetromino untuk game Tetris
+ * Oleh: Dzakit Tsabit Assyafiq
  */
 
  #include "blocks.h"
  #include <stdlib.h>
- #include <time.h>
  #include <string.h>
+ #include <time.h>
  
- // Definisi warna untuk setiap tetromino
- static const SDL_Color TETROMINO_COLORS[TETROMINO_COUNT] = {
-     {0, 255, 255, 255},  // I - Cyan
-     {0, 0, 255, 255},    // J - Biru
-     {255, 165, 0, 255},  // L - Oranye
-     {255, 255, 0, 255},  // O - Kuning
-     {0, 255, 0, 255},    // S - Hijau
-     {128, 0, 128, 255},  // T - Ungu
-     {255, 0, 0, 255}     // Z - Merah
- };
- 
- // Definisi bentuk tetromino (4x4 grid)
- static const int TETROMINO_SHAPES[TETROMINO_COUNT][4][4] = {
-     // I
+ // Definisi bentuk-bentuk blok Tetromino dalam representasi 4x4
+ // Setiap blok direpresentasikan sebagai array 2D (4x4)
+ // dimana 1 menandakan bagian blok, 0 menandakan kosong
+ const int TETROMINO_SHAPES[7][4][4][4] = {
+     // I - bentuk garis (cyan)
      {
-         {0, 0, 0, 0},
-         {1, 1, 1, 1},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {0, 0, 0, 0},
+             {1, 1, 1, 1},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 1, 0},
+             {0, 0, 1, 0},
+             {0, 0, 1, 0},
+             {0, 0, 1, 0}
+         },
+         {
+             {0, 0, 0, 0},
+             {0, 0, 0, 0},
+             {1, 1, 1, 1},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 1, 0, 0}
+         }
      },
-     // J
+     // J - bentuk L terbalik (biru)
      {
-         {1, 0, 0, 0},
-         {1, 1, 1, 0},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {1, 0, 0, 0},
+             {1, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 1, 0},
+             {0, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 0, 0},
+             {1, 1, 1, 0},
+             {0, 0, 1, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {0, 1, 0, 0},
+             {1, 1, 0, 0},
+             {0, 0, 0, 0}
+         }
      },
-     // L
+     // L - bentuk L (oranye)
      {
-         {0, 0, 1, 0},
-         {1, 1, 1, 0},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {0, 0, 1, 0},
+             {1, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 0, 0},
+             {1, 1, 1, 0},
+             {1, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {1, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         }
      },
-     // O
+     // O - bentuk kotak (kuning)
      {
-         {0, 1, 1, 0},
-         {0, 1, 1, 0},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {0, 1, 1, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 1, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 1, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 1, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         }
      },
-     // S
+     // S - bentuk S (hijau)
      {
-         {0, 1, 1, 0},
-         {1, 1, 0, 0},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {0, 1, 1, 0},
+             {1, 1, 0, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {0, 1, 1, 0},
+             {0, 0, 1, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 0, 0},
+             {0, 1, 1, 0},
+             {1, 1, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {1, 0, 0, 0},
+             {1, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         }
      },
-     // T
+     // T - bentuk T (ungu)
      {
-         {0, 1, 0, 0},
-         {1, 1, 1, 0},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {0, 1, 0, 0},
+             {1, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {0, 1, 1, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 0, 0},
+             {1, 1, 1, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {1, 1, 0, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         }
      },
-     // Z
+     // Z - bentuk Z (merah)
      {
-         {1, 1, 0, 0},
-         {0, 1, 1, 0},
-         {0, 0, 0, 0},
-         {0, 0, 0, 0}
+         {
+             {1, 1, 0, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 1, 0},
+             {0, 1, 1, 0},
+             {0, 1, 0, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 0, 0, 0},
+             {1, 1, 0, 0},
+             {0, 1, 1, 0},
+             {0, 0, 0, 0}
+         },
+         {
+             {0, 1, 0, 0},
+             {1, 1, 0, 0},
+             {1, 0, 0, 0},
+             {0, 0, 0, 0}
+         }
      }
  };
  
- // Array untuk mengacak urutan tetromino
- static TetrominoType shuffledTypes[TETROMINO_COUNT];
+ // Warna untuk setiap jenis Tetromino (format RGBA)
+ const SDL_Color TETROMINO_COLORS[7] = {
+     {0, 255, 255, 255},   // I - Cyan
+     {0, 0, 255, 255},     // J - Blue
+     {255, 165, 0, 255},   // L - Orange
+     {255, 255, 0, 255},   // O - Yellow
+     {0, 255, 0, 255},     // S - Green
+     {128, 0, 128, 255},   // T - Purple
+     {255, 0, 0, 255}      // Z - Red
+ };
  
- /**
-  * Pengacak array tetromino untuk memastikan distribusi yang adil
-  */
- static void shuffleTetrominoes() {
-     // Inisialisasi array dengan urutan tetromino
-     for (int i = 0; i < TETROMINO_COUNT; i++) {
-         shuffledTypes[i] = (TetrominoType)i;
+ // Inisialisasi sistem Tetromino
+ TetrominoSystem* tetromino_init() {
+     TetrominoSystem* system = (TetrominoSystem*)malloc(sizeof(TetrominoSystem));
+     if (!system) {
+         return NULL;
      }
      
-     // Algoritma Fisher-Yates untuk pengacakan
-     for (int i = TETROMINO_COUNT - 1; i > 0; i--) {
+     // Inisialisasi RNG
+     srand(time(NULL));
+     
+     // Inisialisasi bag Tetromino
+     for (int i = 0; i < 7; i++) {
+         system->bag[i] = i;
+     }
+     
+     // Kocok bag awal
+     tetromino_shuffle_bag(system);
+     
+     // Set posisi awal indeks bag ke 0
+     system->bag_index = 0;
+     
+     // Buat Tetromino aktif dan berikutnya
+     system->current = tetromino_create(tetromino_get_next_from_bag(system));
+     system->next = tetromino_create(tetromino_get_next_from_bag(system));
+     
+     return system;
+ }
+ 
+ // Hapus sistem Tetromino
+ void tetromino_free(TetrominoSystem* system) {
+     if (system) {
+         if (system->current) {
+             free(system->current);
+         }
+         if (system->next) {
+             free(system->next);
+         }
+         free(system);
+     }
+ }
+ 
+ // Kocok bag Tetromino untuk random 7-bag
+ void tetromino_shuffle_bag(TetrominoSystem* system) {
+     for (int i = 6; i > 0; i--) {
          int j = rand() % (i + 1);
-         TetrominoType temp = shuffledTypes[i];
-         shuffledTypes[i] = shuffledTypes[j];
-         shuffledTypes[j] = temp;
+         // Tukar
+         int temp = system->bag[i];
+         system->bag[i] = system->bag[j];
+         system->bag[j] = temp;
      }
  }
  
- bool initBlockSystem(TetrominoQueue* queue) {
-     if (!queue) return false;
+ // Dapatkan jenis Tetromino berikutnya dari bag
+ int tetromino_get_next_from_bag(TetrominoSystem* system) {
+     int next_type = system->bag[system->bag_index];
      
-     // Seed random number generator
-     srand((unsigned int)time(NULL));
+     // Tingkatkan indeks bag
+     system->bag_index++;
      
-     // Inisialisasi queue
-     queue->canHold = true;
-     
-     // Buat 3 blok awal
-     shuffleTetrominoes();
-     for (int i = 0; i < 3; i++) {
-         queue->next[i] = createTetromino(shuffledTypes[i]);
+     // Jika kita sudah menggunakan seluruh bag, kocok kembali
+     if (system->bag_index >= 7) {
+         system->bag_index = 0;
+         tetromino_shuffle_bag(system);
      }
      
-     // Inisialisasi hold dengan nilai tidak valid
-     queue->hold.type = TETROMINO_COUNT; // Nilai tidak valid sebagai penanda belum ada hold
-     
-     return true;
+     return next_type;
  }
  
- Tetromino createTetromino(TetrominoType type) {
-     Tetromino tetromino;
+ // Buat Tetromino baru dengan jenis tertentu
+ Tetromino* tetromino_create(int type) {
+     Tetromino* tetromino = (Tetromino*)malloc(sizeof(Tetromino));
+     if (!tetromino) {
+         return NULL;
+     }
      
-     tetromino.type = type;
-     tetromino.rotation = 0;
-     tetromino.color = TETROMINO_COLORS[type];
+     tetromino->type = type;
+     tetromino->rotation = 0;
      
-     // Salin bentuk dari definisi tetromino
-     memcpy(tetromino.blocks, TETROMINO_SHAPES[type], sizeof(int) * 4 * 4);
+     // Posisi awal di bagian atas papan permainan
+     // Posisi ini akan bervariasi tergantung pada jenis Tetromino
+     tetromino->x = 3;  // Posisi tengah
+     tetromino->y = 0;  // Bagian atas papan
      
-     // Posisi awal (tengah atas)
-     tetromino.x = GRID_WIDTH / 2 - 2;
-     tetromino.y = 0;
+     // Koreksi posisi awal untuk Tetromino I
+     if (type == 0) {  // Piece I
+         tetromino->y = -1;
+     }
      
      return tetromino;
  }
  
- Tetromino getNextTetromino(TetrominoQueue* queue) {
-     // Ambil tetromino dari awal queue
-     Tetromino next = queue->next[0];
-     
-     // Geser queue ke depan
-     for (int i = 0; i < 2; i++) {
-         queue->next[i] = queue->next[i + 1];
+ // Dapatkan blok Tetromino saat ini (berdasarkan jenis dan rotasi)
+ void tetromino_get_blocks(const Tetromino* tetromino, int blocks[4][4]) {
+     if (!tetromino) {
+         memset(blocks, 0, sizeof(int) * 16);
+         return;
      }
      
-     // Shuffle ulang jika perlu
-     static int count = 3;
-     if (count >= TETROMINO_COUNT) {
-         shuffleTetrominoes();
-         count = 0;
-     }
-     
-     // Tambahkan tetromino baru ke akhir queue
-     queue->next[2] = createTetromino(shuffledTypes[count++]);
-     
-     return next;
- }
- 
- void refillQueue(TetrominoQueue* queue) {
-     shuffleTetrominoes();
-     for (int i = 0; i < 3; i++) {
-         queue->next[i] = createTetromino(shuffledTypes[i]);
-     }
- }
- 
- bool holdTetromino(TetrominoQueue* queue, Tetromino* current) {
-     if (!queue->canHold) return false;
-     
-     queue->canHold = false;
-     
-     if (queue->hold.type == TETROMINO_COUNT) {
-         // Belum ada hold, simpan current dan ambil next
-         queue->hold = createTetromino(current->type);
-         *current = getNextTetromino(queue);
-     } else {
-         // Tukar hold dengan current
-         TetrominoType holdType = queue->hold.type;
-         queue->hold = createTetromino(current->type);
-         *current = createTetromino(holdType);
-     }
-     
-     return true;
- }
- 
- void resetHold(TetrominoQueue* queue) {
-     queue->canHold = true;
- }
- 
- void lockTetromino(GameBoard* board, const Tetromino* tetromino) {
+     // Salin bentuk berdasarkan jenis dan rotasi
      for (int y = 0; y < 4; y++) {
          for (int x = 0; x < 4; x++) {
-             if (tetromino->blocks[y][x]) {
-                 int boardX = tetromino->x + x;
-                 int boardY = tetromino->y + y;
-                 
-                 // Pastikan koordinat valid
-                 if (boardX >= 0 && boardX < GRID_WIDTH && boardY >= 0 && boardY < GRID_HEIGHT) {
-                     board->grid[boardY][boardX] = 1;
-                     board->colors[boardY][boardX] = tetromino->color;
-                 }
-             }
+             blocks[y][x] = TETROMINO_SHAPES[tetromino->type][tetromino->rotation][y][x];
          }
      }
  }
  
- int checkLines(GameBoard* board, int* clearedLines) {
-     int numCleared = 0;
-     
-     // Periksa setiap baris dari bawah ke atas
-     for (int y = GRID_HEIGHT - 1; y >= 0; y--) {
-         bool isLineFull = true;
-         
-         // Periksa apakah baris penuh
-         for (int x = 0; x < GRID_WIDTH; x++) {
-             if (board->grid[y][x] == 0) {
-                 isLineFull = false;
-                 break;
-             }
-         }
-         
-         // Jika baris penuh, tambahkan ke array
-         if (isLineFull) {
-             clearedLines[numCleared++] = y;
-         }
+ // Rotasi Tetromino (kanan/searah jarum jam)
+ void tetromino_rotate_right(Tetromino* tetromino) {
+     tetromino->rotation = (tetromino->rotation + 1) % 4;
+ }
+ 
+ // Rotasi Tetromino (kiri/berlawanan arah jarum jam)
+ void tetromino_rotate_left(Tetromino* tetromino) {
+     tetromino->rotation = (tetromino->rotation + 3) % 4;  // +3 mod 4 = -1 mod 4
+ }
+ 
+ // Ganti Tetromino aktif dengan Tetromino berikutnya dan hasilkan Tetromino baru berikutnya
+ void tetromino_swap_next(TetrominoSystem* system) {
+     // Bebaskan Tetromino aktif
+     if (system->current) {
+         free(system->current);
      }
      
-     return numCleared;
+     // Aktifkan Tetromino berikutnya
+     system->current = system->next;
+     
+     // Buat Tetromino berikutnya yang baru
+     system->next = tetromino_create(tetromino_get_next_from_bag(system));
  }
  
- void clearLines(GameBoard* board, const int* lineIndices, int numLines) {
-     // Proses setiap baris yang akan dihapus
-     for (int i = 0; i < numLines; i++) {
-         int lineIdx = lineIndices[i];
-         
-         // Geser semua baris di atas baris yang dihapus ke bawah
-         for (int y = lineIdx; y > 0; y--) {
-             for (int x = 0; x < GRID_WIDTH; x++) {
-                 board->grid[y][x] = board->grid[y-1][x];
-                 board->colors[y][x] = board->colors[y-1][x];
-             }
-         }
-         
-         // Kosongkan baris paling atas
-         for (int x = 0; x < GRID_WIDTH; x++) {
-             board->grid[0][x] = 0;
-         }
+ // Dapatkan warna Tetromino berdasarkan jenisnya
+ SDL_Color tetromino_get_color(int type) {
+     if (type >= 0 && type < 7) {
+         return TETROMINO_COLORS[type];
      }
+     
+     // Warna default hitam jika jenis tidak valid
+     SDL_Color black = {0, 0, 0, 255};
+     return black;
  }
  
- void renderTetromino(SDL_Renderer* renderer, const Tetromino* tetromino, int offsetX, int offsetY) {
+ // Render Tetromino pada posisi tertentu dengan renderer SDL
+ void tetromino_render(SDL_Renderer* renderer, const Tetromino* tetromino, 
+                       int offsetX, int offsetY, int cellSize) {
+     if (!tetromino) {
+         return;
+     }
+     
+     // Dapatkan bentuk Tetromino
+     int blocks[4][4];
+     tetromino_get_blocks(tetromino, blocks);
+     
+     // Dapatkan warna Tetromino
+     SDL_Color color = tetromino_get_color(tetromino->type);
+     
+     // Setel warna rendering
+     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+     
+     // Render setiap blok
      for (int y = 0; y < 4; y++) {
          for (int x = 0; x < 4; x++) {
-             if (tetromino->blocks[y][x]) {
-                 SDL_FRect rect = {
-                     (float)((tetromino->x + x) * BLOCK_SIZE + offsetX),
-                     (float)((tetromino->y + y) * BLOCK_SIZE + offsetY),
-                     (float)BLOCK_SIZE,
-                     (float)BLOCK_SIZE
+             if (blocks[y][x]) {
+                 SDL_Rect rect = {
+                     offsetX + (tetromino->x + x) * cellSize,
+                     offsetY + (tetromino->y + y) * cellSize,
+                     cellSize,
+                     cellSize
                  };
                  
-                 // Gunakan warna tetromino
-                 SDL_SetRenderDrawColor(renderer, 
-                                       tetromino->color.r, 
-                                       tetromino->color.g, 
-                                       tetromino->color.b, 
-                                       tetromino->color.a);
+                 // Gambar kotak terisi
                  SDL_RenderFillRect(renderer, &rect);
                  
-                 // Gambar outline
-                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                 SDL_RenderRect(renderer, &rect);
+                 // Gambar garis tepi dengan warna yang lebih gelap
+                 SDL_SetRenderDrawColor(renderer, color.r / 2, color.g / 2, color.b / 2, color.a);
+                 SDL_RenderDrawRect(renderer, &rect);
              }
          }
      }
- }
- 
- void renderBoard(SDL_Renderer* renderer, const GameBoard* board, int offsetX, int offsetY) {
-     // Render grid
-     SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
-     for (int x = 0; x <= GRID_WIDTH; x++) {
-         SDL_FRect lineRect = {
-             (float)(x * BLOCK_SIZE + offsetX),
-             (float)(offsetY),
-             1.0f,
-             (float)(GRID_HEIGHT * BLOCK_SIZE)
-         };
-         SDL_RenderFillRect(renderer, &lineRect);
-     }
-     
-     for (int y = 0; y <= GRID_HEIGHT; y++) {
-         SDL_FRect lineRect = {
-             (float)(offsetX),
-             (float)(y * BLOCK_SIZE + offsetY),
-             (float)(GRID_WIDTH * BLOCK_SIZE),
-             1.0f
-         };
-         SDL_RenderFillRect(renderer, &lineRect);
-     }
-     
-     // Render blok
-     for (int y = 0; y < GRID_HEIGHT; y++) {
-         for (int x = 0; x < GRID_WIDTH; x++) {
-             if (board->grid[y][x]) {
-                 SDL_FRect blockRect = {
-                     (float)(x * BLOCK_SIZE + offsetX),
-                     (float)(y * BLOCK_SIZE + offsetY),
-                     (float)BLOCK_SIZE,
-                     (float)BLOCK_SIZE
-                 };
-                 
-                 // Gunakan warna yang tersimpan di board
-                 SDL_Color color = board->colors[y][x];
-                 SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-                 SDL_RenderFillRect(renderer, &blockRect);
-                 
-                 // Gambar outline
-                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                 SDL_RenderRect(renderer, &blockRect);
-             }
-         }
-     }
- }
- 
- void resetBoard(GameBoard* board) {
-     // Kosongkan seluruh grid
-     memset(board->grid, 0, sizeof(int) * GRID_HEIGHT * GRID_WIDTH);
  }
