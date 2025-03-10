@@ -1,1 +1,0 @@
-dzakir suka makan kol goreng
