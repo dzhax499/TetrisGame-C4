@@ -5,8 +5,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "level.h"
-#include "endless.h"
+#include "../modes/level.h"
+#include "../modes/endless.h"
 
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
