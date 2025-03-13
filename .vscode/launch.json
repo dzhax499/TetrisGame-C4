@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": ".",
-      "program": "build/Debug/outDebug",
+      "cwd": "c:/Users/ymete/TetrisDzak/TetrisGame-C4/TETRIS/src/core/tetromino",
+      "program": "c:/Users/ymete/TetrisDzak/TetrisGame-C4/TETRIS/src/core/tetromino/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
