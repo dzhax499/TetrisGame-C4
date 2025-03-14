@@ -129,7 +129,7 @@ static const Color TETROMINO_COLORS[7] = {
 };
 
 void InitBlocks(void) {
-    // Tidak ada yang perlu dilakukan khusus, hanya untuk konsistensi API
+    //  konsistensi API
 }
 
 /**
@@ -153,4 +153,21 @@ TetrisBlock GenerateRandomBlock(void) {
     block.color = TETROMINO_COLORS[block.type];
     
     return block;
+}
+
+/**
+ * @brief Menghasilkan blok Tetris acak baru
+ * @return TetrisBlock Blok Tetris baru
+ */ 
+void RotateBock(TetrisBlock* block) {
+    // Simpan rotasi saat ini
+    int current_rotation = block->rotation;
+    
+    // Perbarui rotasi
+    block->rotation = (block->rotation + 1) % 4;
+    
+    // Jika tabrakan terjadi, kembalikan rotasi ke nilai sebelumnya
+    if (CheckCollision(block, block->x, block->y)) {
+        block->rotation = current_rotation;
+    }
 }

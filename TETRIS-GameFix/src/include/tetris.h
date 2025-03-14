@@ -27,5 +27,13 @@ typedef struct {
     Color color;  // Warna blok
 } TetrisBlock;
 
+// Fungsi load dan unload asset permainan
+void LoadGameAssets(void);
+void UnloadGameAssets(void);
+
+// Fungsi drawing tambahan
+void DrawPauseOverlay(void);
+void DrawGameOverScreen(int score);
+
 
 #endif

@@ -11,14 +11,14 @@
 // init sistem blok
 void initBlocks(void);
 
-// Fungsi management block
-TetrisBlock GenerateBlock(void);
-void RotateBlock(TetrisBlock* block);
-void MoveBlock(TetrisBlock* block, int x, int y);
-bool CheckCollision(TetrisBlock* block, int x, int y);
-void LockBlock(TetrisBlock* block);
-void ClearLines(void);
-void DrawBlock(TetrisBlock* block);
+TetrisBlock GenerateRandomBlock(void);
+bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation);
+bool RotateBlock(TetrisBlock *block, TetrisBoard *board);
+bool MoveBlockHorizontal(TetrisBlock *block, TetrisBoard *board, int dx);
+bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board);
+void HardDropBlock(TetrisBlock *block, TetrisBoard *board);
+void PlaceBlock(TetrisBlock *block, TetrisBoard *board);
+bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
 
 
 #endif
