@@ -16,6 +16,7 @@ bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int
 bool RotateBlock(TetrisBlock *block, TetrisBoard *board);
 bool MoveBlockHorizontal(TetrisBlock *block, TetrisBoard *board, int dx);
 bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board);
+bool CheckCollision(TetrisBlock *block, int testX, int testY);
 void HardDropBlock(TetrisBlock *block, TetrisBoard *board);
 void PlaceBlock(TetrisBlock *block, TetrisBoard *board);
 bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
