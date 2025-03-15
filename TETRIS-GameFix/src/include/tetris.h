@@ -2,7 +2,7 @@
 // Deskripsi : Header untuk game Tetris
 // Oleh      : Dzakit Tsabit 241511071
 
-#ifdef TETRIS_H
+#ifndef TETRIS_H
 #define TETRIS_H
 
 #include <stdbool.h>
@@ -21,10 +21,19 @@ typedef struct {
 } TetrisBoard;
 
 typedef struct {
-    int x, y;
-    int rotation;
-    int type;
-} Tetromino;
+    int type;     // Tipe blok (0-6 untuk I, J, L, O, S, T, Z)
+    int rotation; // Rotasi saat ini (0-3)
+    int x, y;     // Posisi pada papan
+    Color color;  // Warna blok
+} TetrisBlock;
+
+// Fungsi load dan unload asset permainan
+void LoadGameAssets(void);
+void UnloadGameAssets(void);
+
+// Fungsi drawing tambahan
+void DrawPauseOverlay(void);
+void DrawGameOverScreen(int score);
 
 
 #endif
