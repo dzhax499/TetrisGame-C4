@@ -1,6 +1,6 @@
 // Nama file  : scoring.h
 // Deskripsi  : header untuk sistem skor, perkembangan level, dan tingkat kesulitan permainan
-// Oleh       : Fatimah
+// Oleh       : Fatimah Hawwa 241511074
 
 #ifndef SCORING_H
 #define SCORING_H
