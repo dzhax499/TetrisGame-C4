@@ -115,7 +115,7 @@ target_link_libraries(tetris_graphics
 
 # src/ui/CMakeLists.txt
 add_library(tetris_ui
-    menu/main_menu.c
+    menu/menu.c
     menu/pause_menu.c
     hud/score_display.c
     hud/next_preview.c
