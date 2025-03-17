@@ -1,6 +1,7 @@
 // Nama file : board.c
 // Deskripsi : Implementasi logika papan permainan Tetris (Array 2D)
 // Oleh      : Ibnu Hilmi 241511079
+//             Rizky Satria Gunawan 241511089
 
 #include "raylib.h"
 #include "include/board.h"
@@ -83,6 +84,7 @@ void InitBoard(TetrisBoard* board) {
     board->current_score = 0;
     board->current_level = 1;
     board->lines_cleared = 0;
+    board->game_over = false;
 }
 
 // Periksa apakah posisi blok valid
