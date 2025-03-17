@@ -60,7 +60,8 @@
   * 
   * @param board  Pointer ke struktur Board yang berisi informasi grid permainan
   */
- void DrawBoard(Board* board);
+ void DrawBoard(TetrisBoard* board);
+ void DrawScore(TetrisBoard* board);
  
  /**
   * DrawActiveTetromino
@@ -69,7 +70,7 @@
   * 
   * @param tetromino  Pointer ke struktur Tetromino yang sedang aktif
   */
- void DrawActiveTetromino(Tetromino* tetromino);
+ void DrawActiveTetromino(TetrisBlock* tetromino);
  
  /**
   * DrawNextTetromino
@@ -78,7 +79,7 @@
   * 
   * @param nextTetromino  Pointer ke struktur Tetromino yang akan muncul berikutnya
   */
- void DrawNextBlock(Tetromino* nextTetromino);
+ void DrawNextBlock(TetrisBoard* board);
  
  /**
   * DrawGameInterface
@@ -113,6 +114,6 @@
   * 
   * @param gameState  Pointer ke struktur GameState yang berisi keadaan permainan saat ini
   */
- void DrawGame(GameState* gameState);
+ void DrawGame(TetrisBoard* board);
  
  #endif /* RENDERING_H */

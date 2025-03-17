@@ -6,6 +6,8 @@
 #define TETRIS_H
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "raylib.h"
 
 // Definisi ukuran papan permainan
@@ -23,6 +25,7 @@
 typedef struct {
     int type;     // Tipe blok (0-6 untuk I, J, L, O, S, T, Z)
     int rotation; // Rotasi saat ini (0-3)
+    int shape[4][4]; // Bentuk blok
     int x, y;     // Posisi pada papan
     Color color;  // Warna blok
 } TetrisBlock;
