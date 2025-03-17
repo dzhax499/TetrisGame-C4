@@ -43,7 +43,7 @@ void InitRendering(void) {
     
     // Memuat font permainan
     int fontChars[] = { 0 }; // Memuat semua karakter default
-    gameFont = LoadFontEx("assets/fonts/game_font.ttf", 32, fontChars, 0);
+    Font gameFont = LoadFontEx("assets/fonts/game_font.ttf", 32, fontChars, 0);
     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
 }    
 // Membersihkan sumber daya rendering
@@ -134,7 +134,7 @@ void CloseRendering(void) {
  }
  
  // Menggambar tetromino berikutnya di area pratinjau
- void DrawNextTetromino(Tetromino* nextTetromino) {
+ void DrawNextBlock(Tetromino* nextTetromino) {
      // Menggambar kotak pratinjau
      DrawRectangle(
          PREVIEW_OFFSET_X, 
