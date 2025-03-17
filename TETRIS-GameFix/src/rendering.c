@@ -78,48 +78,30 @@ void CloseRendering(void) {
      }
  }
  
- // Menggambar papan permainan dengan semua blok yang sudah ditempatkan
- void DrawBoard(Board* board) {
-     // Menggambar latar belakang papan
-     DrawRectangle(
-         BOARD_OFFSET_X, 
-         BOARD_OFFSET_Y, 
-         board->width * BLOCK_SIZE, 
-         board->height * BLOCK_SIZE, 
-         DARKGRAY
-     );
-     
-     // Menggambar garis grid
-     for (int x = 0; x <= board->width; x++) {
-         DrawLine(
-             BOARD_OFFSET_X + x * BLOCK_SIZE, 
-             BOARD_OFFSET_Y, 
-             BOARD_OFFSET_X + x * BLOCK_SIZE, 
-             BOARD_OFFSET_Y + board->height * BLOCK_SIZE, 
-             GRAY
-         );
-     }
-     
-     for (int y = 0; y <= board->height; y++) {
-         DrawLine(
-             BOARD_OFFSET_X, 
-             BOARD_OFFSET_Y + y * BLOCK_SIZE, 
-             BOARD_OFFSET_X + board->width * BLOCK_SIZE, 
-             BOARD_OFFSET_Y + y * BLOCK_SIZE, 
-             GRAY
-         );
-     }
-     
-     // Menggambar blok yang telah ditempatkan
-     for (int y = 0; y < board->height; y++) {
-         for (int x = 0; x < board->width; x++) {
-             DrawBlock(x, y, board->grid[y][x]);
-         }
-     }
- }
+// Render papan ke layar
+void DrawBoard(TetrisBoard* board) {
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            Color cellColor = GetBlockColor(board->grid[y][x]);
+            DrawRectangle(BOARD_OFFSET_X + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, cellColor);
+        }
+    }
+}
+
+// Render skor dan level
+void DrawScore(TetrisBoard* board) {
+    char scoreText[50];
+    sprintf(scoreText, "Score: %d", board->current_score);
+    DrawText(scoreText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y, 20, WHITE);
+
+    char levelText[50];
+    sprintf(levelText, "Level: %d", board->current_level);
+    DrawText(levelText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y + 30, 20, WHITE);
+}
+
  
  // Menggambar tetromino aktif di posisinya saat ini
- void DrawActiveTetromino(Tetromino* tetromino) {
+ void DrawActiveTetromino(TetrisBlock* tetromino) {
      for (int y = 0; y < 4; y++) {
          for (int x = 0; x < 4; x++) {
              if (tetromino->shape[y][x] > 0) {
@@ -133,66 +115,43 @@ void CloseRendering(void) {
      }
  }
  
- // Menggambar tetromino berikutnya di area pratinjau
- void DrawNextBlock(Tetromino* nextTetromino) {
-     // Menggambar kotak pratinjau
-     DrawRectangle(
-         PREVIEW_OFFSET_X, 
-         PREVIEW_OFFSET_Y, 
-         4 * BLOCK_SIZE, 
-         4 * BLOCK_SIZE, 
-         LIGHTGRAY
-     );
-     
-     // Menampilkan teks "NEXT"
-     DrawText("NEXT", PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y - 30, 20, BLACK);
-     
-     // Menggambar tetromino berikutnya dalam kotak pratinjau
-     for (int y = 0; y < 4; y++) {
-         for (int x = 0; x < 4; x++) {
-             if (nextTetromino->shape[y][x] > 0) {
-                 DrawRectangle(
-                     PREVIEW_OFFSET_X + x * BLOCK_SIZE, 
-                     PREVIEW_OFFSET_Y + y * BLOCK_SIZE, 
-                     BLOCK_SIZE, BLOCK_SIZE, 
-                     BLOCK_COLORS[nextTetromino->type]
-                 );
-                 
-                 // Menggambar garis tepi
-                 DrawRectangleLines(
-                     PREVIEW_OFFSET_X + x * BLOCK_SIZE, 
-                     PREVIEW_OFFSET_Y + y * BLOCK_SIZE, 
-                     BLOCK_SIZE, BLOCK_SIZE, 
-                     BLACK
-                 );
-             }
-         }
-     }
- }
+ // Render blok berikutnya
+void DrawNextBlock(TetrisBoard* board) {
+    // Contoh: Render blok berikutnya di sebelah kanan papan
+    TetrisBlock nextBlock = GenerateRandomBlock();
+    for (int y = 0; y < 4; y++) {
+        for (int x = 0; x < 4; x++) {
+            if (TETROMINO_SHAPES[nextBlock.type][nextBlock.rotation][y][x] != 0) {
+                DrawRectangle(BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, nextBlock.color);
+            }
+        }
+    }
+}
+
  
- // Menggambar tampilan utama permainan (memanggil fungsi gambar lainnya)
- void DrawGame(GameState* gameState) {
-     BeginDrawing();
-     ClearBackground(RAYWHITE);
-     
-     // Menggambar latar belakang
-     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), RAYWHITE);
-     
-     // Menggambar papan permainan dan tetromino aktif
-     DrawBoard(gameState->board);
-     DrawActiveTetromino(gameState->currentTetromino);
-     DrawNextTetromino(gameState->nextTetromino);
-     
-     // Menampilkan skor dan informasi permainan
-     DrawGameInterface(gameState->scoreData);
-     
-     // Menampilkan overlay berdasarkan status permainan
-     if (gameState->state == STATE_GAME_OVER) {
-         DrawGameOver(gameState->scoreData);
-     } else if (gameState->state == STATE_PAUSED) {
-         DrawPauseScreen();
-     }
-     
-     EndDrawing();
- }
- 
+void DrawGame(TetrisBoard* board) {
+    BeginDrawing();
+    ClearBackground(DARKGRAY); // Latar belakang lebih nyaman
+
+    // Header Judul
+    DrawText("TETRIS", 350, 10, 30, RAYWHITE);
+    
+    // Menggambar papan permainan
+    DrawBoard(board);
+    DrawActiveTetromino(&board->current_block);
+    DrawNextBlock(board);
+    DrawScore(board);
+
+    // Garis pemisah UI
+    DrawLine(BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 20, 30, 
+             BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 20, 580, RAYWHITE);
+    
+    // Menampilkan overlay berdasarkan status permainan
+    if (board->game_over) {
+        DrawRectangle(100, 200, 600, 200, Fade(RED, 0.8f));
+        DrawText("GAME OVER", 320, 250, 40, WHITE);
+        DrawText("Press R to Restart", 280, 320, 20, WHITE);
+    }
+
+    EndDrawing();
+}
