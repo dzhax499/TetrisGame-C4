@@ -16,9 +16,9 @@
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-typedef struct {
-    int grid[BOARD_HEIGHT][BOARD_WIDTH]; // 0 kosong, 1-7 warna blok
-} TetrisBoard;
+// typedef struct {
+//     int grid[BOARD_HEIGHT][BOARD_WIDTH]; // 0 kosong, 1-7 warna blok
+// } TetrisBoard0;
 
 typedef struct {
     int type;     // Tipe blok (0-6 untuk I, J, L, O, S, T, Z)

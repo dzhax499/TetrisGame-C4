@@ -1,6 +1,7 @@
 // Nama file : board.h
 // Deskripsi : Header untuk logika papan permainan Tetris (Array 2D)
 // Oleh      : Ibnu Hilmi 241511079
+//             Rizky Satria Gunawan
 
 #ifndef BOARD_H
 #define BOARD_H
@@ -38,30 +39,25 @@ typedef struct {
 // Struktur untuk menyimpan informasi papan permainan
 typedef struct {
     BlockType grid[BOARD_HEIGHT][BOARD_WIDTH];
-    CurrentBlock current_block;
+    TetrisBlock current_block; // Ganti dari CurrentBlock ke TetrisBlock
+    TetrisBlock next_block;    // Tambahkan untuk blok berikutnya
     int current_score;
     int current_level;
     int lines_cleared;
     bool game_over;
 } TetrisBoard;
 
+
+TetrisBoard *board;
+
 // Fungsi inisialisasi papan permainan
-void InitBoard(TetrisBoard* board);
-
-// Fungsi untuk membuat blok baru
-void GenerateNewBlock(TetrisBoard* board);
-
-// Fungsi untuk menggerakkan blok
-bool MoveBlockDown(TetrisBoard* board);
-bool MoveBlockLeft(TetrisBoard* board);
-bool MoveBlockRight(TetrisBoard* board);
-bool RotateBlock(TetrisBoard* board);
-
-// Fungsi untuk memeriksa apakah posisi valid
-bool IsValidPosition(TetrisBoard* board, BlockType block, int row, int col, int rotation);
+void InitBoard1(TetrisBoard* board);
 
 // Fungsi untuk menghapus baris yang penuh
 int ClearFullLines(TetrisBoard* board);
+
+// Fungsi untuk memeriksa game over
+bool IsGameOver(TetrisBoard* board);
 
 // Fungsi rendering
 void DrawBoard(TetrisBoard* board);
