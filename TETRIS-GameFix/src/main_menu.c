@@ -1,7 +1,3 @@
-// Nama file : main_menu.c
-// Deskripsi : File ini berisi implementasi dari menu utama game Tetris, termasuk inisialisasi elemen menu, pembaruan interaksi pengguna, dan proses menggambar tampilan menu.
-// Oleh      : Ibnu Hilmi 241511079
-
 #include "include/main_menu.h"
 #include <stdlib.h>
 
@@ -12,11 +8,14 @@ static MenuState currentState = MENU_STATE_MAIN;
 static MenuButton buttons[MAX_BUTTONS];
 static Font menuFont;
 static Texture2D backgroundTexture;
-static Sound menuSound;
-static Music menuMusic;
+// static Sound menuSound;
+// static Music menuMusic;
 
 void InitMainMenu(void)
 {
+    // Inisialisasi background
+    backgroundTexture = LoadTexture("bg.png");
+
     // Inisialisasi font
     menuFont = GetFontDefault();
     
@@ -31,17 +30,17 @@ void InitMainMenu(void)
     buttons[0] = (MenuButton){
         .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY, buttonWidth, buttonHeight },
         .text = "Play",
-        .color = DARKBLUE,
-        .hoverColor = BLUE,
+        .color = GREEN,
+        .hoverColor = LIME,
         .isHovered = false
     };
     
     // Tombol Settings
     buttons[1] = (MenuButton){
         .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing, buttonWidth, buttonHeight },
-        .text = "Settings",
-        .color = DARKBLUE,
-        .hoverColor = BLUE,
+        .text = "Audio Settings",
+        .color = YELLOW,
+        .hoverColor = GOLD,
         .isHovered = false
     };
     
@@ -49,8 +48,8 @@ void InitMainMenu(void)
     buttons[2] = (MenuButton){
         .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing*2, buttonWidth, buttonHeight },
         .text = "Credits",
-        .color = DARKBLUE,
-        .hoverColor = BLUE,
+        .color = BLUE,
+        .hoverColor = DARKBLUE,
         .isHovered = false
     };
     
@@ -58,15 +57,14 @@ void InitMainMenu(void)
     buttons[3] = (MenuButton){
         .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing*3, buttonWidth, buttonHeight },
         .text = "Exit",
-        .color = DARKBLUE,
-        .hoverColor = BLUE,
+        .color = RED,
+        .hoverColor = MAROON,
         .isHovered = false
     };
     
-    // Load resources (uncomment jika diperlukan)
-    // backgroundTexture = LoadTexture("resources/background.png");
+    // Load resources 
     // menuSound = LoadSound("resources/click.wav");
-    // menuMusic = LoadMusicStream("resources/menu_music.mp3");
+    // menuMusic = LoadMusicStream("mainnmenumusic.mp3");
     // PlayMusicStream(menuMusic);
 }
 
@@ -101,14 +99,30 @@ void UpdateMainMenu(void)
 
 void DrawMainMenu(void)
 {
-    ClearBackground(RAYWHITE);
-    
-    // Draw background (uncomment jika menggunakan background)
-    // DrawTexture(backgroundTexture, 0, 0, WHITE);
+    // Draw background
+    DrawTexture(backgroundTexture, 0, 0, WHITE);
     
     // Draw title
-    DrawText("TETRIS", GetScreenWidth()/2 - MeasureText("TETRIS", 40)/2, 100, 40, BLACK);
     
+    int titleSize = 60; // Larger font size
+    const char* titleText = "TETRIS";
+    int textWidth = MeasureText(titleText, titleSize);
+    int posX = GetScreenWidth()/2 - textWidth/2;
+    int posY = 60;
+
+    // Draw the outline by drawing the text multiple times with offsets
+    DrawText(titleText, posX-2, posY-2, titleSize, BLACK); // top-left
+    DrawText(titleText, posX+2, posY-2, titleSize, BLACK); // top-right
+    DrawText(titleText, posX-2, posY+2, titleSize, BLACK); // bottom-left
+    DrawText(titleText, posX+2, posY+2, titleSize, BLACK); // bottom-right
+    DrawText(titleText, posX-2, posY, titleSize, BLACK);   // left
+    DrawText(titleText, posX+2, posY, titleSize, BLACK);   // right
+    DrawText(titleText, posX, posY-2, titleSize, BLACK);   // top
+    DrawText(titleText, posX, posY+2, titleSize, BLACK);   // bottom
+
+    // Draw the main text in white on top
+    DrawText(titleText, posX, posY, titleSize, WHITE);
+        
     // Draw buttons
     for (int i = 0; i < MAX_BUTTONS; i++)
     {
@@ -124,13 +138,14 @@ void DrawMainMenu(void)
     }
     
     // Draw footer
-    DrawText("(c) 2025 Your Game Studio", 10, GetScreenHeight() - 20, 10, GRAY);
+    DrawText("(c) 2025 D'Okeh Studio", 10, GetScreenHeight() - 20, 10, GRAY);
 }
+
 
 void UnloadMainMenu(void)
 {
     // Unload resources (uncomment jika menggunakan resources)
-    // UnloadTexture(backgroundTexture);
+    UnloadTexture(backgroundTexture);
     // UnloadSound(menuSound);
     // UnloadMusicStream(menuMusic);
 }
