@@ -1,3 +1,8 @@
+
+// Nama file : main_menu.c
+// Deskripsi : File ini berisi implementasi dari menu utama game Tetris, termasuk inisialisasi elemen menu, pembaruan interaksi pengguna, dan proses menggambar tampilan menu.
+// Oleh      : Ibnu Hilmi 241511079
+
 #include "include/main_menu.h"
 #include <stdlib.h>
 
