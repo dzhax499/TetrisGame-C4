@@ -140,7 +140,6 @@ void HardDropBlock(TetrisBlock *block, TetrisBoard *board);
 // Fungsi untuk menempatkan blok di papan
 void PlaceBlock(TetrisBlock *block, TetrisBoard *board);
 
-// Fungsi untuk memeriksa game over
-bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
+
 
 #endif
