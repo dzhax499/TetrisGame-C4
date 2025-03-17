@@ -72,7 +72,7 @@ int ClearFullLines(TetrisBoard* board) {
 }
 
 // Periksa apakah permainan berakhir
-bool IsGameOver(TetrisBoard* board) {
+bool IsGameOver(TetrisBlock *block, TetrisBoard *board) {
     // Periksa baris paling atas
     for (int x = 0; x < BOARD_WIDTH; x++) {
         if (board->grid[0][x] != BLOCK_EMPTY) {

@@ -1,68 +1,124 @@
-// Nama file : main.c
-// Deskripsi : File utama program game Tetris (management game loop)
-// Oleh      : Dzakit Tsabit 241511071
-
-// Nama file : main.c
-// Deskripsi : Implementasi utama game Tetris
-// Oleh      : Dzakit Tsabit 241511071
-
-#include "raylib.h"
-#include "include/tetris.h"
-#include "include/blocks.h"
-#include "include/board.h"
+#include "include/tetris.h"  // Pastikan TetrisBlock didefinisikan di sini
+#include "include/board.h"   // Menggunakan TetrisBlock
+#include "include/blocks.h"  // Menggunakan TetrisBlock
 #include "include/rendering.h"
 #include "include/scoring.h"
 #include "include/main_menu.h"
-#include "include/menu_music.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "raylib.h"
 #include <time.h>
 
-// Game state
-TetrisBoard board;
-TetrisBlock currentBlock;
-bool gameOver = false;
-bool paused = false;
-
-void UpdateGame(void) {
-    if (IsKeyPressed(KEY_P)) {
-        paused = !paused;
-    }
-    if (paused || gameOver) return;
-    
-    if (IsKeyPressed(KEY_LEFT)) {
-        MoveBlockHorizontal(&currentBlock, &board, -1);
-    }
-    if (IsKeyPressed(KEY_RIGHT)) {
-        MoveBlockHorizontal(&currentBlock, &board, 1);
-    }
-    if (IsKeyPressed(KEY_DOWN)) {
-        MoveBlockDown(&currentBlock, &board);
-    }
-    if (IsKeyPressed(KEY_UP)) {
-        RotateBlock(&currentBlock, &board);
-    }
-    if (IsKeyPressed(KEY_SPACE)) {
-        HardDropBlock(&currentBlock, &board);
-    }
-    
-    if (IsGameOver(&currentBlock, &board)) {
-        gameOver = true;
-    }
-}
-
 int main(void) {
-    InitGame();
+    // Inisialisasi window dan rendering
+    InitWindow(800, 600, "Tetris Game");
+    SetTargetFPS(60);
+
+    // Inisialisasi menu utama
     InitMainMenu();
-    InitMusic();
+
+    // Inisialisasi papan permainan
+    TetrisBoard board;
+    InitBoard1(&board);
+
+    // Inisialisasi sistem skor
+    ScoreData scoreData;
+    InitScoring(&scoreData);
+
+    // Inisialisasi rendering
+    InitRendering();
+
+    // Variabel untuk mengontrol state game
+    bool inGame = false;
+    bool gameOver = false;
+
+    // Loop utama game
     while (!WindowShouldClose()) {
-        if (currentState == MENU_STATE_MAIN) {
+        // Update state game berdasarkan menu
+        MenuState currentMenuState = GetCurrentMenuState();
+        if (currentMenuState == MENU_STATE_PLAY) {
+            inGame = true;
+        } else if (currentMenuState == MENU_STATE_EXIT) {
+            break;
+        }
+
+        if (inGame) {
+            // Update game logic
+            if (!gameOver) {
+                // Gerakkan blok ke bawah secara otomatis
+                if (IsKeyPressed(KEY_DOWN)) {
+                    if (!MoveBlockDown(&board.current_block, &board)) {
+                        PlaceBlock(&board.current_block, &board);
+                        board.current_block = board.next_block;
+                        board.next_block = GenerateRandomBlock();
+                        if (IsGameOver(&board.current_block, &board)) {
+                            gameOver = true;
+                        }
+                    }
+                }
+
+                // Gerakkan blok ke kiri atau kanan
+                if (IsKeyPressed(KEY_LEFT)) {
+                    MoveBlockHorizontal(&board.current_block, &board, -1);
+                }
+                if (IsKeyPressed(KEY_RIGHT)) {
+                    MoveBlockHorizontal(&board.current_block, &board, 1);
+                }
+
+                // Rotasi blok
+                if (IsKeyPressed(KEY_UP)) {
+                    RotateBlock(&board.current_block, &board);
+                }
+
+                // Hard drop
+                if (IsKeyPressed(KEY_SPACE)) {
+                    int dropDistance = CalculateDropDistance(&board.current_block, &board); // Hitung jarak jatuh
+                    HardDropBlock(&board.current_block, &board);
+                    AddDropScore(&scoreData, dropDistance);
+                    PlaceBlock(&board.current_block, &board);
+                    board.current_block = board.next_block;
+                    board.next_block = GenerateRandomBlock();
+                    if (IsGameOver(&board.current_block, &board)) {
+                        gameOver = true;
+                    }
+                }
+
+                // Hapus baris yang penuh
+                int linesCleared = ClearFullLines(&board);
+                if (linesCleared > 0) {
+                    AddLineClearScore(&scoreData, linesCleared);
+                }
+            }
+
+            // Render game
+            BeginDrawing();
+            ClearBackground(DARKGRAY);
+
+            if (gameOver) {
+                DrawText("GAME OVER", 300, 250, 40, RED);
+                DrawText("Press R to Restart", 280, 300, 20, WHITE);
+                if (IsKeyPressed(KEY_R)) {
+                    InitBoard1(&board);
+                    InitScoring(&scoreData); // Reset skor
+                    gameOver = false;
+                }
+            } else {
+                DrawBoard(&board);
+                DrawActiveTetromino(&board.current_block);
+                DrawNextBlock(&board);
+                DrawScore(&board, &scoreData); // Tampilkan skor dan level
+            }
+
+            EndDrawing();
+        } else {
+            // Render menu utama
             UpdateMainMenu();
             DrawMainMenu();
-        } else if (currentState == MENU_STATE_PLAY) {
-        UpdateGame();
-        DrawGame(&board);
+        }
     }
+
+    // Unload resources
+    UnloadMainMenu();
+    CloseRendering();
     CloseWindow();
+
     return 0;
 }

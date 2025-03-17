@@ -89,13 +89,13 @@ void DrawBoard(TetrisBoard* board) {
 }
 
 // Render skor dan level
-void DrawScore(TetrisBoard* board) {
+void DrawScore(TetrisBoard* board, ScoreData* scoreData) {
     char scoreText[50];
-    sprintf(scoreText, "Score: %d", board->current_score);
+    sprintf(scoreText, "Score: %d", scoreData->score);
     DrawText(scoreText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y, 20, WHITE);
 
     char levelText[50];
-    sprintf(levelText, "Level: %d", board->current_level);
+    sprintf(levelText, "Level: %d", scoreData->level);
     DrawText(levelText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y + 30, 20, WHITE);
 }
 
@@ -140,7 +140,7 @@ void DrawGame(TetrisBoard* board) {
     DrawBoard(board);
     DrawActiveTetromino(&board->current_block);
     DrawNextBlock(board);
-    DrawScore(board);
+    DrawScore(board, &board->score_data);
 
     // Garis pemisah UI
     DrawLine(BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 20, 30, 

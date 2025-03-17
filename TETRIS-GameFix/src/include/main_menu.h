@@ -5,6 +5,7 @@
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
 #include <raylib.h>
+#include "tetris.h"
 
 // Enum untuk status menu
 typedef enum {

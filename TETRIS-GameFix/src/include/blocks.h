@@ -122,6 +122,9 @@ static const int TETROMINO_SHAPES[7][4][4][4] = {
 // Fungsi untuk menghasilkan blok acak
 TetrisBlock GenerateRandomBlock(void);
 
+// Fungsi tabrakan blok
+bool IsBlockCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation);
+
 // Fungsi untuk memeriksa posisi blok
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation);
 

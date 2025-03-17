@@ -5,6 +5,7 @@
 #ifndef SCORING_H
 #define SCORING_H
 
+#include "tetris.h"
 #include <raylib.h>
 
 // Struktur data untuk menyimpan informasi skor dan level

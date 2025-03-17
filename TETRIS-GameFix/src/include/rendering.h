@@ -19,12 +19,18 @@
   * Konstanta untuk rendering
   * Mendefinisikan ukuran blok dan posisi elemen pada layar
   */
- #define BLOCK_SIZE 30         // Ukuran satu blok tetromino dalam piksel
- #define BOARD_OFFSET_X 300    // Posisi X dari sudut kiri atas papan permainan
- #define BOARD_OFFSET_Y 40     // Posisi Y dari sudut kiri atas papan permainan
- #define PREVIEW_OFFSET_X 550  // Posisi X untuk area pratinjau tetromino berikutnya
- #define PREVIEW_OFFSET_Y 100  // Posisi Y untuk area pratinjau tetromino berikutnya
- 
+ // Konstanta ukuran papan
+#define BOARD_WIDTH 10
+#define BOARD_HEIGHT 20
+#define BLOCK_SIZE 30
+
+#ifndef BOARD_OFFSET_X
+#define BOARD_OFFSET_X 100
+#endif
+
+#ifndef BOARD_OFFSET_Y
+#define BOARD_OFFSET_Y 50
+#endif
  /**
   * InitRendering
   * 
@@ -61,7 +67,7 @@
   * @param board  Pointer ke struktur Board yang berisi informasi grid permainan
   */
  void DrawBoard(TetrisBoard* board);
- void DrawScore(TetrisBoard* board);
+ void DrawScore(TetrisBoard* board, ScoreData* scoreData);
  
  /**
   * DrawActiveTetromino

@@ -7,6 +7,7 @@
 #define BOARD_H
 
 #include "raylib.h"
+#include "tetris.h"
 #include <stdbool.h>
 
 // Konstanta ukuran papan
@@ -45,6 +46,7 @@ typedef struct {
     int current_level;
     int lines_cleared;
     bool game_over;
+    int score_data;
 } TetrisBoard;
 
 

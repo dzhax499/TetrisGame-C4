@@ -3,7 +3,6 @@
 //Oleh      : Dzakit Tsabit 241511071
 
 #include "include/blocks.h"
-#include "include/board.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "raylib.h"
@@ -32,6 +31,21 @@ TetrisBlock GenerateRandomBlock(void) {
     block.y = 0;
     block.color = TETROMINO_COLORS[block.type];
     return block;
+}
+
+bool isCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
+    for (int y = 0; y < 4; y++) {
+        for (int x = 0; x < 4; x++) {
+            if (TETROMINO_SHAPES[block->type][testRotation][y][x] == 0) continue;
+            int boardX = testX + x;
+            int boardY = testY + y;
+            if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT || 
+                (boardY >= 0 && board->grid[boardY][boardX] != BLOCK_EMPTY)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
