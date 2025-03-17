@@ -31,21 +31,28 @@
      RED                     // Blok Z (7)
  };
  
- // Inisialisasi sumber daya untuk rendering
- void InitRendering(void) {
-     // Memuat tekstur, font, dll.
-     InitWindow(800, 600, "Tetris Game");
-     SetTargetFPS(60);
-     
-     // Memuat font permainan
-     Font gameFont = LoadFontEx("assets/fonts/game_font.ttf", 32, NULL, 0);
-     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
-     
-     // Memuat tekstur latar belakang
-     Texture2D backgroundTexture = LoadTexture("assets/textures/background.png");
- }
- 
- // Membersihkan sumber daya rendering
+// Deklarasi variabel global untuk font dan tekstur
+static Font gameFont;
+static Texture2D backgroundTexture;
+
+// Inisialisasi sumber daya untuk rendering
+void InitRendering(void) {
+    // Memuat tekstur, font, dll.
+    InitWindow(800, 600, "Tetris Game");
+    SetTargetFPS(60);
+    
+    // Memuat font permainan
+    int fontChars[] = { 0 }; // Memuat semua karakter default
+    gameFont = LoadFontEx("assets/fonts/game_font.ttf", 32, fontChars, 0);
+    SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
+}    
+// Membersihkan sumber daya rendering
+void CloseRendering(void) {
+    // Melepaskan tekstur, font, dll.
+    UnloadFont(gameFont);
+    UnloadTexture(backgroundTexture);
+    CloseWindow();
+}
  void CloseRendering(void) {
      // Melepaskan tekstur, font, dll.
      CloseWindow();

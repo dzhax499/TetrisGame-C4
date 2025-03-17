@@ -78,7 +78,7 @@
   * 
   * @param nextTetromino  Pointer ke struktur Tetromino yang akan muncul berikutnya
   */
- void DrawNextTetromino(Tetromino* nextTetromino);
+ void DrawNextBlock(Tetromino* nextTetromino);
  
  /**
   * DrawGameInterface
