@@ -59,6 +59,7 @@
   "files.associations": {
     "board.h": "c",
     "tetris.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "blocks.h": "c"
   }
 }

@@ -10,7 +10,6 @@
  #define RENDERING_H
  
  #include <raylib.h>
- #include "tetris.h"
  #include "board.h"
  #include "blocks.h"
  #include "scoring.h"
@@ -18,19 +17,19 @@
  /**
   * Konstanta untuk rendering
   * Mendefinisikan ukuran blok dan posisi elemen pada layar
-  */
- // Konstanta ukuran papan
-#define BOARD_WIDTH 10
-#define BOARD_HEIGHT 20
-#define BLOCK_SIZE 30
+//   */
+//  // Konstanta ukuran papan
+// #define BOARD_WIDTH 10
+// #define BOARD_HEIGHT 20
+// #define BLOCK_SIZE 30
 
-#ifndef BOARD_OFFSET_X
-#define BOARD_OFFSET_X 100
-#endif
+// #ifndef BOARD_OFFSET_X
+// #define BOARD_OFFSET_X 100
+// #endif
 
-#ifndef BOARD_OFFSET_Y
-#define BOARD_OFFSET_Y 50
-#endif
+// #ifndef BOARD_OFFSET_Y
+// #define BOARD_OFFSET_Y 50
+// #endif
  /**
   * InitRendering
   * 

@@ -7,12 +7,8 @@
 
 #include <stdbool.h>
 #include <raylib.h>
-#include "board.h"
-#include "blocks.h"
-#include "main_menu.h"
-#include "scoring.h"
-#include "rendering.h"
 #include <stdlib.h>
+#include <time.h>
 #include <stdio.h>
 #include "raylib.h"
 

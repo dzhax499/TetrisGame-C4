@@ -12,12 +12,12 @@
  #include "include/rendering.h"
  #include "include/scoring.h"
  
- // Konstanta untuk rendering
- #define BLOCK_SIZE 30
- #define BOARD_OFFSET_X 300
- #define BOARD_OFFSET_Y 40
- #define PREVIEW_OFFSET_X 550
- #define PREVIEW_OFFSET_Y 100
+//  // Konstanta untuk rendering
+//  #define BLOCK_SIZE 30
+//  #define BOARD_OFFSET_X 300
+//  #define BOARD_OFFSET_Y 40
+//  #define PREVIEW_OFFSET_X 550
+//  #define PREVIEW_OFFSET_Y 100
  
  // Warna untuk setiap blok tetromino
  static const Color BLOCK_COLORS[] = {
@@ -43,7 +43,7 @@ void InitRendering(void) {
     
     // Memuat font permainan
     int fontChars[] = { 0 }; // Memuat semua karakter default
-    Font gameFont = LoadFontEx("assets/fonts/game_font.ttf", 32, fontChars, 0);
+    Font gameFont = LoadFontEx("C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/TETRIS-GameFix/assets/fonts/game_font.ttf", 32, fontChars, 0);
     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
 }    
 // Membersihkan sumber daya rendering
@@ -53,10 +53,6 @@ void CloseRendering(void) {
     UnloadTexture(backgroundTexture);
     CloseWindow();
 }
- void CloseRendering(void) {
-     // Melepaskan tekstur, font, dll.
-     CloseWindow();
- }
  
  // Menggambar satu blok pada koordinat papan yang ditentukan
  void DrawBlock(int x, int y, int blockType) {
@@ -90,6 +86,7 @@ void DrawBoard(TetrisBoard* board) {
 
 // Render skor dan level
 void DrawScore(TetrisBoard* board, ScoreData* scoreData) {
+    (void)board; // Tidak digunakan saat ini
     char scoreText[50];
     sprintf(scoreText, "Score: %d", scoreData->score);
     DrawText(scoreText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y, 20, WHITE);
@@ -117,6 +114,7 @@ void DrawScore(TetrisBoard* board, ScoreData* scoreData) {
  
  // Render blok berikutnya
 void DrawNextBlock(TetrisBoard* board) {
+    (void)board;
     // Contoh: Render blok berikutnya di sebelah kanan papan
     TetrisBlock nextBlock = GenerateRandomBlock();
     for (int y = 0; y < 4; y++) {
@@ -140,7 +138,7 @@ void DrawGame(TetrisBoard* board) {
     DrawBoard(board);
     DrawActiveTetromino(&board->current_block);
     DrawNextBlock(board);
-    DrawScore(board, &board->score_data);
+    DrawScore(board,&board->score_data);
 
     // Garis pemisah UI
     DrawLine(BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 20, 30, 

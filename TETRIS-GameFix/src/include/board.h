@@ -8,6 +8,7 @@
 
 #include "raylib.h"
 #include "tetris.h"
+#include "scoring.h"
 #include <stdbool.h>
 
 // Konstanta ukuran papan
@@ -16,6 +17,7 @@
 #define BLOCK_SIZE 30
 #define BOARD_OFFSET_X 100
 #define BOARD_OFFSET_Y 50
+
 
 // Tipe data untuk blok
 typedef enum {
@@ -46,11 +48,11 @@ typedef struct {
     int current_level;
     int lines_cleared;
     bool game_over;
-    int score_data;
+    ScoreData score_data;
 } TetrisBoard;
 
 
-TetrisBoard *board;
+extern TetrisBoard *board;
 
 // Fungsi inisialisasi papan permainan
 void InitBoard1(TetrisBoard* board);

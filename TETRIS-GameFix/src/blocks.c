@@ -33,7 +33,7 @@ TetrisBlock GenerateRandomBlock(void) {
     return block;
 }
 
-bool isCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
+bool IsBlockCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
             if (TETROMINO_SHAPES[block->type][testRotation][y][x] == 0) continue;
@@ -46,6 +46,17 @@ bool isCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, i
         }
     }
     return false;
+}
+
+int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board) {
+    int dropDistance = 0;
+
+    // Simulasikan pergerakan blok ke bawah satu per satu
+    while (IsValidBlockPosition(block, board, block->x, block->y + dropDistance + 1, block->rotation)) {
+        dropDistance++;
+    }
+
+    return dropDistance;
 }
 
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
@@ -107,8 +118,4 @@ void PlaceBlock(TetrisBlock *block, TetrisBoard *board) {
             }
         }
     }
-}
-
-bool IsGameOver(TetrisBlock *block, TetrisBoard *board) {
-    return !IsValidBlockPosition(block, board, block->x, block->y, block->rotation);
 }

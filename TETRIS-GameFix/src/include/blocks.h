@@ -6,6 +6,8 @@
 #define BLOCKS_H
 
 #include "tetris.h"
+#include "board.h"
+#include <stdlib.h>
 #include <stdbool.h>
 
 // Inisialisasi sistem blok
@@ -119,6 +121,7 @@ static const int TETROMINO_SHAPES[7][4][4][4] = {
     }
 };
 
+
 // Fungsi untuk menghasilkan blok acak
 TetrisBlock GenerateRandomBlock(void);
 
@@ -142,6 +145,9 @@ void HardDropBlock(TetrisBlock *block, TetrisBoard *board);
 
 // Fungsi untuk menempatkan blok di papan
 void PlaceBlock(TetrisBlock *block, TetrisBoard *board);
+
+//harddrop hitung
+int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board);
 
 
 

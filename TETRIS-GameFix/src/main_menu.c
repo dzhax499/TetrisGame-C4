@@ -18,7 +18,7 @@ static Texture2D backgroundTexture;
 void InitMainMenu(void)
 {
     // Inisialisasi background
-    backgroundTexture = LoadTexture("assets/bg.png");
+    backgroundTexture = LoadTexture("C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/TETRIS-GameFix/assets/textures/bg.png");
 
     // Inisialisasi font
     menuFont = GetFontDefault();
