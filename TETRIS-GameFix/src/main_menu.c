@@ -18,7 +18,7 @@ static Texture2D backgroundTexture;
 void InitMainMenu(void)
 {
     // Inisialisasi background
-    backgroundTexture = LoadTexture("bg.png");
+    backgroundTexture = LoadTexture("assets/bg.png");
 
     // Inisialisasi font
     menuFont = GetFontDefault();

@@ -9,6 +9,8 @@
 #include "raylib.h"
 #include "include/tetris.h"
 #include "include/blocks.h"
+#include "include/main_menu.h"
+#include "include/menu_music.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
