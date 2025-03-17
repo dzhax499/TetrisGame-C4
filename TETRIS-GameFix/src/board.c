@@ -1,135 +1,32 @@
 // Nama file : board.c
 // Deskripsi : Implementasi logika papan permainan Tetris (Array 2D)
 // Oleh      : Ibnu Hilmi 241511079
+//             Rizky Satria Gunawan 241511089
 
-#include "raylib.h"
 #include "include/board.h"
+#include "include/blocks.h"  // Mengimpor definisi blok dari blocks.h
 #include <string.h>
 #include <stdlib.h>
-
-// Definisi rotasi blok (4 rotasi untuk setiap blok)
-const int BLOCK_SHAPES[7][4][4][4] = {
-    // I-Block (Cyan)
-    {
-        {{0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,0,0}, {0,1,0,0}, {0,1,0,0}},
-        {{0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,0,0}, {0,1,0,0}, {0,1,0,0}}
-    },
-    // J-Block (Blue)
-    {
-        {{1,0,0,0}, {1,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,1,0}, {0,1,0,0}, {0,1,0,0}, {0,0,0,0}},
-        {{0,0,0,0}, {1,1,1,0}, {0,0,1,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,0,0}, {1,1,0,0}, {0,0,0,0}}
-    },
-    // L-Block (Orange)
-    {
-        {{0,0,1,0}, {1,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,0,0}, {0,1,1,0}, {0,0,0,0}},
-        {{0,0,0,0}, {1,1,1,0}, {1,0,0,0}, {0,0,0,0}},
-        {{1,1,0,0}, {0,1,0,0}, {0,1,0,0}, {0,0,0,0}}
-    },
-    // O-Block (Yellow)
-    {
-        {{0,1,1,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,1,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,1,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,1,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}}
-    },
-    // S-Block (Green)
-    {
-        {{0,1,1,0}, {1,1,0,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,1,0}, {0,0,1,0}, {0,0,0,0}},
-        {{0,1,1,0}, {1,1,0,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,1,0}, {0,0,1,0}, {0,0,0,0}}
-    },
-    // T-Block (Purple)
-    {
-        {{0,1,0,0}, {1,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {0,1,1,0}, {0,1,0,0}, {0,0,0,0}},
-        {{0,0,0,0}, {1,1,1,0}, {0,1,0,0}, {0,0,0,0}},
-        {{0,1,0,0}, {1,1,0,0}, {0,1,0,0}, {0,0,0,0}}
-    },
-    // Z-Block (Red)
-    {
-        {{1,1,0,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,0,1,0}, {0,1,1,0}, {0,1,0,0}, {0,0,0,0}},
-        {{1,1,0,0}, {0,1,1,0}, {0,0,0,0}, {0,0,0,0}},
-        {{0,0,1,0}, {0,1,1,0}, {0,1,0,0}, {0,0,0,0}}
-    }
-};
-
-// Fungsi untuk mendapatkan warna blok
-Color GetBlockColor(BlockType block) {
-    switch (block) {
-        case BLOCK_I: return SKYBLUE;    // Cyan
-        case BLOCK_J: return BLUE;       // Blue
-        case BLOCK_L: return ORANGE;     // Orange
-        case BLOCK_O: return YELLOW;     // Yellow
-        case BLOCK_S: return GREEN;      // Green
-        case BLOCK_T: return PURPLE;     // Purple
-        case BLOCK_Z: return RED;        // Red
-        default: return LIGHTGRAY;       // Default untuk blok kosong
-    }
-}
+#include <stdio.h>
+#include "raylib.h"
 
 // Inisialisasi papan permainan
-void InitBoard(TetrisBoard* board) {
+void InitBoard1(TetrisBoard *board) {
     // Bersihkan grid
     memset(board->grid, BLOCK_EMPTY, sizeof(board->grid));
     
-    // Reset skor dan level
+    // Reset skor, level, dan status game over
     board->current_score = 0;
     board->current_level = 1;
     board->lines_cleared = 0;
+    board->game_over = false;
+
+    // Buat blok baru
+    board->current_block = GenerateRandomBlock();
+    board->next_block = GenerateRandomBlock();
 }
 
-// Periksa apakah posisi blok valid
-bool IsValidPosition(TetrisBoard* board, BlockType block, int row, int col, int rotation) {
-    // Periksa setiap sel dalam blok
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            // Lewati sel kosong
-            if (BLOCK_SHAPES[block][rotation][y][x] == 0) continue;
-            
-            // Koordinat aktual di papan
-            int boardX = col + x;
-            int boardY = row + y;
-            
-            // Periksa batas papan
-            if (boardX < 0 || boardX >= BOARD_WIDTH || 
-                boardY < 0 || boardY >= BOARD_HEIGHT) {
-                return false;
-            }
-            
-            // Periksa tabrakan dengan blok lain
-            if (board->grid[boardY][boardX] != BLOCK_EMPTY) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-// Tempatkan blok di papan
-void PlaceBlock(TetrisBoard* board, BlockType block, int row, int col, int rotation) {
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            // Lewati sel kosong
-            if (BLOCK_SHAPES[block][rotation][y][x] == 0) continue;
-            
-            // Koordinat aktual di papan
-            int boardX = col + x;
-            int boardY = row + y;
-            
-            // Tempatkan blok
-            board->grid[boardY][boardX] = block;
-        }
-    }
-}
-
-// Hapus baris yang penuh
+// Hapus baris yang penuh dan update skor
 int ClearFullLines(TetrisBoard* board) {
     int linesCleared = 0;
     
@@ -145,25 +42,21 @@ int ClearFullLines(TetrisBoard* board) {
             }
         }
         
-        // Jika baris penuh, hapus dan geser turun
+        // Jika baris penuh, hapus dan geser baris di atasnya ke bawah
         if (isFullLine) {
             linesCleared++;
             
-            // Geser baris di atasnya ke bawah
             for (int moveY = y; moveY > 0; moveY--) {
-                memcpy(board->grid[moveY], board->grid[moveY - 1], 
-                       sizeof(board->grid[moveY]));
+                memcpy(board->grid[moveY], board->grid[moveY - 1], sizeof(board->grid[moveY]));
             }
             
             // Bersihkan baris teratas
             memset(board->grid[0], BLOCK_EMPTY, sizeof(board->grid[0]));
-            
-            // Kembalikan y untuk memeriksa baris yang baru saja diturunkan
-            y++;
+            y++; // Periksa baris yang sama lagi setelah pergeseran
         }
     }
     
-    // Update skor
+    // Update skor berdasarkan jumlah baris yang dihapus
     switch (linesCleared) {
         case 1: board->current_score += 100; break;
         case 2: board->current_score += 300; break;
@@ -171,7 +64,7 @@ int ClearFullLines(TetrisBoard* board) {
         case 4: board->current_score += 800; break;
     }
     
-    // Update level dan baris yang dihapus
+    // Update level
     board->lines_cleared += linesCleared;
     board->current_level = 1 + (board->lines_cleared / 10);
     
@@ -183,9 +76,65 @@ bool IsGameOver(TetrisBoard* board) {
     // Periksa baris paling atas
     for (int x = 0; x < BOARD_WIDTH; x++) {
         if (board->grid[0][x] != BLOCK_EMPTY) {
+            board->game_over = true;
             return true;
         }
     }
     return false;
 }
 
+// Render papan ke layar
+void DrawBoard(TetrisBoard* board) {
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            Color cellColor = GetBlockColor(board->grid[y][x]);
+            DrawRectangle(BOARD_OFFSET_X + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, cellColor);
+        }
+    }
+}
+
+// Render blok berikutnya
+void DrawNextBlock(TetrisBoard* board) {
+    // Contoh: Render blok berikutnya di sebelah kanan papan
+    TetrisBlock nextBlock = GenerateRandomBlock();
+    for (int y = 0; y < 4; y++) {
+        for (int x = 0; x < 4; x++) {
+            if (TETROMINO_SHAPES[nextBlock.type][nextBlock.rotation][y][x] != 0) {
+                DrawRectangle(BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, nextBlock.color);
+            }
+        }
+    }
+}
+
+// Render skor dan level
+void DrawScore(TetrisBoard* board) {
+    char scoreText[50];
+    sprintf(scoreText, "Score: %d", board->current_score);
+    DrawText(scoreText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y, 20, WHITE);
+
+    char levelText[50];
+    sprintf(levelText, "Level: %d", board->current_level);
+    DrawText(levelText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y + 30, 20, WHITE);
+}
+
+// Fungsi debug: Cetak papan ke konsol
+void PrintBoard(TetrisBoard* board) {
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            printf("%d ", board->grid[y][x]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+// Periksa apakah permainan berakhir
+bool IsGameOver(TetrisBoard* board) {
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        if (board->grid[0][x] != BLOCK_EMPTY) {
+            board->game_over = true;
+            return true;
+        }
+    }
+    return false;
+}
