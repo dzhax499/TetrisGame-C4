@@ -83,39 +83,6 @@ bool IsGameOver(TetrisBoard* board) {
     return false;
 }
 
-// Render papan ke layar
-void DrawBoard(TetrisBoard* board) {
-    for (int y = 0; y < BOARD_HEIGHT; y++) {
-        for (int x = 0; x < BOARD_WIDTH; x++) {
-            Color cellColor = GetBlockColor(board->grid[y][x]);
-            DrawRectangle(BOARD_OFFSET_X + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, cellColor);
-        }
-    }
-}
-
-// Render blok berikutnya
-void DrawNextBlock(TetrisBoard* board) {
-    // Contoh: Render blok berikutnya di sebelah kanan papan
-    TetrisBlock nextBlock = GenerateRandomBlock();
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            if (TETROMINO_SHAPES[nextBlock.type][nextBlock.rotation][y][x] != 0) {
-                DrawRectangle(BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, nextBlock.color);
-            }
-        }
-    }
-}
-
-// Render skor dan level
-void DrawScore(TetrisBoard* board) {
-    char scoreText[50];
-    sprintf(scoreText, "Score: %d", board->current_score);
-    DrawText(scoreText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y, 20, WHITE);
-
-    char levelText[50];
-    sprintf(levelText, "Level: %d", board->current_level);
-    DrawText(levelText, BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y + 30, 20, WHITE);
-}
 
 // Fungsi debug: Cetak papan ke konsol
 void PrintBoard(TetrisBoard* board) {

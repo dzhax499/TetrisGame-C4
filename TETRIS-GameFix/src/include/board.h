@@ -57,12 +57,7 @@ void InitBoard1(TetrisBoard* board);
 int ClearFullLines(TetrisBoard* board);
 
 // Fungsi untuk memeriksa game over
-bool IsGameOver(TetrisBoard* board);
-
-// Fungsi rendering
-void DrawBoard(TetrisBoard* board);
-void DrawNextBlock(TetrisBoard* board);
-void DrawScore(TetrisBoard* board);
+bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
 
 // Fungsi utilitas
 Color GetBlockColor(BlockType block);
