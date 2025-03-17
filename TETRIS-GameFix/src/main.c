@@ -9,6 +9,9 @@
 #include "raylib.h"
 #include "include/tetris.h"
 #include "include/blocks.h"
+#include "include/board.h"
+#include "include/rendering.h"
+#include "include/scoring.h"
 #include "include/main_menu.h"
 #include "include/menu_music.h"
 #include <stdlib.h>
@@ -20,19 +23,6 @@ TetrisBoard board;
 TetrisBlock currentBlock;
 bool gameOver = false;
 bool paused = false;
-
-void InitGame(void) {
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
-    SetTargetFPS(60);
-    
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            board.grid[i][j] = 0;
-        }
-    }
-    
-    currentBlock = GenerateRandomBlock();
-}
 
 void UpdateGame(void) {
     if (IsKeyPressed(KEY_P)) {
@@ -61,31 +51,17 @@ void UpdateGame(void) {
     }
 }
 
-void DrawGame(void) {
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
-    
-    if (gameOver) {
-        DrawGameOverScreen(0);
-    } else if (paused) {
-        DrawPauseOverlay();
-    } else {
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                if (board.grid[i][j] != 0) {
-                    DrawRectangle(j * 30, i * 30, 30, 30, BLACK);
-                }
-            }
-        }
-    }
-    EndDrawing();
-}
-
 int main(void) {
     InitGame();
+    InitMainMenu();
+    InitMusic();
     while (!WindowShouldClose()) {
+        if (currentState == MENU_STATE_MAIN) {
+            UpdateMainMenu();
+            DrawMainMenu();
+        } else if (currentState == MENU_STATE_PLAY) {
         UpdateGame();
-        DrawGame();
+        DrawGame(&board);
     }
     CloseWindow();
     return 0;
