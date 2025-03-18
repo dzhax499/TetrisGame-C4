@@ -36,9 +36,6 @@ int main(void)
     {
         BeginDrawing();
         ClearBackground(DARKGRAY);
-        DrawText("DEBUG: Drawing frame", 10, 10, 20, WHITE);
-        EndDrawing();
-        printf("Loop berjalan\n");
         // Update state game berdasarkan menu
         MenuState currentMenuState = GetCurrentMenuState();
         if (currentMenuState == MENU_STATE_PLAY)
@@ -135,7 +132,6 @@ int main(void)
                 DrawScore(&board, &scoreData); // Tampilkan skor dan level
             }
 
-            EndDrawing();
         }
         else
         {
@@ -149,6 +145,7 @@ int main(void)
             UpdateMainMenu();
             DrawMainMenu();
         }
+        EndDrawing();
     }
 
     // Unload resources
