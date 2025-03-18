@@ -4,6 +4,8 @@
 #include "include/rendering.h"
 #include "include/scoring.h"
 #include "include/main_menu.h"
+#include "include/menu_music.h"
+#include "include/click_sound.h"
 #include "raylib.h"
 #include <time.h>
 
@@ -15,6 +17,12 @@ int main(void)
 
     // Inisialisasi menu utama
     InitMainMenu();
+
+    // Inisialisasi background music
+    InitMenuMusic();
+
+    // Inisialisasi click sound
+    InitClickSound();
 
     // Inisialisasi papan permainan
     TetrisBoard board;
@@ -148,6 +156,8 @@ int main(void)
         {
             // Jika tidak dalam game, tampilkan menu utama
             UpdateMainMenu();
+            UpdateMenuMusic();
+            UpdateClickSound();
             DrawMainMenu();
         }
 
@@ -156,6 +166,8 @@ int main(void)
 
     // Unload resources
     UnloadMainMenu();
+    UnloadMenuMusic(); 
+    UnloadClickSound();
     CloseRendering();
     CloseWindow();
 
