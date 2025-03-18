@@ -33,21 +33,6 @@ TetrisBlock GenerateRandomBlock(void) {
     return block;
 }
 
-bool IsBlockCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            if (TETROMINO_SHAPES[block->type][testRotation][y][x] == 0) continue;
-            int boardX = testX + x;
-            int boardY = testY + y;
-            if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT || 
-                (boardY >= 0 && board->grid[boardY][boardX] != BLOCK_EMPTY)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board) {
     int dropDistance = 0;
 
@@ -62,12 +47,20 @@ int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board) {
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
+            // Skip empty cells in the tetromino
             if (TETROMINO_SHAPES[block->type][testRotation][y][x] == 0) continue;
+
             int boardX = testX + x;
             int boardY = testY + y;
-            if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT || 
-                (boardY >= 0 && board->grid[boardY][boardX] != BLOCK_EMPTY)) {
-                return false;
+
+            // **Jika masih di atas papan (boardY < 0), tidak dianggap tabrakan**
+            if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT) {
+                return false;  // **Di luar batas horizontal atau di bawah papan**
+            }
+
+            // **Cek apakah posisi sudah masuk area yang valid di papan**
+            if (boardY >= 0 && board->grid[boardY][boardX] != BLOCK_EMPTY) {
+                return false;  // **Jika cell terisi, tidak valid**
             }
         }
     }

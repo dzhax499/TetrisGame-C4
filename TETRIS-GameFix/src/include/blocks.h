@@ -118,15 +118,96 @@ static const int TETROMINO_SHAPES[7][4][4][4] = {
          {0,1,1,0}, 
          {0,0,0,0}, 
          {0,0,0,0}}
-    }
+    },
+    // Add the missing shapes to your array:
+
+// S Tetromino (Green)
+{
+    // Rotasi 0°
+    {{0,1,1,0}, 
+     {1,1,0,0}, 
+     {0,0,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 90°
+    {{0,1,0,0}, 
+     {0,1,1,0}, 
+     {0,0,1,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 180° (same as 0°)
+    {{0,0,0,0}, 
+     {0,1,1,0}, 
+     {1,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 270° (same as 90°)
+    {{1,0,0,0}, 
+     {1,1,0,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}}
+},
+
+// T Tetromino (Purple)
+{
+    // Rotasi 0°
+    {{0,1,0,0}, 
+     {1,1,1,0}, 
+     {0,0,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 90°
+    {{0,1,0,0}, 
+     {0,1,1,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 180°
+    {{0,0,0,0}, 
+     {1,1,1,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 270°
+    {{0,1,0,0}, 
+     {1,1,0,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}}
+},
+
+// Z Tetromino (Red)
+{
+    // Rotasi 0°
+    {{1,1,0,0}, 
+     {0,1,1,0}, 
+     {0,0,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 90°
+    {{0,0,1,0}, 
+     {0,1,1,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 180° (same as 0°)
+    {{0,0,0,0}, 
+     {1,1,0,0}, 
+     {0,1,1,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 270° (same as 90°)
+    {{0,1,0,0}, 
+     {1,1,0,0}, 
+     {1,0,0,0}, 
+     {0,0,0,0}}
+}
+    
 };
 
 
 // Fungsi untuk menghasilkan blok acak
 TetrisBlock GenerateRandomBlock(void);
 
-// Fungsi tabrakan blok
-bool IsBlockCollision(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation);
 
 // Fungsi untuk memeriksa posisi blok
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation);

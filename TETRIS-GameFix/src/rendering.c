@@ -78,11 +78,25 @@ void CloseRendering(void) {
 void DrawBoard(TetrisBoard* board) {
     for (int y = 0; y < BOARD_HEIGHT; y++) {
         for (int x = 0; x < BOARD_WIDTH; x++) {
+            // **Dapatkan warna berdasarkan isi grid**
             Color cellColor = GetBlockColor(board->grid[y][x]);
-            DrawRectangle(BOARD_OFFSET_X + x * BLOCK_SIZE, BOARD_OFFSET_Y + y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, cellColor);
+
+            // **Sesuaikan posisi berdasarkan offset yang dipakai**
+            int drawX = BOARD_OFFSET_X + x * BLOCK_SIZE;
+            int drawY = BOARD_OFFSET_Y + y * BLOCK_SIZE;
+
+            // **Gambar hanya jika bukan blok kosong**
+            if (board->grid[y][x] != BLOCK_EMPTY) {
+                DrawRectangle(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, cellColor);
+                DrawRectangleLines(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, BLACK); // Outline
+            }
         }
     }
+
+    // **Gambar batas papan**
+    DrawRectangleLines(BOARD_OFFSET_X, BOARD_OFFSET_Y, BOARD_WIDTH * BLOCK_SIZE, BOARD_HEIGHT * BLOCK_SIZE, BLACK);
 }
+
 
 // Render skor dan level
 void DrawScore(TetrisBoard* board, ScoreData* scoreData) {

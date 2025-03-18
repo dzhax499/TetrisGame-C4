@@ -1,4 +1,4 @@
-#include "include/tetris.h" // Pastikan TetrisBlock didefinisikan di sini
+#include "include/tetris.h" 
 #include "include/board.h"  // Menggunakan TetrisBlock
 #include "include/blocks.h" // Menggunakan TetrisBlock
 #include "include/rendering.h"
@@ -36,11 +36,12 @@ int main(void)
     {
         BeginDrawing();
         ClearBackground(DARKGRAY);
+
         // Update state game berdasarkan menu
         MenuState currentMenuState = GetCurrentMenuState();
         if (currentMenuState == MENU_STATE_PLAY)
         {
-            printf("Switching to Game Mode\n");
+            printf("Playing..\n");
             inGame = true;
         }
         else if (currentMenuState == MENU_STATE_EXIT)
@@ -53,8 +54,25 @@ int main(void)
             // Update game logic
             if (!gameOver)
             {
-                printf("Game logic berjalan\n");
-                // Gerakkan blok ke bawah secara otomatis
+                // Gerakkan blok ke bawah secara otomatis setiap beberapa frame
+                static float timer = 0;
+                timer += GetFrameTime();
+                if (timer >= scoreData.fallSpeed)
+                {
+                    if (!MoveBlockDown(&board.current_block, &board))
+                    {
+                        PlaceBlock(&board.current_block, &board);
+                        board.current_block = board.next_block;
+                        board.next_block = GenerateRandomBlock();
+                        if (IsGameOver(&board.current_block, &board))
+                        {
+                            gameOver = true;
+                        }
+                    }
+                    timer = 0; // Reset timer
+                }
+
+                // Gerakkan blok ke bawah jika tombol ditekan
                 if (IsKeyPressed(KEY_DOWN))
                 {
                     if (!MoveBlockDown(&board.current_block, &board))
@@ -88,8 +106,8 @@ int main(void)
                 // Hard drop
                 if (IsKeyPressed(KEY_SPACE))
                 {
-                    int dropDistance = CalculateDropDistance(&board.current_block, &board); // Hitung jarak jatuh
                     HardDropBlock(&board.current_block, &board);
+                    int dropDistance = CalculateDropDistance(&board.current_block, &board); // Hitung jarak jatuh
                     AddDropScore(&scoreData, dropDistance);
                     PlaceBlock(&board.current_block, &board);
                     board.current_block = board.next_block;
@@ -106,13 +124,14 @@ int main(void)
                 {
                     AddLineClearScore(&scoreData, linesCleared);
                 }
+
+                // Gambar papan dan blok
+                DrawBoard(&board);
+                DrawActiveTetromino(&board.current_block);
+                DrawNextBlock(&board);
+                DrawScore(&board, &scoreData);
             }
-
-            // // Render game
-            // BeginDrawing();
-            // ClearBackground(DARKGRAY);
-
-            if (gameOver)
+            else
             {
                 DrawText("GAME OVER", 300, 250, 40, RED);
                 DrawText("Press R to Restart", 280, 300, 20, WHITE);
@@ -124,27 +143,14 @@ int main(void)
                     inGame = false; // Kembali ke menu setelah restart
                 }
             }
-            else
-            {
-                DrawBoard(&board);
-                DrawActiveTetromino(&board.current_block);
-                DrawNextBlock(&board);
-                DrawScore(&board, &scoreData); // Tampilkan skor dan level
-            }
-
         }
         else
         {
-            printf("Main menu aktif\n");
-            // // Render menu utama
-            // BeginDrawing();
-            // ClearBackground(DARKGRAY);
-            // DrawText("DEBUG: Drawing frame", 10, 10, 20, WHITE);
-            // EndDrawing();
-
+            // Jika tidak dalam game, tampilkan menu utama
             UpdateMainMenu();
             DrawMainMenu();
         }
+
         EndDrawing();
     }
 
