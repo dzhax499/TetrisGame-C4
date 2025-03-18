@@ -11,7 +11,7 @@ static Music menuMusic;
 
 void InitMenuMusic(void)
 {
-    menuMusic = LoadMusicStream("menumusic.mp3");
+    menuMusic = LoadMusicStream("../assets/sounds/menu_select.wav");
     PlayMusicStream(menuMusic);
 }
 
