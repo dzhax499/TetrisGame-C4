@@ -5,28 +5,26 @@
 #include "include/main_menu.h"
 #include <stdlib.h>
 
-#define MAX_BUTTONS 4
+#define MAX_BUTTONS 5
 
 // Variabel-variabel menu
 static MenuState currentState = MENU_STATE_MAIN;
 static MenuButton buttons[MAX_BUTTONS];
 static Font menuFont;
 static Texture2D backgroundTexture;
-// static Sound menuSound;
-// static Music menuMusic;
 
 void InitMainMenu(void)
 {
     // Inisialisasi background
-    backgroundTexture = LoadTexture("C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/TETRIS-GameFix/assets/textures/bg.png");
+    backgroundTexture = LoadTexture("<assets>/textures/bg.png");
 
     // Inisialisasi font
     menuFont = GetFontDefault();
     
     // Inisialisasi tombol
-    float buttonWidth = 200.0f;
+    float buttonWidth = 300.0f;
     float buttonHeight = 50.0f;
-    float startY = 200.0f;
+    float startY = 275.0f;
     float spacing = 60.0f;
     float screenWidth = GetScreenWidth();
     
@@ -54,7 +52,7 @@ void InitMainMenu(void)
         .text = "Credits",
         .color = BLUE,
         .hoverColor = DARKBLUE,
-        .isHovered = false
+        .isHovered = true
     };
     
     // Tombol Exit
@@ -65,19 +63,20 @@ void InitMainMenu(void)
         .hoverColor = MAROON,
         .isHovered = false
     };
-    
-    // Load resources 
-    // menuSound = LoadSound("resources/click.wav");
-    // menuMusic = LoadMusicStream("mainnmenumusic.mp3");
-    // PlayMusicStream(menuMusic);
+
+    // Tombol Leaderboard
+    buttons[4] = (MenuButton){
+        .rect = (Rectangle){ 640, 10, 150, 50 },
+        .text = "Leaderboard",
+        .color = PURPLE,
+        .hoverColor = DARKPURPLE,
+        .isHovered = false
+    };
 }
 
 void UpdateMainMenu(void)
 {
     Vector2 mousePoint = GetMousePosition();
-    
-    // Update music (uncomment jika menggunakan music)
-    // UpdateMusicStream(menuMusic);
     
     for (int i = 0; i < MAX_BUTTONS; i++)
     {
@@ -96,6 +95,7 @@ void UpdateMainMenu(void)
                 case 1: currentState = MENU_STATE_OPTIONS; break;
                 case 2: currentState = MENU_STATE_CREDITS; break;
                 case 3: currentState = MENU_STATE_EXIT; break;
+                case 4: currentState = MENU_STATE_LEADERBOARD; break;
             }
         }
     }
@@ -108,11 +108,11 @@ void DrawMainMenu(void)
     
     // Draw title
     
-    int titleSize = 60; // Larger font size
+    int titleSize = 120; // Larger font size
     const char* titleText = "TETRIS";
     int textWidth = MeasureText(titleText, titleSize);
     int posX = GetScreenWidth()/2 - textWidth/2;
-    int posY = 60;
+    int posY = 120;
 
     // Draw the outline by drawing the text multiple times with offsets
     DrawText(titleText, posX-2, posY-2, titleSize, BLACK); // top-left
@@ -131,8 +131,13 @@ void DrawMainMenu(void)
     for (int i = 0; i < MAX_BUTTONS; i++)
     {
         DrawRectangleRec(buttons[i].rect, buttons[i].isHovered ? buttons[i].hoverColor : buttons[i].color);
-        DrawRectangleLinesEx(buttons[i].rect, 2, BLACK);
-        
+
+        DrawRectangleLinesEx(buttons[0].rect, 2, LIME);
+        DrawRectangleLinesEx(buttons[1].rect, 2, GOLD);
+        DrawRectangleLinesEx(buttons[2].rect, 2, DARKBLUE);
+        DrawRectangleLinesEx(buttons[3].rect, 2, MAROON);
+        DrawRectangleLinesEx(buttons[4].rect, 2, DARKPURPLE);
+
         // Center text in button
         int textWidth = MeasureText(buttons[i].text, 20);
         int textX = buttons[i].rect.x + buttons[i].rect.width/2 - textWidth/2;
@@ -142,16 +147,13 @@ void DrawMainMenu(void)
     }
     
     // Draw footer
-    DrawText("(c) 2025 D'Okeh Studio", 10, GetScreenHeight() - 20, 10, GRAY);
+    DrawText("(c) 2025 D'Okeh Studio", 10, GetScreenHeight() - 25, 20, RAYWHITE);
 }
 
 
 void UnloadMainMenu(void)
 {
-    // Unload resources (uncomment jika menggunakan resources)
     UnloadTexture(backgroundTexture);
-    // UnloadSound(menuSound);
-    // UnloadMusicStream(menuMusic);
 }
 
 MenuState GetCurrentMenuState(void)

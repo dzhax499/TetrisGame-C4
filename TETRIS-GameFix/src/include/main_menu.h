@@ -1,11 +1,11 @@
 // Nama file : main_menu.h
 // Deskripsi : File header yang mendeklarasikan fungsi dan struktur data yang digunakan dalam sistem menu game Tetris, termasuk definisi tombol menu dan status menu.
-// Oleh      : Ibnu Hilmi 241511079#ifndef MAIN_MENU_H
+// Oleh      : Ibnu Hilmi 241511079
 
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
+
 #include <raylib.h>
-#include "tetris.h"
 
 // Enum untuk status menu
 typedef enum {
@@ -13,6 +13,7 @@ typedef enum {
     MENU_STATE_PLAY,
     MENU_STATE_OPTIONS,
     MENU_STATE_CREDITS,
+    MENU_STATE_LEADERBOARD,
     MENU_STATE_EXIT
 } MenuState;
 
