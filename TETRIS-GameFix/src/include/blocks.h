@@ -224,12 +224,14 @@ bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board);
 // Fungsi untuk hard drop (jatuh cepat)
 void HardDropBlock(TetrisBlock *block, TetrisBoard *board);
 
+void HoldCurrentBlock(TetrisBoard* board);
+
 // Fungsi untuk menempatkan blok di papan
 void PlaceBlock(TetrisBlock *block, TetrisBoard *board);
 
 //harddrop hitung
 int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board);
 
-
+bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board);
 
 #endif

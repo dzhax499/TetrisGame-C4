@@ -9,6 +9,8 @@
  #include "include/tetris.h"
  #include "include/scoring.h"
  
+ #define HIGH_SCORE_FILE "tetris_highscore.dat"
+
  // Inisialisasi sistem skor
  void InitScoring(ScoreData* scoreData) {
      scoreData->score = 0;
@@ -95,38 +97,28 @@
  
  // Simpan skor tertinggi ke dalam file
  void SaveHighScore(ScoreData* scoreData) {
-     // Buka file
-     FILE* file = fopen("highscore.dat", "r");
-     int highScore = 0;
-     
-     // Baca skor tertinggi yang ada jika file tersedia
-     if (file) {
-         fscanf(file, "%d", &highScore);
-         fclose(file);
-     }
-     
-     // Perbarui skor tertinggi jika skor saat ini lebih tinggi
-     if (scoreData->score > highScore) {
-         file = fopen("highscore.dat", "w");
-         if (file) {
-             fprintf(file, "%d", scoreData->score);
-             fclose(file);
-         }
-     }
- }
+    int currentHighScore = LoadHighScore();
+    
+    if (scoreData->score > currentHighScore) {
+        FILE* file = fopen(HIGH_SCORE_FILE, "wb");
+        if (file) {
+            fwrite(&scoreData->score, sizeof(int), 1, file);
+            fclose(file);
+        }
+    }
+}
  
  // Muat skor tertinggi dari file
  int LoadHighScore(void) {
-     FILE* file = fopen("highscore.dat", "r");
-     int highScore = 0;
-     
-     if (file) {
-         fscanf(file, "%d", &highScore);
-         fclose(file);
-     }
-     
-     return highScore;
- }
- 
+    int highScore = 0;
+    FILE* file = fopen(HIGH_SCORE_FILE, "rb");
+    
+    if (file) {
+        fread(&highScore, sizeof(int), 1, file);
+        fclose(file);
+    }
+    
+    return highScore;
+}
  // Berikan poin bonus untuk gerakan spesial (T-spin, back-to-back tet)
  

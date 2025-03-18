@@ -1,55 +1,47 @@
-#include "include/tetris.h" 
-#include "include/board.h"  // Menggunakan TetrisBlock
-#include "include/blocks.h" // Menggunakan TetrisBlock
+#include "include/tetris.h"
+#include "include/board.h"
+#include "include/blocks.h"
 #include "include/rendering.h"
 #include "include/scoring.h"
 #include "include/main_menu.h"
-#include "include/menu_music.h"
-#include "include/click_sound.h"
 #include "raylib.h"
 #include <time.h>
 
 int main(void)
 {
-    // Inisialisasi window dan rendering
-    InitWindow(800, 600, "Tetris Game");
+    // Initialize window ONCE
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
 
-    // Inisialisasi menu utama
+    // Seed random
+    srand(time(NULL));
+
+    // Initialization
+    InitBlocks0();
     InitMainMenu();
 
-    // Inisialisasi background music
-    InitMenuMusic();
-
-    // Inisialisasi click sound
-    InitClickSound();
-
-    // Inisialisasi papan permainan
     TetrisBoard board;
     InitBoard1(&board);
 
-    // Inisialisasi sistem skor
     ScoreData scoreData;
     InitScoring(&scoreData);
 
-    // Inisialisasi rendering
-    InitRendering();
-
-    // Variabel untuk mengontrol state game
+    // Game state variables
     bool inGame = false;
     bool gameOver = false;
 
-    // Loop utama game
+    // Timer for automatic block fall
+    float fallTimer = 0.0f;
+    float fallDelay = 1.0f; // Waktu jatuh awal
+
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
-        // Update state game berdasarkan menu
         MenuState currentMenuState = GetCurrentMenuState();
         if (currentMenuState == MENU_STATE_PLAY)
         {
-            printf("Playing..\n");
             inGame = true;
         }
         else if (currentMenuState == MENU_STATE_EXIT)
@@ -57,118 +49,98 @@ int main(void)
             break;
         }
 
-        if (inGame)
+        if (inGame && !gameOver)
         {
-            // Update game logic
-            if (!gameOver)
+            // Update fall timer
+            fallTimer += GetFrameTime();
+
+            // Automatic block fall
+            if (fallTimer >= fallDelay)
             {
-                // Gerakkan blok ke bawah secara otomatis setiap beberapa frame
-                static float timer = 0;
-                timer += GetFrameTime();
-                if (timer >= scoreData.fallSpeed)
+                if (!MoveBlockDown(&board.current_block, &board))
                 {
-                    if (!MoveBlockDown(&board.current_block, &board))
-                    {
-                        PlaceBlock(&board.current_block, &board);
-                        board.current_block = board.next_block;
-                        board.next_block = GenerateRandomBlock();
-                        if (IsGameOver(&board.current_block, &board))
-                        {
-                            gameOver = true;
-                        }
-                    }
-                    timer = 0; // Reset timer
-                }
-
-                // Gerakkan blok ke bawah jika tombol ditekan
-                if (IsKeyPressed(KEY_DOWN))
-                {
-                    if (!MoveBlockDown(&board.current_block, &board))
-                    {
-                        PlaceBlock(&board.current_block, &board);
-                        board.current_block = board.next_block;
-                        board.next_block = GenerateRandomBlock();
-                        if (IsGameOver(&board.current_block, &board))
-                        {
-                            gameOver = true;
-                        }
-                    }
-                }
-
-                // Gerakkan blok ke kiri atau kanan
-                if (IsKeyPressed(KEY_LEFT))
-                {
-                    MoveBlockHorizontal(&board.current_block, &board, -1);
-                }
-                if (IsKeyPressed(KEY_RIGHT))
-                {
-                    MoveBlockHorizontal(&board.current_block, &board, 1);
-                }
-
-                // Rotasi blok
-                if (IsKeyPressed(KEY_UP))
-                {
-                    RotateBlock(&board.current_block, &board);
-                }
-
-                // Hard drop
-                if (IsKeyPressed(KEY_SPACE))
-                {
-                    HardDropBlock(&board.current_block, &board);
-                    int dropDistance = CalculateDropDistance(&board.current_block, &board); // Hitung jarak jatuh
-                    AddDropScore(&scoreData, dropDistance);
                     PlaceBlock(&board.current_block, &board);
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
+
+                    // Check game over
                     if (IsGameOver(&board.current_block, &board))
                     {
                         gameOver = true;
                     }
                 }
-
-                // Hapus baris yang penuh
-                int linesCleared = ClearFullLines(&board);
-                if (linesCleared > 0)
-                {
-                    AddLineClearScore(&scoreData, linesCleared);
-                }
-
-                // Gambar papan dan blok
-                DrawBoard(&board);
-                DrawActiveTetromino(&board.current_block);
-                DrawNextBlock(&board);
-                DrawScore(&board, &scoreData);
+                fallTimer = 0; // Reset timer
             }
-            else
+
+            // Player controls
+            if (IsKeyPressed(KEY_LEFT))
+                MoveBlockHorizontal(&board.current_block, &board, -1);
+
+            if (IsKeyPressed(KEY_RIGHT))
+                MoveBlockHorizontal(&board.current_block, &board, 1);
+
+            if (IsKeyPressed(KEY_UP))
+                RotateBlock(&board.current_block, &board);
+
+            if (IsKeyPressed(KEY_DOWN))
+                MoveBlockDown(&board.current_block, &board);
+
+            if (IsKeyPressed(KEY_SPACE))
             {
-                DrawText("GAME OVER", 300, 250, 40, RED);
-                DrawText("Press R to Restart", 280, 300, 20, WHITE);
-                if (IsKeyPressed(KEY_R))
-                {
-                    InitBoard1(&board);
-                    InitScoring(&scoreData); // Reset skor
-                    gameOver = false;
-                    inGame = false; // Kembali ke menu setelah restart
-                }
+                HardDropBlock(&board.current_block, &board);
+                board.current_block = board.next_block;
+                board.next_block = GenerateRandomBlock();
+            }
+            // Tambahkan kontrol hold
+            if (IsKeyPressed(KEY_C))
+            {
+                HoldCurrentBlock(&board);
+            }
+
+
+            // Clear full lines
+            int linesCleared = ClearFullLines(&board);
+            if (linesCleared > 0)
+            {
+                AddLineClearScore(&scoreData, linesCleared);
+            }
+
+            // Drawing
+            DrawBoard(&board);
+            DrawActiveTetromino(&board.current_block);
+            // Sebelum menggambar
+            DrawBlockShadow(&board.current_block, &board);
+            DrawHoldBlock(&board);
+            DrawNextBlock(&board);
+            DrawScore(&board, &scoreData);
+        }
+        else if (gameOver)
+        {
+            DrawText("GAME OVER", 300, 250, 40, RED);
+            DrawText("Press R to Restart", 280, 300, 20, WHITE);
+            DrawText(TextFormat("Final Score: %d", scoreData.score), 280, 350, 20, WHITE);
+
+            if (IsKeyPressed(KEY_R))
+            {
+                SaveHighScore(&scoreData); // Save high score
+                InitBoard1(&board);
+                InitScoring(&scoreData);
+                gameOver = false;
+                inGame = false;
+                fallTimer = 0;
             }
         }
         else
         {
-            // Jika tidak dalam game, tampilkan menu utama
             UpdateMainMenu();
-            UpdateMenuMusic();
-            UpdateClickSound();
             DrawMainMenu();
         }
 
         EndDrawing();
     }
 
-    // Unload resources
+    // Cleanup
     UnloadMainMenu();
-    UnloadMenuMusic(); 
-    UnloadClickSound();
-    CloseRendering();
     CloseWindow();
 
     return 0;

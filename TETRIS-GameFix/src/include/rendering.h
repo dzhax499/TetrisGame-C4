@@ -85,7 +85,8 @@
   * @param nextTetromino  Pointer ke struktur Tetromino yang akan muncul berikutnya
   */
  void DrawNextBlock(TetrisBoard* board);
- 
+ void DrawBlockShadow(TetrisBlock* block, TetrisBoard* board);
+ void DrawHoldBlock(TetrisBoard* board);
  /**
   * DrawGameInterface
   * 
