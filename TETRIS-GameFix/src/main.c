@@ -51,6 +51,12 @@ int main(void)
 
         if (inGame && !gameOver)
         {
+            // Update fall speed based on current level
+            fallDelay = UpdateFallSpeed(&scoreData);
+            
+            fallDelay = 1.0f - ((scoreData.level - 1) * 0.15f);
+            if (fallDelay < 0.1f)
+                fallDelay = 0.1f;
             // Update fall timer
             fallTimer += GetFrameTime();
 
@@ -96,7 +102,6 @@ int main(void)
             {
                 HoldCurrentBlock(&board);
             }
-
 
             // Clear full lines
             int linesCleared = ClearFullLines(&board);

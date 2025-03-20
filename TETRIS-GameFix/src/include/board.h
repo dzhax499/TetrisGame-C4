@@ -66,7 +66,6 @@ bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
 
 // Fungsi utilitas
 Color GetBlockColor(BlockType block);
-BlockType GetRandomBlock();
 
 // Fungsi debug
 void PrintBoard(TetrisBoard* board);

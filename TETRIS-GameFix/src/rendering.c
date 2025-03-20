@@ -43,7 +43,7 @@ void InitRendering(void) {
     
     // Memuat font permainan
     int fontChars[] = { 0 }; // Memuat semua karakter default
-    Font gameFont = LoadFontEx("C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/TETRIS-GameFix/assets/fonts/game_font.ttf", 32, fontChars, 0);
+    Font gameFont = LoadFontEx("../assets/fonts/game_font.ttf", 32, fontChars, 0);
     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
 }    
 // Membersihkan sumber daya rendering
@@ -101,40 +101,64 @@ void DrawBoard(TetrisBoard* board) {
 // Render skor dan level
 void DrawScore(TetrisBoard* board, ScoreData* scoreData) {
     (void)board; // Tidak digunakan
-    int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50;
     
-    // Skor
+    // Ubah posisi - Geser lebih jauh dari board
+    int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
+    
+    // Tambahkan background untuk area informasi
+    DrawRectangle(offsetX - 20, BOARD_OFFSET_Y - 20, 
+                 200, BOARD_HEIGHT * BLOCK_SIZE + 40, 
+                 Fade(DARKGRAY, 0.7f));
+    
+    // Header informasi
+    DrawText("GAME INFO", offsetX, BOARD_OFFSET_Y - 10, 20, WHITE);
+    
+    // Skor - geser ke bawah
     DrawText(TextFormat("SCORE: %d", scoreData->score), 
-             offsetX, BOARD_OFFSET_Y, 20, WHITE);
-    
-    // Level
-    DrawText(TextFormat("LEVEL: %d", scoreData->level), 
              offsetX, BOARD_OFFSET_Y + 30, 20, WHITE);
     
-    // Blok Selanjutnya
-    DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 60, 20, WHITE);
+    // Level - geser ke bawah
+    DrawText(TextFormat("LEVEL: %d", scoreData->level), 
+             offsetX, BOARD_OFFSET_Y + 60, 20, WHITE);
     
-    // Blok Hold
-    DrawText("HOLD:", offsetX, BOARD_OFFSET_Y + 200, 20, WHITE);
+    // Batas area Next Block
+    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 100, 
+                      150, 100, WHITE);
+    
+    // Label Next Block - HAPUS DARI SINI, PINDAH KE DrawNextBlock
+    DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 100, 15, WHITE);
+    
+    // Batas area Hold Block
+    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 230, 
+                      150, 100, WHITE);
+    
+    // Label Hold Block
+    DrawText("HOLD:", offsetX, BOARD_OFFSET_Y + 230, 15, WHITE);
 }
 
 void DrawHoldBlock(TetrisBoard* board) {
     if (board->hold_block.hasHeld) {
+        // Gunakan cara perhitungan yang sama dengan DrawScore
+        int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
+        
         TetrisBlock* holdBlock = &board->hold_block.block;
-        int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50;
+        
+        // Posisi tengah untuk hold block (25 = offset untuk tengah kotak 150px)
+        int blockOffsetX = offsetX + 25;
+        int blockOffsetY = BOARD_OFFSET_Y + 250;
         
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
-                if (holdBlock->shape[y][x] != 0) {
+                if (TETROMINO_SHAPES[holdBlock->type][0][y][x] != 0) {
                     DrawRectangle(
-                        offsetX + x * BLOCK_SIZE, 
-                        BOARD_OFFSET_Y + 230 + y * BLOCK_SIZE, 
+                        blockOffsetX + x * BLOCK_SIZE, 
+                        blockOffsetY + y * BLOCK_SIZE, 
                         BLOCK_SIZE, BLOCK_SIZE, 
                         holdBlock->color
                     );
                     DrawRectangleLines(
-                        offsetX + x * BLOCK_SIZE, 
-                        BOARD_OFFSET_Y + 230 + y * BLOCK_SIZE, 
+                        blockOffsetX + x * BLOCK_SIZE, 
+                        blockOffsetY + y * BLOCK_SIZE, 
                         BLOCK_SIZE, BLOCK_SIZE, 
                         BLACK
                     );
@@ -143,7 +167,6 @@ void DrawHoldBlock(TetrisBoard* board) {
         }
     }
 }
-
 void DrawBlockShadow(TetrisBlock* block, TetrisBoard* board) {
     TetrisBlock shadowBlock = *block;
     
@@ -216,22 +239,33 @@ void DrawBlockShadow(TetrisBlock* block, TetrisBoard* board) {
 
  // Render blok berikutnya
  void DrawNextBlock(TetrisBoard* board) {
+    // HAPUS DEKLARASI VARIABEL offsetX LAMA
+    // int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50;
+    
+    // Gunakan cara perhitungan yang sama dengan DrawScore
+    int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
+    
+    // // Tambahkan label NEXT: di sini saja
+    // DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 90, 10, WHITE);
+    
     TetrisBlock nextBlock = board->next_block;
     
-    DrawText("NEXT", BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50, BOARD_OFFSET_Y, 20, WHITE);
+    // Posisi tengah untuk next block (25 = offset untuk tengah kotak 150px)
+    int blockOffsetX = offsetX + 25;
+    int blockOffsetY = BOARD_OFFSET_Y + 120;
     
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
             if (TETROMINO_SHAPES[nextBlock.type][0][y][x] != 0) {
                 DrawRectangle(
-                    BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50 + x * BLOCK_SIZE, 
-                    BOARD_OFFSET_Y + 50 + y * BLOCK_SIZE, 
+                    blockOffsetX + x * BLOCK_SIZE, 
+                    blockOffsetY + y * BLOCK_SIZE, 
                     BLOCK_SIZE, BLOCK_SIZE, 
                     nextBlock.color
                 );
                 DrawRectangleLines(
-                    BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 50 + x * BLOCK_SIZE, 
-                    BOARD_OFFSET_Y + 50 + y * BLOCK_SIZE, 
+                    blockOffsetX + x * BLOCK_SIZE, 
+                    blockOffsetY + y * BLOCK_SIZE, 
                     BLOCK_SIZE, BLOCK_SIZE, 
                     BLACK
                 );

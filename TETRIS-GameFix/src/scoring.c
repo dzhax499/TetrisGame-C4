@@ -2,14 +2,14 @@
  * scoring.c
  * 
  * Menangani sistem skor, perkembangan level, dan tingkat kesulitan permainan
- * Penulis: Fatimah & Abi
+ * Penulis: Fatimah 
  */
 
  #include <raylib.h>
  #include "include/tetris.h"
  #include "include/scoring.h"
  
- #define HIGH_SCORE_FILE "tetris_highscore.dat"
+ #define HIGH_SCORE_FILE "../assets/log/highscore.dat"
 
  // Inisialisasi sistem skor
  void InitScoring(ScoreData* scoreData) {
@@ -100,10 +100,13 @@
     int currentHighScore = LoadHighScore();
     
     if (scoreData->score > currentHighScore) {
-        FILE* file = fopen(HIGH_SCORE_FILE, "wb");
+        FILE* file = fopen(HIGH_SCORE_FILE, "w");  // Gunakan mode text
         if (file) {
-            fwrite(&scoreData->score, sizeof(int), 1, file);
+            fprintf(file, "%d", scoreData->score);  // Tulis sebagai string angka
             fclose(file);
+            printf("High score saved: %d\n", scoreData->score);  // Debug
+        } else {
+            printf("Failed to open file for writing\n");  // Debug
         }
     }
 }
@@ -111,14 +114,16 @@
  // Muat skor tertinggi dari file
  int LoadHighScore(void) {
     int highScore = 0;
-    FILE* file = fopen(HIGH_SCORE_FILE, "rb");
+    FILE* file = fopen(HIGH_SCORE_FILE, "r");  // Gunakan mode text
     
     if (file) {
-        fread(&highScore, sizeof(int), 1, file);
+        fscanf(file, "%d", &highScore);  // Baca sebagai angka
         fclose(file);
+        printf("High score loaded: %d\n", highScore);  // Debug
+    } else {
+        printf("High score file not found, using default 0\n");  // Debug
     }
     
     return highScore;
-}
- // Berikan poin bonus untuk gerakan spesial (T-spin, back-to-back tet)
+ }
  

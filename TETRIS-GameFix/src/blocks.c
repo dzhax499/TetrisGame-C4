@@ -184,23 +184,64 @@ void HardDropBlock(TetrisBlock *block, TetrisBoard *board) {
 void HoldCurrentBlock(TetrisBoard* board) {
     // Jika belum pernah memegang blok
     if (!board->hold_block.hasHeld) {
+        // Salin blok saat ini ke hold block
         board->hold_block.block = board->current_block;
         board->hold_block.hasHeld = true;
         
+        // Reset rotasi dan posisi blok yang di-hold
+        board->hold_block.block.rotation = 0;
+        board->hold_block.block.x = BOARD_WIDTH / 2 - 2;
+        board->hold_block.block.y = 0;
+        
+        // Update shape array based on the new rotation
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                board->hold_block.block.shape[y][x] = TETROMINO_SHAPES[board->hold_block.block.type][0][y][x];
+            }
+        }
+        
         // Ganti blok saat ini dengan blok berikutnya
         board->current_block = board->next_block;
+        
+        // Reset posisi blok baru
+        board->current_block.x = BOARD_WIDTH / 2 - 2;
+        board->current_block.y = 0;
+        
+        // Generate blok berikutnya
         board->next_block = GenerateRandomBlock();
     } 
     // Jika sudah pernah memegang blok
     else {
-        // Tukar blok yang sedang aktif dengan blok yang di-hold
+        // Simpan blok saat ini sementara
         TetrisBlock tempBlock = board->current_block;
-        board->current_block = board->hold_block.block;
-        board->hold_block.block = tempBlock;
         
-        // Reset posisi blok
+        // Ganti blok saat ini dengan blok yang di-hold
+        board->current_block = board->hold_block.block;
+        
+        // Reset rotasi dan posisi blok yang baru
+        board->current_block.rotation = 0;
         board->current_block.x = BOARD_WIDTH / 2 - 2;
         board->current_block.y = 0;
+        
+        // Update shape array for current block
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                board->current_block.shape[y][x] = TETROMINO_SHAPES[board->current_block.type][0][y][x];
+            }
+        }
+        
+        // Update blok yang di-hold
+        board->hold_block.block = tempBlock;
+        
+        // Reset rotasi blok yang di-hold
+        board->hold_block.block.rotation = 0;
+        
+        // Update shape array for held block
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                board->hold_block.block.shape[y][x] = TETROMINO_SHAPES[board->hold_block.block.type][0][y][x];
+            }
+        }
     }
 }
 

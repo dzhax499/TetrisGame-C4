@@ -40,6 +40,9 @@ void InitBoard1(TetrisBoard *board) {
     board->current_level = 1;
     board->lines_cleared = 0;
     board->game_over = false;
+    
+    // Initialize hold block state
+    board->hold_block.hasHeld = false;
 
     // Buat blok baru
     board->current_block = GenerateRandomBlock();
