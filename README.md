@@ -53,8 +53,9 @@ tetris/
 │   └── sound.c          # Implementasi sistem audio
 ├── makefile             # Buildscript
 └── README.md            # Dokumentasi
+```
 
-**Deskripsi File-File Utama**
+Deskripsi File-File Utama
 
 **blocks.c/h**
 
@@ -116,7 +117,7 @@ Library Raylib (direkomendasikan versi 3.5+)
 Kompilasi
 Menggunakan Makefile:
 
-`make`
+```make```
 
 `./tetris_game`
 
