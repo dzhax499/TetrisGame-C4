@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -std=c99
 LDFLAGS = -Lmingw64 -lraylib -lopengl32 -lm -lpthread -lwinpthread
 
 # Direktori source dan include
-SRC_DIR = ./
+SRC_DIR = ./src
 INCLUDE_DIR = include
 
 # File source dan object
