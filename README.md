@@ -121,7 +121,9 @@ Menggunakan Makefile:
 make
 ```
 
-`./tetris_game`
+```
+./tetris_game
+```
 
 **Kontrol Permainan**
 | Tombol  | Fungsi                            |
