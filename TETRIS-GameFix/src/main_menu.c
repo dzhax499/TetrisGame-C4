@@ -16,7 +16,10 @@ static Texture2D backgroundTexture;
 void InitMainMenu(void)
 {
     // Inisialisasi background
-    backgroundTexture = LoadTexture("../assets/textures/bg.png");
+    backgroundTexture = LoadTexture("bg.png");
+    if (backgroundTexture.id == 0) {
+        TraceLog(LOG_ERROR, "Background texture could not be loaded");
+    }
 
     // Inisialisasi font
     menuFont = GetFontDefault();
@@ -24,7 +27,7 @@ void InitMainMenu(void)
     // Inisialisasi tombol
     float buttonWidth = 300.0f;
     float buttonHeight = 50.0f;
-    float startY = 275.0f;
+    float startY = 350.0f;
     float spacing = 60.0f;
     float screenWidth = GetScreenWidth();
     
@@ -64,10 +67,10 @@ void InitMainMenu(void)
         .isHovered = false
     };
 
-    // Tombol Leaderboard
+    // Tombol Highscore
     buttons[4] = (MenuButton){
-        .rect = (Rectangle){ 640, 10, 150, 50 },
-        .text = "Leaderboard",
+        .rect = (Rectangle){ 860, 10, 150, 50 },
+        .text = "Highscore",
         .color = PURPLE,
         .hoverColor = DARKPURPLE,
         .isHovered = false
@@ -95,7 +98,7 @@ void UpdateMainMenu(void)
                 case 1: currentState = MENU_STATE_OPTIONS; break;
                 case 2: currentState = MENU_STATE_CREDITS; break;
                 case 3: currentState = MENU_STATE_EXIT; break;
-                case 4: currentState = MENU_STATE_LEADERBOARD; break;
+                case 4: currentState = MENU_STATE_HIGHSCORE; break;
             }
         }
     }
@@ -104,7 +107,7 @@ void UpdateMainMenu(void)
 void DrawMainMenu(void)
 {
     // Draw background
-    DrawTexture(backgroundTexture, 0, 0, WHITE);
+    DrawTexture(backgroundTexture, 0, 0, BLACK);
     
     // Draw title
     

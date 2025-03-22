@@ -7,6 +7,9 @@
 #include "raylib.h"
 #include <time.h>
 
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 768
+
 int main(void)
 {
     // Initialize window ONCE
