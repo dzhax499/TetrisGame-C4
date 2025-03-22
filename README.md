@@ -21,11 +21,11 @@ Sistem scoring dan level
 Menu interaktif
 
 ## Tim Pengembang
-Dzakit Tsabit (241511071) - Implementasi blok Tetris
-Ibnu Hilmi (241511079) - Logika papan permainan & menu
-Rizky Satria Gunawan (241511089) - Logika papan permainan
-Abi - (241511091)  Rendering (241511091)
-Fatimah Hawwa (241511074) - Sistem skor
+- Dzakit Tsabit (241511071) - Implementasi blok Tetris
+- Ibnu Hilmi (241511079) - Logika papan permainan & menu
+- Rizky Satria Gunawan (241511089) - Logika papan permainan
+- Varian Abidarma (241511091)  Rendering (241511091)
+- Fatimah Hawwa (241511074) - Sistem skor
 
 ## Struktur Proyek
 ```
@@ -55,64 +55,56 @@ tetris/
 └── README.md            # Dokumentasi
 ```
 
-Deskripsi File-File Utama
+## Deskripsi File-File Utama
 
-**blocks.c/h**
+### **blocks.c/h**
+- ✅ Implementasi bentuk-bentuk blok Tetris (I, J, L, O, S, T, Z)
+- 🔄 Rotasi blok dan logika wall-kick
+- 📦 Pergerakan blok (horizontal, vertikal, hard drop)
+- ✋ Fungsi hold block
 
-Implementasi bentuk-bentuk blok Tetris (I, J, L, O, S, T, Z)
-Rotasi blok dan logika wall-kick
-Pergerakan blok (horizontal, vertikal, hard drop)
-Fungsi hold block
+### **board.c/h**
+- 🎮 Implementasi papan permainan **10x20**
+- 🧹 Pengecekan dan penghapusan **baris yang penuh**
+- ❌ Pengecekan **game over**
+- 🎨 Pewarnaan blok
 
-**board.c/h**
+### **main.c**
+- 🔁 Program utama, **game loop**
+- 🎮 Penanganan **input pemain**
+- 🧠 Logika utama permainan
+- 🔄 Perpindahan antar state (**menu, bermain, game over**)
 
-Implementasi papan permainan 10x20
-Pengecekan dan penghapusan baris yang penuh
-Pengecekan game over
-Pewarnaan blok
+### **main_menu.c/h**
+- 📜 Menu utama dengan tombol **interaktif**
+- 🔄 Navigasi antar menu (**play, settings, credits, exit**)
+- 🎨 Rendering menu
 
-**main.c**
+### **rendering.c/h**
+- 🖼️ Rendering **papan permainan**
+- 🔲 Rendering **blok aktif, next, dan hold**
+- 👥 Rendering **shadow drop**
+- 🏆 Rendering UI (**skor, level**)
 
-Program utama, game loop
-Penanganan input pemain
-Logika utama permainan
-Perpindahan antar state (menu, bermain, game over)
+### **scoring.c/h**
+- 🏆 Sistem perhitungan **skor**
+- 📈 Kenaikan **level** berdasarkan baris yang dihapus
+- 💾 Penyimpanan **highscore**
+- ⏳ Pengaturan **kecepatan jatuh blok** berdasarkan level
 
-**main_menu.c/h**
+### **sound.c/h**
+- 🎵 Pengelolaan **sound effect dan musik latar**
+- 🔊 Fungsi untuk **memainkan efek suara** saat aksi tertentu
 
-Menu utama dengan tombol interaktif
-Navigasi antar menu (play, settings, credits, exit)
-Rendering menu
-
-**rendering.c/h**
-
-Rendering papan permainan
-Rendering blok aktif, next, dan hold
-Rendering shadow drop
-Rendering UI (skor, level)
-
-**scoring.c/h**
-
-Sistem perhitungan skor
-Kenaikan level berdasarkan baris yang dihapus
-Penyimpanan highscore
-Pengaturan kecepatan jatuh blok berdasarkan level
-
-**sound.c/h**
-
-Pengelolaan sound effect dan musik latar
-Fungsi untuk memainkan efek suara saat aksi tertentu
-
-**tetris.h**
-
-Definisi konstanta global
-Struktur dasar blok Tetris
-Definisi ukuran window dan papan
+### **tetris.h**
+- 🔢 Definisi **konstanta global**
+- 🔲 Struktur dasar **blok Tetris**
+- 🖥️ Definisi **ukuran window dan papan**
 
 **Prasyarat**
 
-Compiler C (GCC/MinGW)
-Library Raylib (direkomendasikan versi 3.5+)
+- Compiler C (GCC/MinGW)
+- Library Raylib (direkomendasikan versi 3.5+)
 
 Kompilasi
 Menggunakan Makefile:
