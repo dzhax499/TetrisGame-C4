@@ -117,7 +117,9 @@ Library Raylib (direkomendasikan versi 3.5+)
 Kompilasi
 Menggunakan Makefile:
 
-```make```
+```
+make
+```
 
 `./tetris_game`
 
@@ -138,7 +140,9 @@ Menggunakan Makefile:
 - Kecepatan jatuh blok meningkat seiring kenaikan level.
 - Setiap **10 baris** yang dibersihkan akan menaikkan level.
 - **Formula kecepatan:**
-`fallDelay = 1.0f - ((level - 1) * 0.15f);`
+```
+fallDelay = 1.0f - ((level - 1) * 0.15f);
+```
 Dengan batas minimum **0.1 detik**.
 
 **Project From Bandung Polytechnic**
