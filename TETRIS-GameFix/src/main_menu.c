@@ -1,12 +1,12 @@
 // Nama file : main_menu.c
-// Deskripsi : File ini berisi implementasi dari menu utama game Tetris, termasuk inisialisasi elemen menu, pembaruan interaksi pengguna, dan proses menggambar tampilan menu.
+// Deskripsi : File ini berisi implementasi dari menu utama game Tetris
 // Oleh      : Ibnu Hilmi 241511079
 
 #include "include/main_menu.h"
-#include "include/game_sound.h" // Add this include
+#include "include/game_sound.h"
 #include <stdlib.h>
 
-#define MAX_BUTTONS 5
+#define MAX_BUTTONS 4
 
 // Variabel-variabel menu
 static MenuState currentState = MENU_STATE_MAIN;
@@ -17,7 +17,11 @@ static Texture2D backgroundTexture;
 void InitMainMenu(void)
 {
     // Inisialisasi background
-    backgroundTexture = LoadTexture("../assets/textures/bg.png");
+    ClearBackground(LIGHTGRAY);
+    backgroundTexture = LoadTexture("assets/textures/bg.png");
+    if (backgroundTexture.id == 0) {
+        TraceLog(LOG_WARNING, "Background texture could not be loaded");
+    }
 
     // Inisialisasi font
     menuFont = GetFontDefault();
@@ -25,7 +29,7 @@ void InitMainMenu(void)
     // Inisialisasi tombol
     float buttonWidth = 300.0f;
     float buttonHeight = 50.0f;
-    float startY = 275.0f;
+    float startY = 350.0f;
     float spacing = 60.0f;
     float screenWidth = GetScreenWidth();
     
@@ -38,22 +42,22 @@ void InitMainMenu(void)
         .isHovered = false
     };
     
-    // Tombol Settings
+    // Tombol Credits - switched positions with Highscore
     buttons[1] = (MenuButton){
-        .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing, buttonWidth, buttonHeight },
-        .text = "Audio Settings",
-        .color = YELLOW,
-        .hoverColor = GOLD,
-        .isHovered = false
-    };
-    
-    // Tombol Credits
-    buttons[2] = (MenuButton){
-        .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing*2, buttonWidth, buttonHeight },
+        .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing*1, buttonWidth, buttonHeight },
         .text = "Credits",
         .color = BLUE,
         .hoverColor = DARKBLUE,
-        .isHovered = true
+        .isHovered = false
+    };
+    
+    // Tombol Highscore - switched positions with Credits
+    buttons[2] = (MenuButton){
+        .rect = (Rectangle){ screenWidth/2 - buttonWidth/2, startY + spacing*2, buttonWidth, buttonHeight },
+        .text = "Highscore",
+        .color = YELLOW,
+        .hoverColor = GOLD,
+        .isHovered = false
     };
     
     // Tombol Exit
@@ -62,15 +66,6 @@ void InitMainMenu(void)
         .text = "Exit",
         .color = RED,
         .hoverColor = MAROON,
-        .isHovered = false
-    };
-
-    // Tombol Leaderboard
-    buttons[4] = (MenuButton){
-        .rect = (Rectangle){ 640, 10, 150, 50 },
-        .text = "Leaderboard",
-        .color = PURPLE,
-        .hoverColor = DARKPURPLE,
         .isHovered = false
     };
 }
@@ -87,7 +82,12 @@ void UpdateMainMenu(void)
         
         // Play hover sound if we just started hovering
         if (!wasHovered && buttons[i].isHovered) {
-            PlaySoundEffect(SOUND_CLICK);
+            // Use SOUND_CLICK if SOUND_HOVER is not defined
+            #ifdef SOUND_HOVER
+                PlaySoundEffect(SOUND_HOVER);
+            #else
+                PlaySoundEffect(SOUND_CLICK);
+            #endif
         }
         
         // Check mouse click
@@ -96,13 +96,13 @@ void UpdateMainMenu(void)
             // Play click sound
             PlaySoundEffect(SOUND_CLICK);
             
+            // Fixed: Map button labels to appropriate states
             switch (i)
             {
                 case 0: currentState = MENU_STATE_PLAY; break;
-                case 1: currentState = MENU_STATE_OPTIONS; break;
-                case 2: currentState = MENU_STATE_CREDITS; break;
+                case 1: currentState = MENU_STATE_CREDITS; break; // Credits is button 1
+                case 2: currentState = MENU_STATE_HIGHSCORE; break; // Highscore is button 2 
                 case 3: currentState = MENU_STATE_EXIT; break;
-                case 4: currentState = MENU_STATE_LEADERBOARD; break;
             }
         }
     }
@@ -111,30 +111,34 @@ void UpdateMainMenu(void)
     if (IsKeyPressed(KEY_M)) {
         ToggleBackgroundMusic();
     }
+    
+    // Allow ESC key to return to main menu from other states
+    if (IsKeyPressed(KEY_ESCAPE) && currentState != MENU_STATE_MAIN) {
+        currentState = MENU_STATE_MAIN;
+    }
 }
 
 void DrawMainMenu(void)
 {
     // Draw background
-    DrawTexture(backgroundTexture, 0, 0, WHITE);
+    DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
     
     // Draw title
-    
-    int titleSize = 120; // Larger font size
+    int titleSize = 120;
     const char* titleText = "TETRIS";
     int textWidth = MeasureText(titleText, titleSize);
     int posX = GetScreenWidth()/2 - textWidth/2;
     int posY = 120;
 
     // Draw the outline by drawing the text multiple times with offsets
-    DrawText(titleText, posX-2, posY-2, titleSize, BLACK); // top-left
-    DrawText(titleText, posX+2, posY-2, titleSize, BLACK); // top-right
-    DrawText(titleText, posX-2, posY+2, titleSize, BLACK); // bottom-left
-    DrawText(titleText, posX+2, posY+2, titleSize, BLACK); // bottom-right
-    DrawText(titleText, posX-2, posY, titleSize, BLACK);   // left
-    DrawText(titleText, posX+2, posY, titleSize, BLACK);   // right
-    DrawText(titleText, posX, posY-2, titleSize, BLACK);   // top
-    DrawText(titleText, posX, posY+2, titleSize, BLACK);   // bottom
+    DrawText(titleText, posX-2, posY-2, titleSize, BLACK);
+    DrawText(titleText, posX+2, posY-2, titleSize, BLACK);
+    DrawText(titleText, posX-2, posY+2, titleSize, BLACK);
+    DrawText(titleText, posX+2, posY+2, titleSize, BLACK);
+    DrawText(titleText, posX-2, posY, titleSize, BLACK);
+    DrawText(titleText, posX+2, posY, titleSize, BLACK);
+    DrawText(titleText, posX, posY-2, titleSize, BLACK);
+    DrawText(titleText, posX, posY+2, titleSize, BLACK);
 
     // Draw the main text in white on top
     DrawText(titleText, posX, posY, titleSize, WHITE);
@@ -144,11 +148,16 @@ void DrawMainMenu(void)
     {
         DrawRectangleRec(buttons[i].rect, buttons[i].isHovered ? buttons[i].hoverColor : buttons[i].color);
 
-        DrawRectangleLinesEx(buttons[0].rect, 2, LIME);
-        DrawRectangleLinesEx(buttons[1].rect, 2, GOLD);
-        DrawRectangleLinesEx(buttons[2].rect, 2, DARKBLUE);
-        DrawRectangleLinesEx(buttons[3].rect, 2, MAROON);
-        DrawRectangleLinesEx(buttons[4].rect, 2, DARKPURPLE);
+        // Fixed: Match border colors to actual button colors
+        Color borderColor;
+        switch (i) {
+            case 0: borderColor = LIME; break;
+            case 1: borderColor = DARKBLUE; break;
+            case 2: borderColor = GOLD; break;
+            case 3: borderColor = MAROON; break;
+            default: borderColor = WHITE;
+        }
+        DrawRectangleLinesEx(buttons[i].rect, 2, borderColor);
 
         // Center text in button
         int textWidth = MeasureText(buttons[i].text, 20);
@@ -159,12 +168,11 @@ void DrawMainMenu(void)
     }
     
     // Add audio control hint
-    DrawText("Press M to toggle music", 10, GetScreenHeight() - 50, 20, RAYWHITE);
+    DrawText("Press M to toggle music", 10, GetScreenHeight() - 735, 20, RAYWHITE);
     
     // Draw footer
-    DrawText("(c) 2025 D'Okeh Studio", 10, GetScreenHeight() - 25, 20, RAYWHITE);
+    DrawText("(c) 2023 D'Okeh Studio", 10, GetScreenHeight() - 760, 20, RAYWHITE);
 }
-
 
 void UnloadMainMenu(void)
 {
@@ -174,4 +182,10 @@ void UnloadMainMenu(void)
 MenuState GetCurrentMenuState(void)
 {
     return currentState;
+}
+
+// Added: New function to set the menu state externally
+void SetMenuState(MenuState newState)
+{
+    currentState = newState;
 }
