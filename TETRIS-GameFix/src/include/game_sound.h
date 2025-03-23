@@ -1,6 +1,6 @@
 // File: game_sound.h
 // Deskripsi: Header file untuk mengatur semua suara dalam game Tetris
-// Oleh: [Your Name]
+// Oleh: Abi
 
 #ifndef GAME_SOUND_H
 #define GAME_SOUND_H
@@ -8,46 +8,46 @@
 #include "raylib.h"
 #include <stdbool.h>
 
-// Sound effect IDs
+// ID untuk efek suara
 typedef enum {
-    SOUND_CLICK,
-    SOUND_GAME_OVER,
-    SOUND_COUNT  // Total number of sound effects
+    SOUND_CLICK,       // Efek suara saat tombol ditekan
+    SOUND_GAME_OVER,   // Efek suara saat permainan berakhir
+    SOUND_COUNT        // Jumlah total efek suara
 } SoundEffectType;
 
-// Music track IDs
+// ID untuk trek musik
 typedef enum {
-    MUSIC_MENU,
-    MUSIC_GAMEPLAY,
-    MUSIC_COUNT  // Total number of music tracks
+    MUSIC_MENU,       // Musik latar untuk menu
+    MUSIC_GAMEPLAY,   // Musik latar saat permainan berlangsung
+    MUSIC_COUNT       // Jumlah total trek musik
 } MusicTrackType;
 
-// Initialize all sound resources
+// Inisialisasi semua sumber daya suara
 void InitGameSound(void);
 
-// Play a specific sound effect
+// Memainkan efek suara tertentu
 void PlaySoundEffect(SoundEffectType soundType);
 
-// Play background music for the specified context
+// Memainkan musik latar untuk konteks yang ditentukan
 void PlayBackgroundMusic(MusicTrackType musicType);
 
-// Stop all currently playing music
+// Menghentikan semua musik yang sedang diputar
 void StopBackgroundMusic(void);
 
-// Update music streams (must be called each frame)
+// Memperbarui aliran musik (harus dipanggil setiap frame)
 void UpdateGameSound(void);
 
-// Pause/unpause the currently playing background music
+// Menjeda/melanjutkan musik latar yang sedang diputar
 void ToggleBackgroundMusic(void);
 
-// Set music and sound effects volume (0.0 to 1.0)
+// Mengatur volume musik dan efek suara (0.0 hingga 1.0)
 void SetMusicVolume1(float volume);
 void SetSoundEffectsVolume(float volume);
 
-// Check if any music is currently playing
+// Memeriksa apakah ada musik yang sedang diputar
 bool IsBackgroundMusicPlaying(void);
 
-// Free all sound resources
+// Membebaskan semua sumber daya suara
 void UnloadGameSound(void);
 
 #endif // GAME_SOUND_H
