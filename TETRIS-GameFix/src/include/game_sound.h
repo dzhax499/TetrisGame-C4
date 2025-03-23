@@ -12,6 +12,7 @@
 typedef enum {
     SOUND_CLICK,       // Efek suara saat tombol ditekan
     SOUND_GAME_OVER,   // Efek suara saat permainan berakhir
+    SOUND_LINE_CLEAR,   // Efek suara saat baris terhapus
     SOUND_COUNT        // Jumlah total efek suara
 } SoundEffectType;
 

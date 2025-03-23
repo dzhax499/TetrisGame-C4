@@ -17,6 +17,7 @@ void InitGameSound(void) {
     // Memuat efek suara
     soundEffects[SOUND_CLICK] = LoadSound("assets/sounds/menu_select.wav");
     soundEffects[SOUND_GAME_OVER] = LoadSound("assets/sounds/game_over.wav");
+    soundEffects[SOUND_LINE_CLEAR] = LoadSound("assets/sounds/line_clear1.wav");
     
     // Memuat musik latar
     musicTracks[MUSIC_MENU] = LoadMusicStream("assets/sounds/game_menu1.mp3");

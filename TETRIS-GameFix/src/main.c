@@ -144,7 +144,7 @@ int main(void)
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
-                PlaySoundEffect(SOUND_CLICK); // Play sound on line clear
+                PlaySoundEffect(SOUND_LINE_CLEAR); // Play sound on line clear
             }
 
             // Drawing
