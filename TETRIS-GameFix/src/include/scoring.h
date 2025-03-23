@@ -15,6 +15,7 @@ typedef struct {
     int linesCleared;       // Total garis yang telah dibersihkan
     float fallSpeed;        // Kecepatan jatuh tetromino
     int linesToNextLevel;   // Garis yang dibutuhkan untuk naik level
+    int highScore;  // Tambahkan field untuk high score
 } ScoreData;
 
 // Fungsi untuk menginisialisasi sistem skor
@@ -41,4 +42,6 @@ void SaveHighScore(ScoreData* scoreData);
 // Fungsi untuk memuat skor tertinggi dari file
 int LoadHighScore(void);
 
+// Tambahkan fungsi getter untuk high score
+int GetHighScore(ScoreData* scoreData);  
 #endif // SCORING_H

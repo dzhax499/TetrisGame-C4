@@ -3,6 +3,7 @@
 // Oleh      : Ibnu Hilmi 241511079
 
 #include "include/main_menu.h"
+#include "include/game_sound.h" // Add this include
 #include <stdlib.h>
 
 #define MAX_BUTTONS 5
@@ -85,13 +86,19 @@ void UpdateMainMenu(void)
     for (int i = 0; i < MAX_BUTTONS; i++)
     {
         // Check mouse hover
+        bool wasHovered = buttons[i].isHovered;
         buttons[i].isHovered = CheckCollisionPointRec(mousePoint, buttons[i].rect);
+        
+        // Play hover sound if we just started hovering
+        if (!wasHovered && buttons[i].isHovered) {
+            PlaySoundEffect(SOUND_CLICK);
+        }
         
         // Check mouse click
         if (buttons[i].isHovered && IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
         {
-            // Play sound (uncomment jika menggunakan sound)
-            // PlaySound(menuSound);
+            // Play click sound
+            PlaySoundEffect(SOUND_CLICK);
             
             switch (i)
             {
@@ -102,6 +109,11 @@ void UpdateMainMenu(void)
                 case 4: currentState = MENU_STATE_HIGHSCORE; break;
             }
         }
+    }
+    
+    // Toggle music with M key
+    if (IsKeyPressed(KEY_M)) {
+        ToggleBackgroundMusic();
     }
 }
 
@@ -149,6 +161,9 @@ void DrawMainMenu(void)
         
         DrawText(buttons[i].text, textX, textY, 20, WHITE);
     }
+    
+    // Add audio control hint
+    DrawText("Press M to toggle music", 10, GetScreenHeight() - 50, 20, RAYWHITE);
     
     // Draw footer
     DrawText("(c) 2025 D'Okeh Studio", 10, GetScreenHeight() - 25, 20, RAYWHITE);
