@@ -38,6 +38,7 @@ tetris/
 ├── include/             # Header files
 │   ├── blocks.h         # Definisi bentuk dan logika block 
 │   ├── board.h          # Definisi papan permainan
+├──├──game_sound.h
 │   ├── main_menu.h      # Deklarasi menu utama
 │   ├── rendering.h      # Fungsi rendering
 │   ├── scoring.h        # Sistem skor
@@ -48,6 +49,7 @@ tetris/
 │   ├── board.c          # Implementasi logika papan
 │   ├── main.c           # Program utama
 │   ├── main_menu.c      # Implementasi menu
+├──├──game_sound.c
 │   ├── rendering.c      # Implementasi rendering
 │   ├── scoring.c        # Implementasi sistem skor
 │   └── sound.c          # Implementasi sistem audio
