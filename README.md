@@ -11,86 +11,133 @@ Team from C4 :
 # Proyek Tetris
 
 ## Deskripsi
-Proyek ini merupakan implementasi permainan Tetris dengan berbagai fitur modern seperti sistem penilaian, mode permainan yang bervariasi, dan antarmuka pengguna yang intuitif. Proyek ini dikembangkan menggunakan bahasa C dengan SDL3 sebagai framework grafis.
+Game Tetris ini merupakan implementasi lengkap dari permainan klasik Tetris dengan beberapa fitur modern seperti:
+
+Sistem hold block
+Preview block berikutnya
+Shadow drop (bayangan tempat block akan jatuh)
+Wall kicks untuk rotasi yang lebih baik
+Sistem scoring dan level
+Menu interaktif
 
 ## Tim Pengembang
-- Rizky Satria (Koordinator & Game Mode Manager)
-- Varian Abidarma Syuhada (Audio & Settings Developer)
-- Fatimah Hawwa Alkhansa (Game Logic & Scoring)
-- Dzakit Tsabit Assyafiq (Block System & Preview)
-- Ibnu Hilmi Athaillah (UI/UX & Player History)
+- Dzakit Tsabit (241511071) - Implementasi blok Tetris
+- Ibnu Hilmi (241511079) - Logika papan permainan & menu
+- Rizky Satria Gunawan (241511089) - Logika papan permainan
+- Varian Abidarma (241511091)  Rendering (241511091)
+- Fatimah Hawwa (241511074) - Sistem skor
 
 ## Struktur Proyek
 ```
-src/
-├── audio/
-│   ├── audio_manager.c/h
-│   ├── music.c/h
-│   └── sfx.c/h
-├── core/
-│   ├── tetromino/
-│   │   ├── blocks.c/h
-│   │   └── rotation.c/h
-│   └── collision/
-│       └── collision.c/h
-├── game/
-│   ├── game.c/h
-│   ├── modes/
-│   │   ├── endless.c/h
-│   │   └── level.c/h
-│   └── scoring/
-│       └── score.c/h
-├── graphics/
-│   └── animations/
-│       └── particles.c/h
-├── system/
-│   └── sdl_init.c/h
-├── ui/
-│   ├── hud/
-│   │   ├── next_preview.c/h
-│   │   └── score_display.c/h
-│   ├── menu/
-│   │   ├── main_menu.c/h
-│   │   └── pause_menu.c/h
-│   └── settings/
-│       └── settings_menu.c/h
-└── utils/
-    ├── save_load.c/h
-    └── timer.c/h
+tetris/
+├── assets/
+│   ├── audio/           # File-file audio
+│   ├── fonts/           # File-file font
+│   ├── log/             # File log dan highscore
+│   └── textures/        # Tekstur dan gambar
+├── include/             # Header files
+│   ├── blocks.h         # Definisi bentuk dan logika block 
+│   ├── board.h          # Definisi papan permainan
+│   ├── main_menu.h      # Deklarasi menu utama
+│   ├── rendering.h      # Fungsi rendering
+│   ├── scoring.h        # Sistem skor
+│   ├── sound.h          # Sistem audio
+│   └── tetris.h         # Definisi umum
+├── src/
+│   ├── blocks.c         # Implementasi logika block
+│   ├── board.c          # Implementasi logika papan
+│   ├── main.c           # Program utama
+│   ├── main_menu.c      # Implementasi menu
+│   ├── rendering.c      # Implementasi rendering
+│   ├── scoring.c        # Implementasi sistem skor
+│   └── sound.c          # Implementasi sistem audio
+├── makefile             # Buildscript
+└── README.md            # Dokumentasi
 ```
 
-## Tabel Pembagian Tugas
+## Deskripsi File-File Utama
 
-| Nama | Peran | Direktori Utama | File yang Dikerjakan | Detail Implementasi |
-|------|-------|-----------------|----------------------|---------------------|
-| Rizky Satria | Koordinator & Game Mode Manager | src/game/<br>src/game/modes/<br>src/system/ | game.c/h<br>endless.c/h<br>level.c/h<br>sdl_init.c/h | - Game state management<br>- Level progression system<br>- Koordinasi antar sistem<br>- Sistem leveling berbasis waktu/skor<br>- Peningkatan kecepatan progresif<br>- Target objectives per level<br>- Level unlocking system<br>- Inisialisasi sistem |
-| Varian Abidarma Syuhada | Audio & Settings Developer | src/audio/<br>src/ui/settings/ | audio_manager.c/h<br>music.c/h<br>sfx.c/h<br>settings_menu.c/h | - Audio initialization<br>- Volume control<br>- Background music loading<br>- Music transitions<br>- Sound effects loading<br>- Effect triggering system<br>- Settings interface |
-| Fatimah Hawwa Alkhansa | Game Logic & Scoring | src/game/scoring/<br>src/utils/<br>src/graphics/animations/ | score.c/h<br>timer.c/h<br>particles.c/h | - Score calculation<br>- Combo system<br>- Game time tracking<br>- Level time management<br>- Score popup animations<br>- "Tetris!" notifications<br>- Level up effects |
-| Dzakit Tsabit Assyafiq | Block System & Preview | src/core/tetromino/<br>src/core/collision/<br>src/ui/hud/ | blocks.c/h<br>rotation.c/h<br>collision.c/h<br>next_preview.c/h | - Block definitions<br>- Hold system<br>- SRS implementation<br>- Wall kick system<br>- Collision detection<br>- Block locking system<br>- Next block preview |
-| Ibnu Hilmi Athaillah | UI/UX & Player History | src/ui/menu/<br>src/ui/hud/<br>src/utils/ | main_menu.c/h<br>pause_menu.c/h<br>score_display.c/h<br>save_load.c/h | - Menu interface<br>- Navigation system<br>- Score display<br>- Timer display<br>- High score saving<br>- Statistics tracking<br>- Achievement system |
+### **blocks.c/h**
+- ✅ Implementasi bentuk-bentuk blok Tetris (I, J, L, O, S, T, Z)
+- 🔄 Rotasi blok dan logika wall-kick
+- 📦 Pergerakan blok (horizontal, vertikal, hard drop)
+- ✋ Fungsi hold block
 
-## Fitur Utama
-- **Mode Permainan**: Mode Endless dan Level dengan tantangan spesifik
-- **Sistem Penilaian**: Perhitungan skor dengan sistem combo
-- **Sistem Blok**: Implementasi Super Rotation System (SRS) dan wall kick
-- **Audio**: Musik latar dan efek suara
-- **UI/UX**: Antarmuka menu utama, menu jeda, dan HUD informatif
-- **Penyimpanan Data**: Sistem penyimpanan skor tinggi dan statistik pemain
+### **board.c/h**
+- 🎮 Implementasi papan permainan **10x20**
+- 🧹 Pengecekan dan penghapusan **baris yang penuh**
+- ❌ Pengecekan **game over**
+- 🎨 Pewarnaan blok
 
-## Petunjuk Kompilasi dan Menjalankan
-*[Instruksi kompilasi dan running akan ditambahkan di sini]*
+### **main.c**
+- 🔁 Program utama, **game loop**
+- 🎮 Penanganan **input pemain**
+- 🧠 Logika utama permainan
+- 🔄 Perpindahan antar state (**menu, bermain, game over**)
 
-## Dependensi
-- SDL3
-- SDL3_mixer (untuk audio)
-- SDL3_ttf (untuk rendering teks)
-- SDL3_image (untuk loading gambar)
+### **main_menu.c/h**
+- 📜 Menu utama dengan tombol **interaktif**
+- 🔄 Navigasi antar menu (**play, settings, credits, exit**)
+- 🎨 Rendering menu
 
-## Status Proyek
-Dalam pengembangan aktif
+### **rendering.c/h**
+- 🖼️ Rendering **papan permainan**
+- 🔲 Rendering **blok aktif, next, dan hold**
+- 👥 Rendering **shadow drop**
+- 🏆 Rendering UI (**skor, level**)
 
-## Kontak
-Untuk pertanyaan lebih lanjut, silakan hubungi koordinator tim (Rizky) melalui [email koordinator].
+### **scoring.c/h**
+- 🏆 Sistem perhitungan **skor**
+- 📈 Kenaikan **level** berdasarkan baris yang dihapus
+- 💾 Penyimpanan **highscore**
+- ⏳ Pengaturan **kecepatan jatuh blok** berdasarkan level
+
+### **sound.c/h**
+- 🎵 Pengelolaan **sound effect dan musik latar**
+- 🔊 Fungsi untuk **memainkan efek suara** saat aksi tertentu
+
+### **tetris.h**
+- 🔢 Definisi **konstanta global**
+- 🔲 Struktur dasar **blok Tetris**
+- 🖥️ Definisi **ukuran window dan papan**
+
+**Prasyarat**
+
+- Compiler C (GCC/MinGW)
+- Library Raylib (direkomendasikan versi 3.5+)
+
+Kompilasi
+Menggunakan Makefile:
+
+```
+make
+```
+
+```
+./tetris_game
+```
+
+**Kontrol Permainan**
+| Tombol  | Fungsi                            |
+|---------|-----------------------------------|
+| ←       | Gerak ke kiri                    |
+| →       | Gerak ke kanan                   |
+| ↓       | Percepat turun                   |
+| Z       | Putar blok (90° searah jarum jam) |
+| SPACE   | Hard drop (jatuh langsung)       |
+| C       | Hold blok                        |
+| R       | Restart game (saat game over)    |
+| ESC     | Keluar/kembali ke menu           |
+
+**Fitur Level & Kecepatan**
+
+- Kecepatan jatuh blok meningkat seiring kenaikan level.
+- Setiap **10 baris** yang dibersihkan akan menaikkan level.
+- **Formula kecepatan:**
+```
+fallDelay = 1.0f - ((level - 1) * 0.15f);
+```
+Dengan batas minimum **0.1 detik**.
 
 **Project From Bandung Polytechnic**
 
