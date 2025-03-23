@@ -60,6 +60,7 @@
     "board.h": "c",
     "tetris.h": "c",
     "stdbool.h": "c",
-    "blocks.h": "c"
+    "blocks.h": "c",
+    "game_sound.h": "c"
   }
 }

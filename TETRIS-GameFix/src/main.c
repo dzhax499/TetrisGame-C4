@@ -1,3 +1,7 @@
+// Nama file : main.c
+// Deskripsi : File utama yang menggabungkan semua komponen, menginisialisasi permainan, dan mengatur loop utama permainan.
+// Oleh      : Ibnu Hilmi 241511079
+
 #include "include/tetris.h"
 #include "include/board.h"
 #include "include/blocks.h"
@@ -13,17 +17,17 @@
 
 int main(void)
 {
-    // Initialize window with consistent constants
+    // Inisialisasi jendela dengan konstanta yang konsisten
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
     
-    // Initialize audio system
+    // Inisialisasi sistem audio
     InitAudioDevice();
 
-    // Seed random
+    // Pengacakan seed
     srand(time(NULL));
 
-    // Initialization
+    // Inisialisasi
     InitBlocks0();
     InitMainMenu();
     InitGameSound();
@@ -34,16 +38,16 @@ int main(void)
     ScoreData scoreData;
     InitScoring(&scoreData);
 
-    // Game state variables
+    // Variabel status permainan
     bool inGame = false;
     bool gameOver = false;
     bool wasPreviouslyInGame = false;
 
-    // Timer for automatic block fall
+    // Timer untuk jatuhnya blok secara otomatis
     float fallTimer = 0.0f;
-    float fallDelay = 1.0f; // Initial fall time
+    float fallDelay = 1.0f; // Waktu jatuh awal
 
-    // Start with menu music
+    // Mulai dengan musik menu
     PlayBackgroundMusic(MUSIC_MENU);
 
     while (!WindowShouldClose())
@@ -51,16 +55,16 @@ int main(void)
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
-        // Update game sounds
+        // Perbarui suara permainan
         UpdateGameSound();
 
         MenuState currentMenuState = GetCurrentMenuState();
         
-        // Handle menu state transitions
+        // Menangani transisi status menu
         if (currentMenuState == MENU_STATE_PLAY)
         {
             if (!inGame) {
-                // Start gameplay music when entering game
+                // Mulai musik gameplay saat memasuki permainan
                 PlayBackgroundMusic(MUSIC_GAMEPLAY);
                 PlaySoundEffect(SOUND_CLICK);
             }
@@ -68,55 +72,100 @@ int main(void)
         }
         else if (currentMenuState == MENU_STATE_CREDITS)
         {
-            // Fix: Don't break the game loop, just display credits
-            inGame = false; // Make sure we're not in game
+            // Perbaikan: Jangan menghentikan loop permainan, hanya tampilkan kredit
+            inGame = false; // Pastikan kita tidak dalam permainan
             
             ClearBackground(LIGHTGRAY);
             DrawText("CREDITS", WINDOW_WIDTH/2 - MeasureText("CREDITS", 40)/2, 
                 WINDOW_HEIGHT/2 - 150, 40, BLACK);
 
-            // Draw names and IDs
-            DrawText("Dzakir Tsabit \t 241511071", WINDOW_WIDTH/2 - MeasureText("Dzakir Tsabit 241511071", 20)/2, 
+            // Tampilkan nama dan ID
+            DrawText("Dzakir Tsabit \t\t 241511071", WINDOW_WIDTH/2 - MeasureText("Dzakir Tsabit 241511071", 20)/2, 
                 WINDOW_HEIGHT/2 - 50, 20, BLACK);
-            // Add other team member names here
-            DrawText("Ibnu Hilmi \t 241511079", WINDOW_WIDTH/2 - MeasureText("Ibnu Hilmi 241511079", 20)/2, 
+            DrawText("Fatimah Hawwa \t\t 241511074", WINDOW_WIDTH/2 - MeasureText("Fatimah Hawwa 241511074", 20)/2, 
                 WINDOW_HEIGHT/2 - 20, 20, BLACK);
+            DrawText("Ibnu Hilmi \t\t\t\t 241511079", WINDOW_WIDTH/2 - MeasureText("Ibnu Hilmi 241511079", 20)/2, 
+                WINDOW_HEIGHT/2 - -10, 20, BLACK);
+            DrawText("Rizky Satria \t\t\t 241511089", WINDOW_WIDTH/2 - MeasureText("Rizky Satria 241511089", 20)/2, 
+                WINDOW_HEIGHT/2 - -40, 20, BLACK);
+            DrawText("Varian Abidarma \t 241511091", WINDOW_WIDTH/2 - MeasureText("Varian Abidarma 241511091", 20)/2,
+                WINDOW_HEIGHT/2 - -70, 20, BLACK);
+
 
             DrawText("Press ESC to return to menu", WINDOW_WIDTH/2 - MeasureText("Press ESC to return to menu", 20)/2, 
                 WINDOW_HEIGHT/2 + 120, 20, BLACK);
 
-            // Menu navigation is now handled in UpdateMainMenu()
+            // Navigasi menu sekarang ditangani di UpdateMainMenu()
         }
         else if (currentMenuState == MENU_STATE_HIGHSCORE)
         {
-            // Fix: Don't break the game loop, just display highscores
-            inGame = false; // Make sure we're not in game
+            // Perbaikan: Jangan menghentikan loop permainan, hanya tampilkan skor tertinggi
+            inGame = false; // Pastikan kita tidak dalam permainan
             
             ClearBackground(LIGHTGRAY);
             DrawText("HIGHSCORES", WINDOW_WIDTH/2 - MeasureText("HIGHSCORES", 40)/2, 
                 WINDOW_HEIGHT/2 - 150, 40, BLACK);
+            
+            // Buka, baca, dan tampilkan skor tertinggi dari highscore.dat
+            FILE *fileHighscore = fopen("assets/log/highscore.dat", "rb");
+            
+            if (fileHighscore)
+            {
+                // Definisikan struktur untuk data skor tertinggi
+                typedef struct {
+                    char name[30];
+                    int score;
+                } HighscoreData;
                 
-            // Add code to display high scores here
-            DrawText("Coming Soon!", WINDOW_WIDTH/2 - MeasureText("Coming Soon!", 30)/2, 
-                WINDOW_HEIGHT/2 - 30, 30, BLACK);
+                HighscoreData highscores[5]; // Asumsikan kita menyimpan 5 skor teratas
+                int count = 0;
                 
+                // Baca data skor tertinggi dari file
+                count = fread(highscores, sizeof(HighscoreData), 5, fileHighscore);
+                
+                // Tutup file setelah membaca
+                fclose(fileHighscore);
+                
+                // Tampilkan skor tertinggi
+                if (count > 0)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        char scoreText[50];
+                        sprintf(scoreText, "%d. %s - %d", i+1, highscores[i].name, highscores[i].score);
+                        DrawText(scoreText, WINDOW_WIDTH/2 - MeasureText(scoreText, 25)/2, 
+                            WINDOW_HEIGHT/2 - 80 + (i * 40), 25, BLACK);
+                    }
+                }
+                else
+                {
+                    DrawText("No high scores yet!", WINDOW_WIDTH/2 - MeasureText("No high scores yet!", 30)/2, 
+                        WINDOW_HEIGHT/2 - 30, 30, BLACK);
+                }
+            }
+            else
+            {
+                DrawText("Highscore file not found!", WINDOW_WIDTH/2 - MeasureText("Highscore file not found!", 30)/2, 
+                    WINDOW_HEIGHT/2 - 30, 30, BLACK);
+            }
+            
             DrawText("Press ESC to return to menu", WINDOW_WIDTH/2 - MeasureText("Press ESC to return to menu", 20)/2, 
                 WINDOW_HEIGHT/2 + 120, 20, BLACK);
-                
-            // Menu navigation is now handled in UpdateMainMenu()
+            
+            // Navigasi menu sekarang ditangani di UpdateMainMenu()
         }
         else if (currentMenuState == MENU_STATE_EXIT)
         {
-            // Exit the game
+            // Keluar dari permainan
             break;
         }
         else if (currentMenuState == MENU_STATE_MAIN)
         {
-            // We're in the main menu
+            // Kita berada di menu utama
             inGame = false;
             
             if (wasPreviouslyInGame) {
-                // We just returned to the menu from gameplay
+                // Kita baru saja kembali ke menu dari gameplay
                 PlayBackgroundMusic(MUSIC_MENU);
                 wasPreviouslyInGame = false;
             }
@@ -125,15 +174,15 @@ int main(void)
             DrawMainMenu();
         }
 
-        // Game logic - only run if we're in game
+        // Logika permainan - hanya berjalan jika kita dalam permainan
         if (inGame && !gameOver)
         {
-            // Track if we just entered the game
+            // Lacak jika kita baru saja memasuki permainan
             if (!wasPreviouslyInGame) {
                 wasPreviouslyInGame = true;
             }
             
-            // Update fall speed based on current level
+            // Perbarui kecepatan jatuh berdasarkan level saat ini
             #ifdef HAVE_UPDATE_FALL_SPEED
                 fallDelay = UpdateFallSpeed(&scoreData);
             #else
@@ -142,10 +191,10 @@ int main(void)
                     fallDelay = 0.1f;
             #endif
                 
-            // Update fall timer
+            // Perbarui timer jatuh
             fallTimer += GetFrameTime();
 
-            // Automatic block fall
+            // Jatuhnya blok otomatis
             if (fallTimer >= fallDelay)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
@@ -154,7 +203,7 @@ int main(void)
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
 
-                    // Check game over
+                    // Periksa game over
                     if (IsGameOver(&board.current_block, &board))
                     {
                         gameOver = true;
@@ -165,7 +214,7 @@ int main(void)
                 fallTimer = 0; // Reset timer
             }
 
-            // Player controls
+            // Kontrol pemain
             if (IsKeyPressed(KEY_LEFT))
                 MoveBlockHorizontal(&board.current_block, &board, -1);
 
@@ -194,13 +243,13 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
 
-            // Mute/unmute background music with M key
+            // Mute/unmute musik latar belakang dengan tombol M
             if (IsKeyPressed(KEY_M))
             {
                 ToggleBackgroundMusic();
             }
 
-            // Clear full lines
+            // Bersihkan baris yang penuh
             int linesCleared = ClearFullLines(&board);
             if (linesCleared > 0)
             {
@@ -213,7 +262,7 @@ int main(void)
                 #endif
             }
 
-            // Drawing
+            // Penggambaran
             
             DrawBlockShadow(&board.current_block, &board);
             
@@ -247,7 +296,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
                 PlayBackgroundMusic(MUSIC_MENU);
                 
-                // Reset to main menu
+                // Reset ke menu utama
                 SetWindowState(MENU_STATE_MAIN);
             }
         }
@@ -255,7 +304,7 @@ int main(void)
         EndDrawing();
     }
 
-    // Cleanup
+    // Pembersihan
     UnloadMainMenu();
     UnloadGameSound();
     CloseAudioDevice();
