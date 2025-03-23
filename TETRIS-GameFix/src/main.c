@@ -254,12 +254,7 @@ int main(void)
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
-                
-                #ifdef SOUND_LINE_CLEAR
-                    PlaySoundEffect(SOUND_LINE_CLEAR);
-                #else
-                    PlaySoundEffect(SOUND_CLICK);
-                #endif
+                PlaySoundEffect(SOUND_LINE_CLEAR);
             }
 
             // Penggambaran
