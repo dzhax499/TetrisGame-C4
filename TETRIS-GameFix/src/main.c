@@ -4,6 +4,7 @@
 #include "include/rendering.h"
 #include "include/scoring.h"
 #include "include/main_menu.h"
+#include "include/game_sound.h"  // Add this include
 #include "raylib.h"
 #include <time.h>
 
@@ -12,6 +13,9 @@ int main(void)
     // Initialize window ONCE
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
+    
+    // Initialize audio system
+    InitAudioDevice();
 
     // Seed random
     srand(time(NULL));
@@ -19,6 +23,7 @@ int main(void)
     // Initialization
     InitBlocks0();
     InitMainMenu();
+    InitGameSound();  // Initialize game sounds
 
     TetrisBoard board;
     InitBoard1(&board);
@@ -29,19 +34,31 @@ int main(void)
     // Game state variables
     bool inGame = false;
     bool gameOver = false;
+    bool wasPreviouslyInGame = false;
 
     // Timer for automatic block fall
     float fallTimer = 0.0f;
     float fallDelay = 1.0f; // Waktu jatuh awal
+
+    // Start with menu music
+    PlayBackgroundMusic(MUSIC_MENU);
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
+        // Update game sounds
+        UpdateGameSound();
+
         MenuState currentMenuState = GetCurrentMenuState();
         if (currentMenuState == MENU_STATE_PLAY)
         {
+            if (!inGame) {
+                // Start gameplay music when entering game
+                PlayBackgroundMusic(MUSIC_GAMEPLAY);
+                PlaySoundEffect(SOUND_CLICK);
+            }
             inGame = true;
         }
         else if (currentMenuState == MENU_STATE_EXIT)
@@ -51,12 +68,18 @@ int main(void)
 
         if (inGame && !gameOver)
         {
+            // Track if we just entered the game
+            if (!wasPreviouslyInGame) {
+                wasPreviouslyInGame = true;
+            }
+            
             // Update fall speed based on current level
             fallDelay = UpdateFallSpeed(&scoreData);
             
             fallDelay = 1.0f - ((scoreData.level - 1) * 0.15f);
             if (fallDelay < 0.1f)
                 fallDelay = 0.1f;
+                
             // Update fall timer
             fallTimer += GetFrameTime();
 
@@ -73,6 +96,8 @@ int main(void)
                     if (IsGameOver(&board.current_block, &board))
                     {
                         gameOver = true;
+                        StopBackgroundMusic();  // Switch back to menu music
+                        PlaySoundEffect(SOUND_GAME_OVER); // Play game over sound
                     }
                 }
                 fallTimer = 0; // Reset timer
@@ -85,8 +110,10 @@ int main(void)
             if (IsKeyPressed(KEY_RIGHT))
                 MoveBlockHorizontal(&board.current_block, &board, 1);
 
-            if (IsKeyPressed(KEY_UP))
+            if (IsKeyPressed(KEY_UP)) {
                 RotateBlock(&board.current_block, &board);
+                PlaySoundEffect(SOUND_CLICK); // Play click sound on rotation
+            }
 
             if (IsKeyPressed(KEY_DOWN))
                 MoveBlockDown(&board.current_block, &board);
@@ -96,11 +123,20 @@ int main(void)
                 HardDropBlock(&board.current_block, &board);
                 board.current_block = board.next_block;
                 board.next_block = GenerateRandomBlock();
+                PlaySoundEffect(SOUND_CLICK); // Play click sound on hard drop
             }
+            
             // Tambahkan kontrol hold
             if (IsKeyPressed(KEY_C))
             {
                 HoldCurrentBlock(&board);
+                PlaySoundEffect(SOUND_CLICK); // Play click sound on hold
+            }
+
+            // Mute/unmute background music with M key
+            if (IsKeyPressed(KEY_M))
+            {
+                ToggleBackgroundMusic();
             }
 
             // Clear full lines
@@ -108,6 +144,7 @@ int main(void)
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
+                PlaySoundEffect(SOUND_CLICK); // Play sound on line clear
             }
 
             // Drawing
@@ -132,11 +169,20 @@ int main(void)
                 InitScoring(&scoreData);
                 gameOver = false;
                 inGame = false;
+                wasPreviouslyInGame = false;
                 fallTimer = 0;
+                PlaySoundEffect(SOUND_CLICK); // Play click sound on restart
+                PlayBackgroundMusic(MUSIC_MENU); // Return to menu music
             }
         }
         else
         {
+            if (wasPreviouslyInGame) {
+                // We just returned to the menu from gameplay
+                PlayBackgroundMusic(MUSIC_MENU);
+                wasPreviouslyInGame = false;
+            }
+            
             UpdateMainMenu();
             DrawMainMenu();
         }
@@ -146,6 +192,8 @@ int main(void)
 
     // Cleanup
     UnloadMainMenu();
+    UnloadGameSound();  // Unload game sounds
+    CloseAudioDevice();  // Close audio device
     CloseWindow();
 
     return 0;
