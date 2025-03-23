@@ -1,32 +1,33 @@
 // File: game_sound.c
 // Deskripsi: Implementasi sistem suara dalam game Tetris
-// Oleh: [Your Name]
+// Oleh: Abi
 
 #include "include/game_sound.h"
 #include <stdio.h>
 
-// Static variables for sounds and music
+// Variabel statis untuk menyimpan efek suara dan musik
 static Sound soundEffects[SOUND_COUNT];
 static Music musicTracks[MUSIC_COUNT];
-static MusicTrackType currentMusicTrack = MUSIC_COUNT; // Nothing playing initially
+static MusicTrackType currentMusicTrack = MUSIC_COUNT; // Tidak ada musik yang diputar saat awal
 static bool isMusicEnabled = true;
 static float musicVolume = 0.7f;
 static float soundVolume = 1.0f;
 
 void InitGameSound(void) {
-    // Load sound effects
+    // Memuat efek suara
     soundEffects[SOUND_CLICK] = LoadSound("assets/sounds/menu_select.wav");
     soundEffects[SOUND_GAME_OVER] = LoadSound("assets/sounds/game_over.wav");
+    soundEffects[SOUND_LINE_CLEAR] = LoadSound("assets/sounds/line_clear1.wav");
     
-    // Load music
-    musicTracks[MUSIC_MENU] = LoadMusicStream("assets/sounds/game_music.mp3");
-    musicTracks[MUSIC_GAMEPLAY] = LoadMusicStream("assets/sounds/game_music.mp3");
+    // Memuat musik latar
+    musicTracks[MUSIC_MENU] = LoadMusicStream("assets/sounds/game_menu1.mp3");
+    musicTracks[MUSIC_GAMEPLAY] = LoadMusicStream("assets/sounds/game_menu2.mp3");
     
-    // Set initial volumes
+    // Mengatur volume awal
     SetMusicVolume1(musicVolume);
     SetSoundEffectsVolume(soundVolume);
     
-    // Set music to loop
+    // Mengatur musik agar berulang (loop)
     for (int i = 0; i < MUSIC_COUNT; i++) {
         musicTracks[i].looping = true;
     }
@@ -34,14 +35,14 @@ void InitGameSound(void) {
 
 void PlaySoundEffect(SoundEffectType soundType) {
     if (soundType < SOUND_COUNT) {
-        // Play the sound with the current volume
+        // Memainkan efek suara dengan volume saat ini
         SetSoundVolume(soundEffects[soundType], soundVolume);
         PlaySound(soundEffects[soundType]);
     }
 }
 
 void PlayBackgroundMusic(MusicTrackType musicType) {
-    // Stop any currently playing music
+    // Menghentikan musik yang sedang diputar
     StopBackgroundMusic();
     
     if (musicType < MUSIC_COUNT && isMusicEnabled) {
@@ -59,7 +60,7 @@ void StopBackgroundMusic(void) {
 }
 
 void UpdateGameSound(void) {
-    // Update the currently playing music stream
+    // Memperbarui aliran musik yang sedang dimainkan
     if (currentMusicTrack < MUSIC_COUNT && isMusicEnabled) {
         UpdateMusicStream(musicTracks[currentMusicTrack]);
     }
@@ -80,7 +81,7 @@ void ToggleBackgroundMusic(void) {
 void SetMusicVolume1(float volume) {
     musicVolume = volume;
     
-    // Apply to currently playing music
+    // Menerapkan volume ke musik yang sedang dimainkan
     if (currentMusicTrack < MUSIC_COUNT) {
         SetMusicVolume1(musicVolume);
     }
@@ -88,7 +89,7 @@ void SetMusicVolume1(float volume) {
 
 void SetSoundEffectsVolume(float volume) {
     soundVolume = volume;
-    // No need to apply to sounds - it will be applied when played
+    // Tidak perlu diterapkan langsung ke efek suara, akan digunakan saat dimainkan
 }
 
 bool IsBackgroundMusicPlaying(void) {
@@ -99,15 +100,15 @@ bool IsBackgroundMusicPlaying(void) {
 }
 
 void UnloadGameSound(void) {
-    // Stop any playing music first
+    // Menghentikan musik yang sedang dimainkan terlebih dahulu
     StopBackgroundMusic();
     
-    // Unload sound effects
+    // Membebaskan memori efek suara
     for (int i = 0; i < SOUND_COUNT; i++) {
         UnloadSound(soundEffects[i]);
     }
     
-    // Unload music tracks
+    // Membebaskan memori trek musik
     for (int i = 0; i < MUSIC_COUNT; i++) {
         UnloadMusicStream(musicTracks[i]);
     }
