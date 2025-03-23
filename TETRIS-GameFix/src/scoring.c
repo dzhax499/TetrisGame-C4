@@ -75,29 +75,7 @@ void AddLineClearScore(ScoreData* scoreData, int lineCount) {
     scoreData->linesCleared += lineCount;
     
     // Periksa apakah harus naik level
-    CheckLevelUp(scoreData);
-}
-
-// Periksa apakah pemain harus naik level
-int CheckLevelUp(ScoreData* scoreData) {
-    if (scoreData->linesCleared >= scoreData->linesToNextLevel) {
-        // Naik level
-        scoreData->level++;
-        
-        // Perbarui jumlah garis yang dibutuhkan untuk level berikutnya
-        scoreData->linesToNextLevel += 10;
-        
-        // Perbarui kecepatan jatuh
-        UpdateFallSpeed(scoreData);
-        
-        // Putar suara level up
-        PlaySoundEffect(SOUND_CLICK); // Gunakan sound effect yang tersedia
-    }
-    
-    // Update high score jika skor saat ini lebih tinggi
-    if (scoreData->score > scoreData->highScore) {
-        scoreData->highScore = scoreData->score;
-    }
+    // CheckLevelUp(scoreData);
 }
 
 // Dapatkan tingkat kesulitan saat ini
