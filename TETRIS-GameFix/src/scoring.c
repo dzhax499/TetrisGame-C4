@@ -107,49 +107,36 @@ int GetDifficulty(ScoreData* scoreData) {
 
 // Simpan skor tertinggi ke dalam file
 void SaveHighScore(ScoreData* scoreData) {
-    // Hanya simpan jika skor lebih tinggi dari high score yang ada
-    if (scoreData->score > scoreData->highScore) {
+    if (scoreData->score > LoadHighScore()) {  // Periksa langsung dari file
         FILE* file = fopen(HIGH_SCORE_FILE, "w");
-        
+
         if (file) {
-            // Pastikan direktori ada
             fprintf(file, "%d", scoreData->score);
             fclose(file);
-            
-            // Update high score dalam struktur data
-            scoreData->highScore = scoreData->score;
+            scoreData->highScore = scoreData->score;  // Update setelah sukses menyimpan
         } else {
-            // Coba buat direktori jika tidak ada
-            #ifdef _WIN32
-            system("mkdir ..\\assets\\log");
-            #else
-            system("mkdir -p ../assets/log");
-            #endif
-            
-            // Coba lagi setelah membuat direktori
-            file = fopen(HIGH_SCORE_FILE, "w");
-            if (file) {
-                fprintf(file, "%d", scoreData->score);
-                fclose(file);
-                scoreData->highScore = scoreData->score;
-            }
+            printf("Gagal menyimpan highscore! Pastikan direktori tersedia.\n");
         }
     }
 }
+
 
 // Muat skor tertinggi dari file
 int LoadHighScore(void) {
     int highScore = 0;
     FILE* file = fopen(HIGH_SCORE_FILE, "r");
-    
+
     if (file) {
         if (fscanf(file, "%d", &highScore) != 1) {
-            // Jika format file tidak valid, gunakan nilai default
+            printf("File highscore.dat ditemukan, tetapi tidak bisa dibaca. Set highscore = 0\n");
             highScore = 0;
+        } else {
+            printf("Highscore saat ini: %d\n", highScore);
         }
         fclose(file);
+    } else {
+        printf("File highscore.dat tidak ditemukan, menggunakan highscore default = 0\n");
     }
-    
     return highScore;
 }
 
