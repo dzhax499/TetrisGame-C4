@@ -31,7 +31,7 @@ void AddDropScore(ScoreData* scoreData, int dropDistance);
 void AddLineClearScore(ScoreData* scoreData, int lineCount);
 
 // Fungsi untuk memeriksa apakah level harus dinaikkan
-void CheckLevelUp(ScoreData* scoreData);
+int CheckLevelUp(ScoreData* scoreData);
 
 // Fungsi untuk mendapatkan tingkat kesulitan saat ini
 int GetDifficulty(ScoreData* scoreData);
