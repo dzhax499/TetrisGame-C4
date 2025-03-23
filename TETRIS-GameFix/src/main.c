@@ -1,90 +1,152 @@
-// Nama file : main.c
-// Deskripsi : File utama program game Tetris (management game loop)
-// Oleh      : Dzakit Tsabit 241511071
-
-// Nama file : main.c
-// Deskripsi : Implementasi utama game Tetris
-// Oleh      : Dzakit Tsabit 241511071
-
-#include "raylib.h"
 #include "include/tetris.h"
+#include "include/board.h"
 #include "include/blocks.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "include/rendering.h"
+#include "include/scoring.h"
+#include "include/main_menu.h"
+#include "raylib.h"
 #include <time.h>
 
-// Game state
-TetrisBoard board;
-TetrisBlock currentBlock;
-bool gameOver = false;
-bool paused = false;
-
-void InitGame(void) {
+int main(void)
+{
+    // Initialize window ONCE
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
-    
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            board.grid[i][j] = 0;
+
+    // Seed random
+    srand(time(NULL));
+
+    // Initialization
+    InitBlocks0();
+    InitMainMenu();
+
+    TetrisBoard board;
+    InitBoard1(&board);
+
+    ScoreData scoreData;
+    InitScoring(&scoreData);
+
+    // Game state variables
+    bool inGame = false;
+    bool gameOver = false;
+
+    // Timer for automatic block fall
+    float fallTimer = 0.0f;
+    float fallDelay = 1.0f; // Waktu jatuh awal
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(DARKGRAY);
+
+        MenuState currentMenuState = GetCurrentMenuState();
+        if (currentMenuState == MENU_STATE_PLAY)
+        {
+            inGame = true;
         }
-    }
-    
-    currentBlock = GenerateRandomBlock();
-}
+        else if (currentMenuState == MENU_STATE_EXIT)
+        {
+            break;
+        }
 
-void UpdateGame(void) {
-    if (IsKeyPressed(KEY_P)) {
-        paused = !paused;
-    }
-    if (paused || gameOver) return;
-    
-    if (IsKeyPressed(KEY_LEFT)) {
-        MoveBlockHorizontal(&currentBlock, &board, -1);
-    }
-    if (IsKeyPressed(KEY_RIGHT)) {
-        MoveBlockHorizontal(&currentBlock, &board, 1);
-    }
-    if (IsKeyPressed(KEY_DOWN)) {
-        MoveBlockDown(&currentBlock, &board);
-    }
-    if (IsKeyPressed(KEY_UP)) {
-        RotateBlock(&currentBlock, &board);
-    }
-    if (IsKeyPressed(KEY_SPACE)) {
-        HardDropBlock(&currentBlock, &board);
-    }
-    
-    if (IsGameOver(&currentBlock, &board)) {
-        gameOver = true;
-    }
-}
+        if (inGame && !gameOver)
+        {
+            // Update fall speed based on current level
+            fallDelay = UpdateFallSpeed(&scoreData);
+            
+            fallDelay = 1.0f - ((scoreData.level - 1) * 0.15f);
+            if (fallDelay < 0.1f)
+                fallDelay = 0.1f;
+            // Update fall timer
+            fallTimer += GetFrameTime();
 
-void DrawGame(void) {
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
-    
-    if (gameOver) {
-        DrawGameOverScreen(0);
-    } else if (paused) {
-        DrawPauseOverlay();
-    } else {
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                if (board.grid[i][j] != 0) {
-                    DrawRectangle(j * 30, i * 30, 30, 30, BLACK);
+            // Automatic block fall
+            if (fallTimer >= fallDelay)
+            {
+                if (!MoveBlockDown(&board.current_block, &board))
+                {
+                    PlaceBlock(&board.current_block, &board);
+                    board.current_block = board.next_block;
+                    board.next_block = GenerateRandomBlock();
+
+                    // Check game over
+                    if (IsGameOver(&board.current_block, &board))
+                    {
+                        gameOver = true;
+                    }
                 }
+                fallTimer = 0; // Reset timer
+            }
+
+            // Player controls
+            if (IsKeyPressed(KEY_LEFT))
+                MoveBlockHorizontal(&board.current_block, &board, -1);
+
+            if (IsKeyPressed(KEY_RIGHT))
+                MoveBlockHorizontal(&board.current_block, &board, 1);
+
+            if (IsKeyPressed(KEY_UP))
+                RotateBlock(&board.current_block, &board);
+
+            if (IsKeyPressed(KEY_DOWN))
+                MoveBlockDown(&board.current_block, &board);
+
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                HardDropBlock(&board.current_block, &board);
+                board.current_block = board.next_block;
+                board.next_block = GenerateRandomBlock();
+            }
+            // Tambahkan kontrol hold
+            if (IsKeyPressed(KEY_C))
+            {
+                HoldCurrentBlock(&board);
+            }
+
+            // Clear full lines
+            int linesCleared = ClearFullLines(&board);
+            if (linesCleared > 0)
+            {
+                AddLineClearScore(&scoreData, linesCleared);
+            }
+
+            // Drawing
+            DrawBoard(&board);
+            DrawActiveTetromino(&board.current_block);
+            // Sebelum menggambar
+            DrawBlockShadow(&board.current_block, &board);
+            DrawHoldBlock(&board);
+            DrawNextBlock(&board);
+            DrawScore(&board, &scoreData);
+        }
+        else if (gameOver)
+        {
+            DrawText("GAME OVER", 300, 250, 40, RED);
+            DrawText("Press R to Restart", 280, 300, 20, WHITE);
+            DrawText(TextFormat("Final Score: %d", scoreData.score), 280, 350, 20, WHITE);
+
+            if (IsKeyPressed(KEY_R))
+            {
+                SaveHighScore(&scoreData); // Save high score
+                InitBoard1(&board);
+                InitScoring(&scoreData);
+                gameOver = false;
+                inGame = false;
+                fallTimer = 0;
             }
         }
-    }
-    EndDrawing();
-}
+        else
+        {
+            UpdateMainMenu();
+            DrawMainMenu();
+        }
 
-int main(void) {
-    InitGame();
-    while (!WindowShouldClose()) {
-        UpdateGame();
-        DrawGame();
+        EndDrawing();
     }
+
+    // Cleanup
+    UnloadMainMenu();
     CloseWindow();
+
     return 0;
 }

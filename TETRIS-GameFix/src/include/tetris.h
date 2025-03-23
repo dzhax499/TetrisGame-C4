@@ -6,7 +6,9 @@
 #define TETRIS_H
 
 #include <stdbool.h>
+#include <raylib.h>
 #include <stdlib.h>
+#include <time.h>
 #include <stdio.h>
 #include "raylib.h"
 
@@ -15,8 +17,8 @@
 #define BOARD_HEIGHT 20
 
 // Definisi ukuran window
-#define WINDOW_WIDTH  800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH  1024  // Lebih lebar
+#define WINDOW_HEIGHT 768   // Lebih tinggi
 
 // typedef struct {
 //     int grid[BOARD_HEIGHT][BOARD_WIDTH]; // 0 kosong, 1-7 warna blok
@@ -29,6 +31,12 @@ typedef struct {
     int x, y;     // Posisi pada papan
     Color color;  // Warna blok
 } TetrisBlock;
+
+// Tambahkan struktur untuk menyimpan hold block
+typedef struct {
+    TetrisBlock block;
+    bool hasHeld;
+} HoldBlock;
 
 // Fungsi load dan unload asset permainan
 void LoadGameAssets(void);

@@ -2,13 +2,15 @@
  * scoring.c
  * 
  * Menangani sistem skor, perkembangan level, dan tingkat kesulitan permainan
- * Penulis: Fatimah & Abi
+ * Penulis: Fatimah 
  */
 
  #include <raylib.h>
  #include "include/tetris.h"
  #include "include/scoring.h"
  
+ #define HIGH_SCORE_FILE "../assets/log/highscore.dat"
+
  // Inisialisasi sistem skor
  void InitScoring(ScoreData* scoreData) {
      scoreData->score = 0;
@@ -95,38 +97,33 @@
  
  // Simpan skor tertinggi ke dalam file
  void SaveHighScore(ScoreData* scoreData) {
-     // Buka file
-     FILE* file = fopen("highscore.dat", "r");
-     int highScore = 0;
-     
-     // Baca skor tertinggi yang ada jika file tersedia
-     if (file) {
-         fscanf(file, "%d", &highScore);
-         fclose(file);
-     }
-     
-     // Perbarui skor tertinggi jika skor saat ini lebih tinggi
-     if (scoreData->score > highScore) {
-         file = fopen("highscore.dat", "w");
-         if (file) {
-             fprintf(file, "%d", scoreData->score);
-             fclose(file);
-         }
-     }
- }
+    int currentHighScore = LoadHighScore();
+    
+    if (scoreData->score > currentHighScore) {
+        FILE* file = fopen(HIGH_SCORE_FILE, "w");  // Gunakan mode text
+        if (file) {
+            fprintf(file, "%d", scoreData->score);  // Tulis sebagai string angka
+            fclose(file);
+            printf("High score saved: %d\n", scoreData->score);  // Debug
+        } else {
+            printf("Failed to open file for writing\n");  // Debug
+        }
+    }
+}
  
  // Muat skor tertinggi dari file
  int LoadHighScore(void) {
-     FILE* file = fopen("highscore.dat", "r");
-     int highScore = 0;
-     
-     if (file) {
-         fscanf(file, "%d", &highScore);
-         fclose(file);
-     }
-     
-     return highScore;
+    int highScore = 0;
+    FILE* file = fopen(HIGH_SCORE_FILE, "r");  // Gunakan mode text
+    
+    if (file) {
+        fscanf(file, "%d", &highScore);  // Baca sebagai angka
+        fclose(file);
+        printf("High score loaded: %d\n", highScore);  // Debug
+    } else {
+        printf("High score file not found, using default 0\n");  // Debug
+    }
+    
+    return highScore;
  }
- 
- // Berikan poin bonus untuk gerakan spesial (T-spin, back-to-back tet)
  

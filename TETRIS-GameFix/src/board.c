@@ -10,6 +10,26 @@
 #include <stdio.h>
 #include "raylib.h"
 
+TetrisBoard *board = NULL;
+
+Color GetBlockColor(BlockType block) {
+    static const Color BLOCK_COLORS[] = {
+        BLANK,      // 0 = Kosong
+        SKYBLUE,    // 1 = I
+        DARKBLUE,   // 2 = J
+        ORANGE,     // 3 = L
+        YELLOW,     // 4 = O
+        LIME,       // 5 = S
+        PURPLE,     // 6 = T
+        RED         // 7 = Z
+    };
+
+    if (block >= BLOCK_EMPTY && block <= BLOCK_Z) {
+        return BLOCK_COLORS[block];
+    }
+    return GRAY; // Jika tidak valid, kasih warna default
+}
+
 // Inisialisasi papan permainan
 void InitBoard1(TetrisBoard *board) {
     // Bersihkan grid
@@ -20,6 +40,9 @@ void InitBoard1(TetrisBoard *board) {
     board->current_level = 1;
     board->lines_cleared = 0;
     board->game_over = false;
+    
+    // Initialize hold block state
+    board->hold_block.hasHeld = false;
 
     // Buat blok baru
     board->current_block = GenerateRandomBlock();
@@ -71,18 +94,6 @@ int ClearFullLines(TetrisBoard* board) {
     return linesCleared;
 }
 
-// Periksa apakah permainan berakhir
-bool IsGameOver(TetrisBoard* board) {
-    // Periksa baris paling atas
-    for (int x = 0; x < BOARD_WIDTH; x++) {
-        if (board->grid[0][x] != BLOCK_EMPTY) {
-            board->game_over = true;
-            return true;
-        }
-    }
-    return false;
-}
-
 
 // Fungsi debug: Cetak papan ke konsol
 void PrintBoard(TetrisBoard* board) {
@@ -96,7 +107,9 @@ void PrintBoard(TetrisBoard* board) {
 }
 
 // Periksa apakah permainan berakhir
-bool IsGameOver(TetrisBoard* board) {
+bool IsGameOver(TetrisBlock *block, TetrisBoard *board) {
+    (void)block; // Tidak digunakan saat ini
+    // Periksa baris paling atas
     for (int x = 0; x < BOARD_WIDTH; x++) {
         if (board->grid[0][x] != BLOCK_EMPTY) {
             board->game_over = true;

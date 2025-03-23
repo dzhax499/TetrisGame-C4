@@ -6,6 +6,8 @@
 #define BLOCKS_H
 
 #include "tetris.h"
+#include "board.h"
+#include <stdlib.h>
 #include <stdbool.h>
 
 // Inisialisasi sistem blok
@@ -116,11 +118,96 @@ static const int TETROMINO_SHAPES[7][4][4][4] = {
          {0,1,1,0}, 
          {0,0,0,0}, 
          {0,0,0,0}}
-    }
+    },
+    // Add the missing shapes to your array:
+
+// S Tetromino (Green)
+{
+    // Rotasi 0°
+    {{0,1,1,0}, 
+     {1,1,0,0}, 
+     {0,0,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 90°
+    {{0,1,0,0}, 
+     {0,1,1,0}, 
+     {0,0,1,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 180° (same as 0°)
+    {{0,0,0,0}, 
+     {0,1,1,0}, 
+     {1,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 270° (same as 90°)
+    {{1,0,0,0}, 
+     {1,1,0,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}}
+},
+
+// T Tetromino (Purple)
+{
+    // Rotasi 0°
+    {{0,1,0,0}, 
+     {1,1,1,0}, 
+     {0,0,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 90°
+    {{0,1,0,0}, 
+     {0,1,1,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 180°
+    {{0,0,0,0}, 
+     {1,1,1,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 270°
+    {{0,1,0,0}, 
+     {1,1,0,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}}
+},
+
+// Z Tetromino (Red)
+{
+    // Rotasi 0°
+    {{1,1,0,0}, 
+     {0,1,1,0}, 
+     {0,0,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 90°
+    {{0,0,1,0}, 
+     {0,1,1,0}, 
+     {0,1,0,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 180° (same as 0°)
+    {{0,0,0,0}, 
+     {1,1,0,0}, 
+     {0,1,1,0}, 
+     {0,0,0,0}},
+
+    // Rotasi 270° (same as 90°)
+    {{0,1,0,0}, 
+     {1,1,0,0}, 
+     {1,0,0,0}, 
+     {0,0,0,0}}
+}
+    
 };
+
 
 // Fungsi untuk menghasilkan blok acak
 TetrisBlock GenerateRandomBlock(void);
+
 
 // Fungsi untuk memeriksa posisi blok
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation);
@@ -137,9 +224,14 @@ bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board);
 // Fungsi untuk hard drop (jatuh cepat)
 void HardDropBlock(TetrisBlock *block, TetrisBoard *board);
 
+void HoldCurrentBlock(TetrisBoard* board);
+
 // Fungsi untuk menempatkan blok di papan
 void PlaceBlock(TetrisBlock *block, TetrisBoard *board);
 
+//harddrop hitung
+int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board);
 
+bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board);
 
 #endif
