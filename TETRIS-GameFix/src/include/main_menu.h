@@ -13,7 +13,8 @@ typedef enum {
     MENU_STATE_PLAY,
     MENU_STATE_HIGHSCORE,
     MENU_STATE_CREDITS,
-    MENU_STATE_EXIT
+    MENU_STATE_EXIT,
+    MENU_STATE_PAUSE
 } MenuState;
 
 // Struktur untuk tombol menu
@@ -31,7 +32,7 @@ void UpdateMainMenu(void);
 void DrawMainMenu(void);
 void UnloadMainMenu(void);
 MenuState GetCurrentMenuState(void);
-
+void SetMenuState(MenuState newState);
 
 
 

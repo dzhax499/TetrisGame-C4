@@ -237,6 +237,49 @@ void DrawBlockShadow(TetrisBlock* block, TetrisBoard* board) {
     }
 }
 
+void DrawPauseOverlay(void) {
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+    
+    // Semi-transparent background
+    DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.7f));
+    
+    // Draw PAUSE text
+    DrawText("PAUSED", screenWidth/2 - MeasureText("PAUSED", 40)/2, 
+        screenHeight/2 - 100, 40, WHITE);
+    
+    // Define button dimensions and positions
+    Rectangle resumeBtn = {
+        screenWidth/2 - 100,
+        screenHeight/2 - 20,
+        200,
+        50
+    };
+    
+    Rectangle exitBtn = {
+        screenWidth/2 - 100,
+        screenHeight/2 + 50,
+        200,
+        50
+    };
+    
+    // Draw Resume button
+    DrawRectangleRec(resumeBtn, BLUE);
+    DrawRectangleLinesEx(resumeBtn, 2, SKYBLUE);
+    DrawText("RESUME", resumeBtn.x + (resumeBtn.width/2) - MeasureText("RESUME", 20)/2, 
+             resumeBtn.y + 15, 20, WHITE);
+    
+    // Draw Exit button
+    DrawRectangleRec(exitBtn, RED);
+    DrawRectangleLinesEx(exitBtn, 2, PINK);
+    DrawText("EXIT", exitBtn.x + (exitBtn.width/2) - MeasureText("EXIT", 20)/2, 
+             exitBtn.y + 15, 20, WHITE);
+    
+    // Controls hint
+    DrawText("Press P to resume", GetScreenWidth()/2 - MeasureText("Press P to resume", 20)/2, 
+             GetScreenHeight() - 50, 20, GRAY);
+}
+
  // Render blok berikutnya
  void DrawNextBlock(TetrisBoard* board) {
     // HAPUS DEKLARASI VARIABEL offsetX LAMA
