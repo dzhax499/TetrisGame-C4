@@ -19,8 +19,8 @@ void InitGameSound(void) {
     soundEffects[SOUND_GAME_OVER] = LoadSound("assets/sounds/game_over.wav");
     
     // Memuat musik latar
-    musicTracks[MUSIC_MENU] = LoadMusicStream("assets/sounds/game_music.mp3");
-    musicTracks[MUSIC_GAMEPLAY] = LoadMusicStream("assets/sounds/game_music.mp3");
+    musicTracks[MUSIC_MENU] = LoadMusicStream("assets/sounds/game_menu1.mp3");
+    musicTracks[MUSIC_GAMEPLAY] = LoadMusicStream("assets/sounds/game_menu2.mp3");
     
     // Mengatur volume awal
     SetMusicVolume1(musicVolume);
