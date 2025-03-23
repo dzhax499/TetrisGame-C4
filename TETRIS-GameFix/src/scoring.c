@@ -79,7 +79,7 @@ void AddLineClearScore(ScoreData* scoreData, int lineCount) {
 }
 
 // Periksa apakah pemain harus naik level
-void CheckLevelUp(ScoreData* scoreData) {
+int CheckLevelUp(ScoreData* scoreData) {
     if (scoreData->linesCleared >= scoreData->linesToNextLevel) {
         // Naik level
         scoreData->level++;
