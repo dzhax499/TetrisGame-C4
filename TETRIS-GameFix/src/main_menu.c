@@ -16,9 +16,10 @@ static Texture2D backgroundTexture;
 void InitMainMenu(void)
 {
     // Inisialisasi background
-    backgroundTexture = LoadTexture("bg.png");
+    ClearBackground(LIGHTGRAY);
+    backgroundTexture = LoadTexture("assets/textures/bg.png");
     if (backgroundTexture.id == 0) {
-        TraceLog(LOG_ERROR, "Background texture could not be loaded");
+        TraceLog(LOG_WARNING, "Background texture could not be loaded");
     }
 
     // Inisialisasi font
@@ -107,7 +108,7 @@ void UpdateMainMenu(void)
 void DrawMainMenu(void)
 {
     // Draw background
-    DrawTexture(backgroundTexture, 0, 0, BLACK);
+    DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
     
     // Draw title
     
