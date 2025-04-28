@@ -1,14 +1,12 @@
-/**
- * scoring.c
- *
- * Menangani sistem skor, perkembangan level, dan tingkat kesulitan permainan
- * Penulis: Fatimah
- */
+// Nama file  : scoring.c
+// Deskripsi  : Menangani sistem skor, perkembangan level, dan tingkat kesulitan permainan
+// Oleh       : Fatimah Hawwa 241511074
+
 #include <raylib.h>
-#include <stdio.h>  // Untuk fungsi file I/O
+#include <stdio.h>  
 #include "include/tetris.h"
 #include "include/scoring.h"
-#include "include/game_sound.h"  // Untuk efek suara level up
+#include "include/game_sound.h"  
 
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
 
@@ -61,7 +59,7 @@ void AddLineClearScore(ScoreData* scoreData, int lineCount) {
             basePoints = 300;
             break;
         case 4:
-            basePoints = 1200; // Bonus Tetris!
+            basePoints = 1200; 
             break;
         default:
             return;
@@ -75,7 +73,24 @@ void AddLineClearScore(ScoreData* scoreData, int lineCount) {
     scoreData->linesCleared += lineCount;
     
     // Periksa apakah harus naik level
-    // CheckLevelUp(scoreData);
+    CheckLevelUp(scoreData);
+}
+
+// Fungsi untuk memeriksa apakah level harus dinaikkan berdasarkan baris yang dibersihkan 
+int CheckLevelUp(ScoreData* scoreData)  {
+    // Hitung level baru berdasarkan jumlah baris yang dibersihkan (1 level per 3 baris) 
+    int newLevel = 1 + (scoreData->linesCleared / 3);
+        // Update level jika telah bertambah
+        if (newLevel > scoreData->level) {
+            scoreData->level = newLevel;
+            scoreData->linesToNextLevel = 3 * newLevel - scoreData->linesCleared;
+            return 1; // Level bertambah
+        } else {
+            // Perbarui sisa baris untuk level berikutnya
+            scoreData->linesToNextLevel = 3 * (scoreData->level + 1) - scoreData->linesCleared;
+        }
+
+return 0; // Level tidak berubah
 }
 
 // Dapatkan tingkat kesulitan saat ini
@@ -106,19 +121,17 @@ int LoadHighScore(void) {
 
     if (file) {
         if (fscanf(file, "%d", &highScore) != 1) {
-            printf("File highscore.dat ditemukan, tetapi tidak bisa dibaca. Set highscore = 0\n");
             highScore = 0;
-        } else {
-            printf("Highscore saat ini: %d\n", highScore);
-        }
+        }     
         fclose(file);
-    } else {
-        printf("File highscore.dat tidak ditemukan, menggunakan highscore default = 0\n");
-    }
+    
     return highScore;
+    }
 }
 
 // Mendapatkan high score saat ini
 int GetHighScore(ScoreData* scoreData) {
     return scoreData->highScore;
 }
+
+

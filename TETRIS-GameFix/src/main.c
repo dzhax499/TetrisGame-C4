@@ -484,7 +484,11 @@ int main(void)
 
             if (IsKeyPressed(KEY_SPACE))
             {
-                HardDropBlock(&board.current_block, &board);
+                int dropDistance = CalculateDropDistance(&board.current_block, &board);
+                board.current_block.y += dropDistance;
+                AddDropScore(&scoreData, dropDistance);
+                PlaceBlock(&board.current_block, &board);
+
                 board.current_block = board.next_block;
                 board.next_block = GenerateRandomBlock();
                 PlaySoundEffect(SOUND_CLICK);
@@ -507,6 +511,8 @@ int main(void)
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
+                CheckLevelUp(&scoreData);
+                scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
 

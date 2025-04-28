@@ -31,7 +31,7 @@ void AddDropScore(ScoreData* scoreData, int dropDistance);
 void AddLineClearScore(ScoreData* scoreData, int lineCount);
 
 // Fungsi untuk memeriksa apakah level harus dinaikkan
-// int CheckLevelUp(ScoreData* scoreData);
+int CheckLevelUp(ScoreData* scoreData);
 
 // Fungsi untuk mendapatkan tingkat kesulitan saat ini
 int GetDifficulty(ScoreData* scoreData);
@@ -43,5 +43,6 @@ void SaveHighScore(ScoreData* scoreData);
 int LoadHighScore(void);
 
 // Tambahkan fungsi getter untuk high score
-int GetHighScore(ScoreData* scoreData);  
+int GetHighScore(ScoreData* scoreData); 
+ 
 #endif // SCORING_H
