@@ -1,7 +1,7 @@
 // Nama file : main.c
 // Deskripsi : File utama yang menggabungkan semua komponen, menginisialisasi permainan, dan mengatur loop utama permainan.
 // Oleh      : Ibnu Hilmi 241511079
-//             Dzakir Tsabit 241511071
+//             Dzakir Tsabit 241511071 (github : dzhax4499)
 
 /**
  * ===================================
