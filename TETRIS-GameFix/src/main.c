@@ -484,7 +484,11 @@ int main(void)
 
             if (IsKeyPressed(KEY_SPACE))
             {
-                HardDropBlock(&board.current_block, &board);
+                int dropDistance = CalculateDropDistance(&board.current_block, &board);
+                board.current_block.y += dropDistance;
+                AddDropScore(&scoreData, dropDistance);
+                PlaceBlock(&board.current_block, &board);
+
                 board.current_block = board.next_block;
                 board.next_block = GenerateRandomBlock();
                 PlaySoundEffect(SOUND_CLICK);
@@ -507,6 +511,8 @@ int main(void)
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
+                CheckLevelUp(&scoreData);
+                scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
 
@@ -540,13 +546,13 @@ int main(void)
             int fontSize = 16;
             Color textColor = RAYWHITE;
 
-            DrawText("< / >: Gerak Kiri/Kanan", textX, textY, fontSize, textColor);
-            DrawText("^    : Rotasi Blok", textX, textY + 20, fontSize, textColor);
-            DrawText("v    : Turun Cepat", textX, textY + 40, fontSize, textColor);
-            DrawText("SPACE: Hard Drop", textX, textY + 60, fontSize, textColor);
-            DrawText("C    : Hold Block", textX, textY + 80, fontSize, textColor);
-            DrawText("P/ESC: Pause Game", textX, textY + 100, fontSize, textColor);
-            DrawText("M    : Mute/Unmute Musik", textX, textY + 120, fontSize, textColor);
+            DrawText("< / >: Gerak Kiri/Kanan", textX, textY - 10, fontSize, textColor);
+            DrawText("^    : Rotasi Blok", textX, textY + 10, fontSize, textColor);
+            DrawText("v    : Turun Cepat", textX, textY + 30, fontSize, textColor);
+            DrawText("SPACE: Hard Drop", textX, textY + 50, fontSize, textColor);
+            DrawText("C    : Hold Block", textX, textY + 70, fontSize, textColor);
+            DrawText("P/ESC: Pause Game", textX, textY + 90, fontSize, textColor);
+            DrawText("M    : Mute/Unmute Musik", textX, textY + 110, fontSize, textColor);
         }
         /**
          * Penanganan Status Game Over

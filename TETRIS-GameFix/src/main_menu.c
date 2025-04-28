@@ -203,7 +203,7 @@ void DrawMainMenu(void)
     DrawText("Press M to toggle music", 10, GetScreenHeight() - 735, 20, RAYWHITE);
 
     // Draw footer
-    DrawText("(c) 2023 D'Okeh Studio", 10, GetScreenHeight() - 760, 20, RAYWHITE);
+    DrawText("(c) 2025 D'Okeh Studio", 10, GetScreenHeight() - 760, 20, RAYWHITE);
 }
 
 void UnloadMainMenu(void)
