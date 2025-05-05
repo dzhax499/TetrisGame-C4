@@ -70,4 +70,24 @@ Color GetBlockColor(BlockType block);
 // Fungsi debug
 void PrintBoard(TetrisBoard* board);
 
+// Node untuk circular linked list blok
+typedef struct BlockNode {
+    TetrisBlock block;
+    struct BlockNode* next;
+} BlockNode;
+
+// struct TetrisBoard
+
+typedef struct {
+    BlockType grid[BOARD_HEIGHT][BOARD_WIDTH];
+    TetrisBlock current_block;
+    BlockNode* next_blocks; // Circular linked list
+    HoldBlock hold_block;
+    int current_score;
+    int current_level;
+    int lines_cleared;
+    bool game_over;
+    ScoreData score_data;
+} TetrisBoard;
+
 #endif // BOARD_H

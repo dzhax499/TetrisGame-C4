@@ -32,21 +32,20 @@ Color GetBlockColor(BlockType block) {
 
 // Inisialisasi papan permainan
 void InitBoard1(TetrisBoard *board) {
-    // Bersihkan grid
     memset(board->grid, BLOCK_EMPTY, sizeof(board->grid));
-    
-    // Reset skor, level, dan status game over
     board->current_score = 0;
     board->current_level = 1;
     board->lines_cleared = 0;
     board->game_over = false;
-    
-    // Initialize hold block state
     board->hold_block.hasHeld = false;
+    board->next_blocks = NULL;
 
-    // Buat blok baru
-    board->current_block = GenerateRandomBlock();
-    board->next_block = GenerateRandomBlock();
+    // Isi 5 blok pertama
+    for (int i = 0; i < 5; i++) {
+        AddNextBlock(board, GenerateRandomBlock());
+    }
+
+    board->current_block = PopNextBlock(board);
 }
 
 // Hapus baris yang penuh dan update skor
@@ -117,4 +116,56 @@ bool IsGameOver(TetrisBlock *block, TetrisBoard *board) {
         }
     }
     return false;
+}
+
+// Tambah blok ke circular linked list
+void AddNextBlock(TetrisBoard* board, TetrisBlock newBlock) {
+    BlockNode* newNode = (BlockNode*)malloc(sizeof(BlockNode));
+    newNode->block = newBlock;
+
+    if (!board->next_blocks) {
+        newNode->next = newNode;
+        board->next_blocks = newNode;
+    } else {
+        BlockNode* temp = board->next_blocks;
+        while (temp->next != board->next_blocks) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->next = board->next_blocks;
+    }
+}
+
+// Ambil dan hapus blok dari circular list
+TetrisBlock PopNextBlock(TetrisBoard* board) {
+    if (!board->next_blocks) return GenerateRandomBlock();
+
+    BlockNode* head = board->next_blocks;
+    TetrisBlock result = head->block;
+
+    if (head->next == head) {
+        free(head);
+        board->next_blocks = NULL;
+    } else {
+        BlockNode* temp = head;
+        while (temp->next != head) temp = temp->next;
+        temp->next = head->next;
+        board->next_blocks = head->next;
+        free(head);
+    }
+
+    return result;
+}
+
+void PrintNextBlocks(TetrisBoard* board) {
+    if (!board->next_blocks) {
+        printf("Antrian kosong\n");
+        return;
+    }
+
+    BlockNode* current = board->next_blocks;
+    do {
+        printf("Blok type: %d\n", current->block.type);
+        current = current->next;
+    } while (current != board->next_blocks);
 }
