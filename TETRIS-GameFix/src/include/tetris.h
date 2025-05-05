@@ -20,12 +20,16 @@
 #define WINDOW_WIDTH  1024  // Lebih lebar
 #define WINDOW_HEIGHT 768   // Lebih tinggi
 
+// typedef struct {
+//     int grid[BOARD_HEIGHT][BOARD_WIDTH]; // 0 kosong, 1-7 warna blok
+// } TetrisBoard0;
+
 typedef struct {
-    int type;                 // Tipe blok (0-6 untuk I, J, L, O, S, T, Z)
-    int rotation;            // Rotasi saat ini (0-3)
-    int shape[4][4][4];      // 4 rotasi, masing-masing 4x4 grid
-    int x, y;                // Posisi pada papan
-    Color color;             // Warna blok
+    int type;     // Tipe blok (0-6 untuk I, J, L, O, S, T, Z)
+    int rotation; // Rotasi saat ini (0-3)
+    int shape[4][4]; // Bentuk blok
+    int x, y;     // Posisi pada papan
+    Color color;  // Warna blok
 } TetrisBlock;
 
 // Tambahkan struktur untuk menyimpan hold block
@@ -41,5 +45,6 @@ void UnloadGameAssets(void);
 // Fungsi drawing tambahan
 void DrawPauseOverlay(void);
 void DrawGameOverScreen(int score);
+
 
 #endif

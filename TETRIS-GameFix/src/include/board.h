@@ -1,3 +1,8 @@
+// Nama file : board.h
+// Deskripsi : Header untuk logika papan permainan Tetris (Array 2D)
+// Oleh      : Ibnu Hilmi 241511079
+//             Rizky Satria Gunawan
+
 #ifndef BOARD_H
 #define BOARD_H
 
@@ -10,9 +15,9 @@
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
 #define BLOCK_SIZE 30
-#define BOARD_OFFSET_X 250
-#define BOARD_OFFSET_Y 50
-#define NEXT_BLOCKS_COUNT 3 // Jumlah blok berikutnya yang ditampilkan
+#define BOARD_OFFSET_X 250  // Geser ke tengah
+#define BOARD_OFFSET_Y 50   // Tetap sama
+
 
 // Tipe data untuk blok
 typedef enum {
@@ -26,20 +31,6 @@ typedef enum {
     BLOCK_Z      // Red
 } BlockType;
 
-// Struktur node untuk next_blocks (doubly linked circular list)
-typedef struct NextBlockNode {
-    BlockType type;
-    struct NextBlockNode* next;
-    struct NextBlockNode* prev;
-} NextBlockNode;
-
-// Struktur node untuk riwayat hold (doubly linked circular list)
-typedef struct HoldHistoryNode {
-    BlockType type;
-    struct HoldHistoryNode* next;
-    struct HoldHistoryNode* prev;
-} HoldHistoryNode;
-
 // Struktur untuk menyimpan informasi blok yang sedang jatuh
 typedef struct {
     BlockType type;
@@ -52,9 +43,8 @@ typedef struct {
 typedef struct {
     BlockType grid[BOARD_HEIGHT][BOARD_WIDTH];
     TetrisBlock current_block;
-    NextBlockNode* next_blocks; // Circular doubly linked list untuk blok berikutnya
-    HoldHistoryNode* hold_history; // Circular doubly linked list untuk riwayat hold
-    bool hasHeld;
+    TetrisBlock next_block;
+    HoldBlock hold_block;  // Tambahkan ini
     int current_score;
     int current_level;
     int lines_cleared;
@@ -62,10 +52,11 @@ typedef struct {
     ScoreData score_data;
 } TetrisBoard;
 
+
 extern TetrisBoard *board;
 
 // Fungsi inisialisasi papan permainan
-void InitBoard(TetrisBoard* board);
+void InitBoard1(TetrisBoard* board);
 
 // Fungsi untuk menghapus baris yang penuh
 int ClearFullLines(TetrisBoard* board);
@@ -75,18 +66,6 @@ bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
 
 // Fungsi utilitas
 Color GetBlockColor(BlockType block);
-
-// Fungsi untuk mengelola next_blocks (circular doubly linked list)
-void InitNextBlocks(TetrisBoard* board, int count);
-BlockType GetNextBlock(TetrisBoard* board);
-void AddNextBlock(TetrisBoard* board, BlockType type);
-
-// Fungsi untuk mengelola hold_history (circular doubly linked list)
-void HoldCurrentBlock(TetrisBoard* board);
-BlockType GetLastHoldBlock(TetrisBoard* board);
-
-// Fungsi untuk membersihkan memori
-void FreeBoard(TetrisBoard* board);
 
 // Fungsi debug
 void PrintBoard(TetrisBoard* board);

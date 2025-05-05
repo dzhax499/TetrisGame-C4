@@ -1,5 +1,10 @@
+// Nama file : board.c
+// Deskripsi : Implementasi logika papan permainan Tetris (Array 2D)
+// Oleh      : Ibnu Hilmi 241511079
+//             Rizky Satria Gunawan 241511089
+
 #include "include/board.h"
-#include "include/blocks.h"
+#include "include/blocks.h"  // Mengimpor definisi blok dari blocks.h
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,209 +23,98 @@ Color GetBlockColor(BlockType block) {
         PURPLE,     // 6 = T
         RED         // 7 = Z
     };
-    return (block >= BLOCK_EMPTY && block <= BLOCK_Z) ? BLOCK_COLORS[block] : GRAY;
+
+    if (block >= BLOCK_EMPTY && block <= BLOCK_Z) {
+        return BLOCK_COLORS[block];
+    }
+    return GRAY; // Jika tidak valid, kasih warna default
 }
 
-void InitBoard(TetrisBoard* board) {
+// Inisialisasi papan permainan
+void InitBoard1(TetrisBoard *board) {
+    // Bersihkan grid
     memset(board->grid, BLOCK_EMPTY, sizeof(board->grid));
+    
+    // Reset skor, level, dan status game over
     board->current_score = 0;
     board->current_level = 1;
     board->lines_cleared = 0;
     board->game_over = false;
-    board->hasHeld = false;
-    board->hold_history = NULL;
     
-    // Initialize next_blocks as a doubly linked list with 3 random blocks
-    InitNextBlocks(board, NEXT_BLOCKS_COUNT);
+    // Initialize hold block state
+    board->hold_block.hasHeld = false;
+
+    // Buat blok baru
     board->current_block = GenerateRandomBlock();
+    board->next_block = GenerateRandomBlock();
 }
 
-void InitNextBlocks(TetrisBoard* board, int count) {
-    if (count <= 0) {
-        board->next_blocks = NULL;
-        return;
-    }
-
-    // Create the first node
-    NextBlockNode* head = (NextBlockNode*)malloc(sizeof(NextBlockNode));
-    head->type = GenerateRandomBlock().type;
-    head->prev = NULL;
-    
-    NextBlockNode* current = head;
-    NextBlockNode* prev = NULL;
-
-    // Create remaining nodes
-    for (int i = 1; i < count; i++) {
-        NextBlockNode* newNode = (NextBlockNode*)malloc(sizeof(NextBlockNode));
-        newNode->type = GenerateRandomBlock().type;
-        newNode->prev = current;
-        
-        current->next = newNode;
-        prev = current;
-        current = newNode;
-    }
-
-    // Complete the circular link
-    current->next = head;
-    head->prev = current;
-
-    board->next_blocks = head;
-}
-
-BlockType GetNextBlock(TetrisBoard* board) {
-    if (board->next_blocks == NULL) {
-        return BLOCK_EMPTY;
-    }
-
-    // Get the current block type
-    BlockType nextType = board->next_blocks->type;
-    
-    // Move to the next block in the circular list
-    board->next_blocks = board->next_blocks->next;
-    
-    return nextType;
-}
-
-void AddNextBlock(TetrisBoard* board, BlockType type) {
-    if (board->next_blocks == NULL) {
-        // If list is empty, create a new circular list with one node
-        NextBlockNode* newNode = (NextBlockNode*)malloc(sizeof(NextBlockNode));
-        newNode->type = type;
-        newNode->next = newNode;
-        newNode->prev = newNode;
-        board->next_blocks = newNode;
-    } else {
-        // Insert new node before the current head
-        NextBlockNode* newNode = (NextBlockNode*)malloc(sizeof(NextBlockNode));
-        newNode->type = type;
-        
-        NextBlockNode* tail = board->next_blocks->prev;
-        
-        newNode->next = board->next_blocks;
-        newNode->prev = tail;
-        
-        tail->next = newNode;
-        board->next_blocks->prev = newNode;
-    }
-}
-
-void HoldCurrentBlock(TetrisBoard* board) {
-    if (board->hasHeld) return;
-
-    // Create new hold history node
-    HoldHistoryNode* newNode = (HoldHistoryNode*)malloc(sizeof(HoldHistoryNode));
-    newNode->type = board->current_block.type;
-    
-    if (board->hold_history == NULL) {
-        // First hold - create circular list
-        newNode->next = newNode;
-        newNode->prev = newNode;
-    } else {
-        // Insert at head of circular list
-        newNode->next = board->hold_history;
-        newNode->prev = board->hold_history->prev;
-        
-        board->hold_history->prev->next = newNode;
-        board->hold_history->prev = newNode;
-    }
-    
-    board->hold_history = newNode;
-    board->hasHeld = true;
-
-    // Replace current block with next block
-    board->current_block.type = GetNextBlock(board);
-}
-
-BlockType GetLastHoldBlock(TetrisBoard* board) {
-    if (board->hold_history == NULL) {
-        return BLOCK_EMPTY;
-    }
-    return board->hold_history->type;
-}
-
+// Hapus baris yang penuh dan update skor
 int ClearFullLines(TetrisBoard* board) {
     int linesCleared = 0;
     
+    // Iterasi dari bawah ke atas
     for (int y = BOARD_HEIGHT - 1; y >= 0; y--) {
-        bool lineFull = true;
+        bool isFullLine = true;
         
+        // Periksa apakah baris penuh
         for (int x = 0; x < BOARD_WIDTH; x++) {
             if (board->grid[y][x] == BLOCK_EMPTY) {
-                lineFull = false;
+                isFullLine = false;
                 break;
             }
         }
         
-        if (lineFull) {
+        // Jika baris penuh, hapus dan geser baris di atasnya ke bawah
+        if (isFullLine) {
             linesCleared++;
             
-            // Shift all lines above down
-            for (int ny = y; ny > 0; ny--) {
-                memcpy(board->grid[ny], board->grid[ny - 1], sizeof(board->grid[0]));
+            for (int moveY = y; moveY > 0; moveY--) {
+                memcpy(board->grid[moveY], board->grid[moveY - 1], sizeof(board->grid[moveY]));
             }
             
-            // Clear top line
+            // Bersihkan baris teratas
             memset(board->grid[0], BLOCK_EMPTY, sizeof(board->grid[0]));
-            
-            // Check the same line again since we moved everything down
-            y++;
+            y++; // Periksa baris yang sama lagi setelah pergeseran
         }
     }
+    
+    // Update skor berdasarkan jumlah baris yang dihapus
+    switch (linesCleared) {
+        case 1: board->current_score += 100; break;
+        case 2: board->current_score += 300; break;
+        case 3: board->current_score += 500; break;
+        case 4: board->current_score += 800; break;
+    }
+    
+    // Update level
+    board->lines_cleared += linesCleared;
+    board->current_level = 1 + (board->lines_cleared / 10);
     
     return linesCleared;
 }
 
+
+// Fungsi debug: Cetak papan ke konsol
 void PrintBoard(TetrisBoard* board) {
-    printf("Current Board:\n");
     for (int y = 0; y < BOARD_HEIGHT; y++) {
         for (int x = 0; x < BOARD_WIDTH; x++) {
             printf("%d ", board->grid[y][x]);
         }
         printf("\n");
     }
+    printf("\n");
 }
 
+// Periksa apakah permainan berakhir
 bool IsGameOver(TetrisBlock *block, TetrisBoard *board) {
-    // Check if the current block is colliding with any placed blocks at spawn position
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            if (block->shape[block->rotation][y][x]) {
-                int boardX = block->x + x;
-                int boardY = block->y + y;
-                
-                if (boardY < 0 || boardY >= BOARD_HEIGHT || 
-                    boardX < 0 || boardX >= BOARD_WIDTH || 
-                    board->grid[boardY][boardX] != BLOCK_EMPTY) {
-                    return true;
-                }
-            }
+    (void)block; // Tidak digunakan saat ini
+    // Periksa baris paling atas
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        if (board->grid[0][x] != BLOCK_EMPTY) {
+            board->game_over = true;
+            return true;
         }
     }
     return false;
-}
-
-void FreeBoard(TetrisBoard* board) {
-    // Free next_blocks circular list
-    if (board->next_blocks != NULL) {
-        NextBlockNode* current = board->next_blocks;
-        NextBlockNode* start = current;
-        
-        do {
-            NextBlockNode* next = current->next;
-            free(current);
-            current = next;
-        } while (current != start);
-    }
-    
-    // Free hold_history circular list
-    if (board->hold_history != NULL) {
-        HoldHistoryNode* current = board->hold_history;
-        HoldHistoryNode* start = current;
-        
-        do {
-            HoldHistoryNode* next = current->next;
-            free(current);
-            current = next;
-        } while (current != start);
-    }
 }
