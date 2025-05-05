@@ -26,14 +26,14 @@ typedef enum {
     BLOCK_Z      // Red
 } BlockType;
 
-// Struktur node untuk next_blocks (doubly linked list)
+// Struktur node untuk next_blocks (doubly linked circular list)
 typedef struct NextBlockNode {
     BlockType type;
     struct NextBlockNode* next;
     struct NextBlockNode* prev;
 } NextBlockNode;
 
-// Struktur node untuk riwayat hold (doubly linked list)
+// Struktur node untuk riwayat hold (doubly linked circular list)
 typedef struct HoldHistoryNode {
     BlockType type;
     struct HoldHistoryNode* next;
@@ -52,8 +52,8 @@ typedef struct {
 typedef struct {
     BlockType grid[BOARD_HEIGHT][BOARD_WIDTH];
     TetrisBlock current_block;
-    NextBlockNode* next_blocks; // Linked list untuk blok berikutnya
-    HoldHistoryNode* hold_history; // Riwayat blok yang di-hold
+    NextBlockNode* next_blocks; // Circular doubly linked list untuk blok berikutnya
+    HoldHistoryNode* hold_history; // Circular doubly linked list untuk riwayat hold
     bool hasHeld;
     int current_score;
     int current_level;
@@ -76,14 +76,17 @@ bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
 // Fungsi utilitas
 Color GetBlockColor(BlockType block);
 
-// Fungsi untuk mengelola next_blocks (linked list)
+// Fungsi untuk mengelola next_blocks (circular doubly linked list)
 void InitNextBlocks(TetrisBoard* board, int count);
 BlockType GetNextBlock(TetrisBoard* board);
 void AddNextBlock(TetrisBoard* board, BlockType type);
 
-// Fungsi untuk mengelola hold_history (linked list)
+// Fungsi untuk mengelola hold_history (circular doubly linked list)
 void HoldCurrentBlock(TetrisBoard* board);
 BlockType GetLastHoldBlock(TetrisBoard* board);
+
+// Fungsi untuk membersihkan memori
+void FreeBoard(TetrisBoard* board);
 
 // Fungsi debug
 void PrintBoard(TetrisBoard* board);
