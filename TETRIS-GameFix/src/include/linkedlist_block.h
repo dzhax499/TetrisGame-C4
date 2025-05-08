@@ -13,7 +13,7 @@ typedef struct BlockNode {
 
 typedef struct {
     BlockNode* head;
-    BlendMode* tail;
+    BlockNode* tail;
 } AktifBlok;
 
 
