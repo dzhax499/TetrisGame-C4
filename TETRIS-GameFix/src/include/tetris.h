@@ -28,6 +28,7 @@ typedef struct {
     int rotation; // Rotasi saat ini (0-3)
     int shape[4][4]; // Bentuk blok
     int x, y;     // Posisi pada papan
+    int ukuranblok; // Ukuran blok (4x4)
     Color color;  // Warna blok
 } TetrisBlock;
 

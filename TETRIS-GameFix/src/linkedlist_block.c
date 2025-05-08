@@ -24,14 +24,14 @@ void update_semuablok(AktifBlok* list, TetrisBoard* board)
     while (Pcur != NULL) {
         TetrisBlock* blk = &Pcur->block;
         
-        for (int i = 0; i < 4 i++) {
-            for (int j = 0; j < blk->size; j++) {
+        for (int i = 0; i < 4 ; i++) {
+            for (int j = 0; j < blk->ukuranblok; j++) {
                 if (blk->shape[i][j]) {
                     int x = blk->x + j;
                     int y = blk->y + i;
 
                     if (y >= 0 && y < BOARD_HEIGHT && x >= 0 && x < BOARD_WIDTH) {
-                        board->cells[y][x] = blk->color;  // atau kode warna/textur
+                        board->grid[y][x] = blk->color;  // atau kode warna/textur
                     }
                 }
             }
