@@ -30,6 +30,7 @@
 #include "include/main_menu.h"
 #include "include/game_sound.h"
 #include "raylib.h"
+#include "include/linkedlist_block.h"
 #include <time.h>
 
 /**

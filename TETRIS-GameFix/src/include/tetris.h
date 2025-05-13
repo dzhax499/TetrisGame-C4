@@ -30,6 +30,9 @@ typedef struct {
     int x, y;     // Posisi pada papan
     int ukuranblok; // Ukuran blok (4x4)
     Color color;  // Warna blok
+
+    bool efekmeledak;    // efek ledakan aktif
+    float waktumeledak;  // waktu animasi
 } TetrisBlock;
 
 // Tambahkan struktur untuk menyimpan hold block

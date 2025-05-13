@@ -44,3 +44,41 @@ void update_semuablok(AktifBlok* list, TetrisBoard* board)
         Pcur = Pcur->next;
     }
 }
+
+void delete_AktifBlok(AktifBlok* list, BlockNode* node) {
+    if (!list || !node) return;
+
+    if (node->prev) {
+        node->prev->next = node->next;
+    } else {
+        // node adalah head
+        list->head = node->next;
+    }
+
+    if (node->next) {
+        node->next->prev = node->prev;
+    }
+
+    free(node);
+}
+
+void gambar_semuablok(AktifBlok* list) {
+    BlockNode* curr = list->head;
+    while (curr) {
+        TetrisBlock* blk = &curr->block;
+
+        for (int i = 0; i < blk->ukuranblok; i++) {
+            for (int j = 0; j < blk->ukuranblok; j++) {
+                if (blk->shape[i][j]) {
+                    int x = blk->x + j;
+                    int y = blk->y + i;
+
+                    // gambar kotak di (x, y) dengan warna blk->color
+                    draw_cell(x, y, blk->color);
+                }
+            }
+        }
+
+        curr = curr->next;
+    }
+}
