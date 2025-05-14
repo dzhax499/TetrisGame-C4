@@ -54,6 +54,7 @@
  */
 //global variabel untuk menyimpan data permainan
 AktifBlok activeBlocks;
+bool paused = false;
 
 int main(void)
 {
@@ -198,6 +199,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
             inGame = true;
+            paused = false;
 
             if (IsKeyPressed(KEY_P))
             {
@@ -353,6 +355,12 @@ int main(void)
          */
         else if (currentMenuState == MENU_STATE_PAUSE)
         {
+            if (!paused)
+            {
+                paused = true;
+                StopBackgroundMusic();
+                PlaySoundEffect(SOUND_CLICK);
+            }
             // Tetap menggambar elemen permainan tanpa memperbarui logika
             DrawBoard(&board);
             DrawBlockShadow(&board.current_block, &board);
@@ -390,6 +398,7 @@ int main(void)
             {
                 inGame = false;
                 SetMenuState(MENU_STATE_MAIN);
+                paused = false;
                 PlayBackgroundMusic(MUSIC_MENU);
                 PlaySoundEffect(SOUND_CLICK);
             }
@@ -435,7 +444,7 @@ int main(void)
          * - Memperbarui skor dan baris yang dihapus
          * - Menggambar semua elemen permainan
          */
-        if (inGame && !gameOver)
+        if (inGame && !gameOver && !paused)
         {
             if (!wasPreviouslyInGame)
             {
