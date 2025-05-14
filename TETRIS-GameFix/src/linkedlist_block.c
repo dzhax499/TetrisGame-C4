@@ -74,7 +74,7 @@ void gambar_semuablok(AktifBlok* list) {
                     int y = blk->y + i;
 
                     // gambar kotak di (x, y) dengan warna blk->color
-                    draw_cell(x, y, blk->color);
+                    DrawBlock(x, y, blk->type);
                 }
             }
         }

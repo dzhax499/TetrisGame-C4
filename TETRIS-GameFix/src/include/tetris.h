@@ -32,7 +32,7 @@ typedef struct {
     Color color;  // Warna blok
 
     bool efekmeledak;    // efek ledakan aktif
-    float waktumeledak;  // waktu animasi
+    int waktumeledak;  // waktu animasi
 } TetrisBlock;
 
 // Tambahkan struktur untuk menyimpan hold block

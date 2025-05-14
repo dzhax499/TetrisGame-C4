@@ -52,6 +52,9 @@
  * 2. Loop utama game
  * 3. Pembersihan sumber daya sebelum program berakhir
  */
+//global variabel untuk menyimpan data permainan
+AktifBlok activeBlocks;
+
 int main(void)
 {
     /**
@@ -66,6 +69,9 @@ int main(void)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
     InitAudioDevice();
+    // inisialisasi linked list untuk menyimpan blok aktif
+    activeBlocks.head = NULL;
+    activeBlocks.tail = NULL;
 
     /**
      * Inisialisasi Generator Angka Acak
@@ -452,6 +458,10 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
+
+                    // tambah blok ke dalam aktif blok linked list
+                    insert_AktifBlok(&activeBlocks, board.current_block);
+                    
                     PlaceBlock(&board.current_block, &board);
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
@@ -517,13 +527,15 @@ int main(void)
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
 
+            update_semuablok(&activeBlocks, &board);
             // Menggambar elemen permainan
-            DrawBlockShadow(&board.current_block, &board);
+            // DrawBlockShadow(&board.current_block, &board);
             DrawBoard(&board);
-            DrawActiveTetromino(&board.current_block);
-            DrawHoldBlock(&board);
-            DrawNextBlock(&board);
-            DrawScore(&board, &scoreData);
+            // DrawActiveTetromino(&board.current_block);
+            gambar_semuablok(&activeBlocks);
+            // DrawHoldBlock(&board);
+            // DrawNextBlock(&board);
+            // DrawScore(&board, &scoreData);
 
             // Tambahkan panel tips kontrol pemain
             // Posisikan di sisi kiri bawah layar

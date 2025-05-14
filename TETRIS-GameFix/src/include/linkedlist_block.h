@@ -4,11 +4,12 @@
 #include "tetris.h"
 #include "blocks.h"
 #include "board.h"
+#include "rendering.h"
 
 typedef struct BlockNode {
     TetrisBlock block;
-    BlockNode* next;
-    BlockNode* prev;
+    struct BlockNode* next;
+    struct BlockNode* prev;
 } BlockNode;
 
 typedef struct {
