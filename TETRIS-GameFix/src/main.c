@@ -29,6 +29,7 @@
 #include "include/scoring.h"
 #include "include/main_menu.h"
 #include "include/game_sound.h"
+#include "include/timer.h"
 #include "raylib.h"
 #include <time.h>
 
@@ -138,6 +139,13 @@ int main(void)
          * Memperbarui status music stream yang sedang diputar
          */
         UpdateGameSound();
+
+        /**
+         * Memperbarui Timer Game
+         * ---------------------
+         * Memperbarui timer game untuk menghitung waktu yang telah berlalu
+         */
+        UpdateGameTimer();
 
         /**
          * Penanganan Tombol ESC Global
@@ -610,6 +618,7 @@ int main(void)
                     SaveHighScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
+                    InitGameTimer();    
                     gameOver = false;
                     inGame = true; // Langsung mulai permainan baru
                     wasPreviouslyInGame = true;
@@ -632,6 +641,7 @@ int main(void)
                     SaveHighScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
+                    InitGameTimer();
                     gameOver = false;
                     inGame = false;
                     wasPreviouslyInGame = false;
@@ -650,6 +660,7 @@ int main(void)
             {
                 InitBoard1(&board);
                 InitScoring(&scoreData);
+                InitGameTimer();
                 gameOver = false;
                 inGame = false;
                 wasPreviouslyInGame = false;
