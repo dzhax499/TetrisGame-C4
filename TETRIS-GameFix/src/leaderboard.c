@@ -1,4 +1,4 @@
-// Nama file  : highscore.c
+// Nama file  : leaderboard.c
 // Deskripsi  : Mengelola daftar high score permainan
 // Oleh       : Fatimah Hawwa 241511074
 
@@ -6,64 +6,64 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "include/highscore.h"
+#include "include/leaderboard.h"
 #include "include/game_sound.h"
 #include "include/main_menu.h"
 #include "include/tetris.h"
 
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
-#define MAX_HIGH_SCORES 10
+#define MAX_LEADERBOARD_ENTRIES 10
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
 
 static Texture2D backgroundTexture;
 
-// Inisialisasi highscoreboard
-void InitHighScore(HighScoreBoard* highscoreboard) {
+// Inisialisasi leaderboard
+void InitLeaderboard(Leaderboard* leaderboard) {
     backgroundTexture = LoadTexture("assets/textures/bg.png");
-    highscoreboard->highScores = NULL;
-    LoadHighScore(highscoreboard);
+    leaderboard->highScores = NULL;
+    LoadLeaderboard(leaderboard);
 }
 
-// Membersihkan memori highscoreboard
-void UnloadHighScore(HighScoreBoard* highscoreboard) {
+// Membersihkan memori leaderboard
+void UnloadLeaderboard(Leaderboard* leaderboard) {
     // Membersihkan semua entri dalam linked list
     UnloadTexture (backgroundTexture);
-    HighScoreEntry* current = highscoreboard->highScores;
-    HighScoreEntry* next;
-    
+    LeaderboardEntry* current = leaderboard->highScores;
+    LeaderboardEntry* next;
+
     while (current != NULL) {
         next = current->next;
         free(current);
         current = next;
     }
-    
-    highscoreboard->highScores = NULL;
+
+    leaderboard->highScores = NULL;
 }
 
-// Tambahkan skor ke daftar high score
-void AddHighScore(HighScoreBoard* highscoreboard, int score, int level) {
-    HighScoreEntry* newEntry = (HighScoreEntry*)malloc(sizeof(HighScoreEntry));
+// Tambahkan skor ke daftar leaderboard
+void AddLeaderboard(Leaderboard* leaderboard, int score, int level) {
+    LeaderboardEntry* newEntry = (LeaderboardEntry*)malloc(sizeof(LeaderboardEntry));
     newEntry->score = score;
     newEntry->level = level;
     newEntry->next = NULL;
 
     // Hitung jumlah entri saat ini
     int count = 0;
-    HighScoreEntry* current = highscoreboard->highScores;
+    LeaderboardEntry* current = leaderboard->highScores;
     while (current) {
         count++;
         current = current->next;
     }
 
     // Jika daftar kosong atau skor baru lebih tinggi dari yang pertama
-    if (!highscoreboard->highScores || highscoreboard->highScores->score < score) {
-        newEntry->next = highscoreboard->highScores;
-        highscoreboard->highScores = newEntry;
+    if (!leaderboard->highScores || leaderboard->highScores->score < score) {
+        newEntry->next = leaderboard->highScores;
+        leaderboard->highScores = newEntry;
     } else {
         // Cari posisi untuk menyisipkan (urutkan dari besar ke kecil)
-        current = highscoreboard->highScores;
-        HighScoreEntry* prev = NULL;
+        current = leaderboard->highScores;
+        LeaderboardEntry* prev = NULL;
         while (current && current->score >= score) {
             prev = current;
             current = current->next;
@@ -72,43 +72,43 @@ void AddHighScore(HighScoreBoard* highscoreboard, int score, int level) {
         if (prev) {
             prev->next = newEntry;
         } else {
-            highscoreboard->highScores = newEntry;
+            leaderboard->highScores = newEntry;
         }
     }
 
     // Batasi hingga 10 entri
     count = 0;
-    current = highscoreboard->highScores;
-    HighScoreEntry* lastValid = NULL;
-    while (current && count < MAX_HIGH_SCORES) {
+    current = leaderboard->highScores;
+    LeaderboardEntry* lastValid = NULL;
+    while (current && count < MAX_LEADERBOARD_ENTRIES) {
         lastValid = current;
         current = current->next;
         count++;
     }
     if (lastValid) {
         // Hapus entri setelah yang ke-10
-        HighScoreEntry* toDelete = lastValid->next;
+        LeaderboardEntry* toDelete = lastValid->next;
         lastValid->next = NULL;
         while (toDelete) {
-            HighScoreEntry* next = toDelete->next;
+            LeaderboardEntry* next = toDelete->next;
             free(toDelete);
             toDelete = next;
         }
     }
 
     // Simpan perubahan ke file
-    SaveHighScore(highscoreboard);
+    SaveLeaderboard(leaderboard);
 }
 
-// Simpan daftar high score ke file
-void SaveHighScore(HighScoreBoard* highscoreboard) {
+// Simpan daftar leaderboard ke file
+void SaveLeaderboard(Leaderboard* leaderboard) {
     FILE* file = fopen(HIGH_SCORE_FILE, "w");
     if (!file) {
-        printf("Gagal menyimpan highscore! Pastikan direktori tersedia.\n");
+        printf("Gagal menyimpan leaderboard! Pastikan direktori tersedia.\n");
         return;
     }
 
-    HighScoreEntry* current = highscoreboard->highScores;
+    LeaderboardEntry* current = leaderboard->highScores;
     while (current) {
         fprintf(file, "%d,%d\n", current->score, current->level);
         current = current->next;
@@ -116,12 +116,12 @@ void SaveHighScore(HighScoreBoard* highscoreboard) {
     fclose(file);
 }
 
-// Muat daftar high score dari file
-void LoadHighScore(HighScoreBoard* highscoreboard) {
-    FreeHighScoreList(highscoreboard); // Kosongkan daftar sebelum memuat
+// Muat daftar leaderboard dari file
+void LoadLeaderboard(Leaderboard* leaderboard) {
+    FreeLeaderboardList(leaderboard); // Kosongkan daftar sebelum memuat
     FILE* file = fopen(HIGH_SCORE_FILE, "r");
     if (!file) {
-        printf("File highscore tidak ditemukan, membuat file baru.\n");
+        printf("File leaderboard tidak ditemukan, membuat file baru.\n");
         file = fopen(HIGH_SCORE_FILE, "w");
         if (file) fclose(file);
         return;
@@ -131,19 +131,19 @@ void LoadHighScore(HighScoreBoard* highscoreboard) {
     while (fgets(line, sizeof(line), file)) {
         int score, level;
         if (sscanf(line, "%d,%d", &score, &level) == 2) {
-            AddHighScore(highscoreboard, score, level);
+            AddLeaderboard(leaderboard, score, level);
         }
     }
     fclose(file);
 }
 
-// Tampilkan daftar high score di layar
-void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int screenHeight) {
-    // Muat ulang highscore untuk memastikan data terbaru
-    LoadHighScore(highscoreboard);
+// Tampilkan daftar leaderboard di layar
+void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHeight) {
+    // Muat ulang leaderboard untuk memastikan data terbaru
+    LoadLeaderboard(leaderboard);
     // Gambar latar belakang
     DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
-    // Buat persegi panjang untuk panel highscoreboard
+    // Buat persegi panjang untuk panel leaderboard
     Rectangle panel = {
         screenWidth / 2 - 250,
         screenHeight / 2 - 300,
@@ -156,8 +156,8 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
     DrawRectangleLinesEx(panel, 3, SKYBLUE);
     
     // Gambar judul
-    DrawText("HIGHSCORE", panel.x + panel.width/2 - MeasureText("HIGHSCORE", 38)/2, 
-             panel.y + 20, 40, GOLD);
+    DrawText("LEADERBOARD", panel.x + panel.width/2 - MeasureText("LEADERBOARD", 38)/2, 
+             panel.y + 20, 40, PURPLE);
     
     // Gambar header tabel
     DrawText("RANK", panel.x + 50, panel.y + 80, 20, WHITE);
@@ -167,12 +167,12 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
     // Gambar garis pemisah
     DrawLine(panel.x + 20, panel.y + 110, panel.x + panel.width - 20, panel.y + 110, WHITE);
     
-    // Gambar entri highscoreboard
+    // Gambar entri leaderboard
     int yPos = panel.y + 130;
-    HighScoreEntry* current = highscoreboard->highScores;
+    LeaderboardEntry* current = leaderboard->highScores;
     int rank = 1;
-    
-    while (current && rank <= MAX_HIGHSCORE_ENTRIES) {
+
+    while (current && rank <= MAX_LEADERBOARD_ENTRIES) {
         // Rank
         char rankText[5];
         sprintf(rankText, "%d", rank);
@@ -194,7 +194,7 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
     }
     
     // Tambahkan placeholder untuk entri kosong
-    while (rank <= MAX_HIGH_SCORES) {
+    while (rank <= MAX_LEADERBOARD_ENTRIES) {
         char rankText[5];
         sprintf(rankText, "%d", rank);
         DrawText(rankText, panel.x + 75, yPos, 20, WHITE);
@@ -229,27 +229,27 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
     }
 }
 
-// Bebaskan memori daftar high score
-void FreeHighScoreList(HighScoreBoard* highscoreboard) {
-    HighScoreEntry* current = highscoreboard->highScores;
+// Bebaskan memori daftar leaderboard
+void FreeLeaderboardList(Leaderboard* leaderboard) {
+    LeaderboardEntry* current = leaderboard->highScores;
     while (current) {
-        HighScoreEntry* next = current->next;
+        LeaderboardEntry* next = current->next;
         free(current);
         current = next;
     }
-    highscoreboard->highScores = NULL;
+    leaderboard->highScores = NULL;
 }
 
 // Fungsi untuk memeriksa apakah skor adalah high score
-bool IsHighScore(HighScoreBoard* highscore, int score) {
+bool IsHighScore(Leaderboard* leaderboard, int score) {
     int count = 0;
-    HighScoreEntry* current = highscore->highScores;
-    while (current && count < MAX_HIGH_SCORES) {
+    LeaderboardEntry* current = leaderboard->highScores;
+    while (current && count < MAX_LEADERBOARD_ENTRIES) {
         if (score > current->score) {
             return true;
         }
         count++;
         current = current->next;
     }
-    return count < MAX_HIGH_SCORES;
+    return count < MAX_LEADERBOARD_ENTRIES;
 }

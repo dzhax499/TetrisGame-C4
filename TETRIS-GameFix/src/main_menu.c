@@ -6,7 +6,7 @@
 #include "include/game_sound.h"
 #include <stdlib.h>
 
-#define MAX_BUTTONS 4
+#define MAX_BUTTONS 5
 
 // Variabel-variabel menu
 static MenuState currentState = MENU_STATE_MAIN;
@@ -65,6 +65,13 @@ void InitMainMenu(void)
         .color = RED,
         .hoverColor = MAROON,
         .isHovered = false};
+
+    buttons[4] = (MenuButton){
+        .rect = (Rectangle){screenWidth - 200, 20, 180, 40},
+        .text = "Leaderboard",
+        .color = PURPLE,
+        .hoverColor = DARKPURPLE,
+        .isHovered = false};
 }
 
 void UpdateMainMenu(void)
@@ -109,6 +116,9 @@ void UpdateMainMenu(void)
             case 3:
                 currentState = MENU_STATE_EXIT;
                 break;
+            case 4:
+                currentState = MENU_STATE_LEADERBOARD;
+                break; // Leaderboard is button 4
             }
         }
     }
@@ -122,7 +132,7 @@ void UpdateMainMenu(void)
     // Allow ESC key to return to main menu from other states
     if (IsKeyPressed(KEY_ESCAPE))
     {
-        if (currentState == MENU_STATE_HIGHSCORE || currentState == MENU_STATE_CREDITS)
+        if (currentState == MENU_STATE_HIGHSCORE || currentState == MENU_STATE_CREDITS || currentState == MENU_STATE_LEADERBOARD)
         {
             // For these states, return to main menu
             currentState = MENU_STATE_MAIN;
@@ -185,6 +195,9 @@ void DrawMainMenu(void)
             break;
         case 3:
             borderColor = MAROON;
+            break;
+        case 4:
+            borderColor = DARKPURPLE;
             break;
         default:
             borderColor = WHITE;

@@ -30,6 +30,7 @@
 #include "include/main_menu.h"
 #include "include/game_sound.h"
 #include "include/timer.h"
+#include "include/leaderboard.h"
 #include "raylib.h"
 #include <time.h>
 
@@ -93,6 +94,9 @@ int main(void)
 
     ScoreData scoreData;
     InitScoring(&scoreData);
+
+    Leaderboard leaderboard;
+    InitLeaderboard(&leaderboard);
 
     /**
      * Variabel Status Permainan
@@ -169,7 +173,8 @@ int main(void)
                 SetMenuState(MENU_STATE_PLAY);
             }
             else if (currentMenuState == MENU_STATE_CREDITS ||
-                     currentMenuState == MENU_STATE_HIGHSCORE)
+                     currentMenuState == MENU_STATE_HIGHSCORE ||
+                     currentMenuState == MENU_STATE_LEADERBOARD)
             {
                 SetMenuState(MENU_STATE_MAIN);
             }
@@ -261,7 +266,7 @@ int main(void)
                     PlaySoundEffect(SOUND_CLICK);
                 }
             }
-
+        
             if (IsKeyPressed(KEY_ESCAPE))
             {
                 SetMenuState(MENU_STATE_MAIN);
@@ -286,7 +291,7 @@ int main(void)
                      WINDOW_HEIGHT / 2 - 150, 40, BLACK);
 
             // Baca dan tampilkan high score
-            int highScore = LoadHighScore();
+            int highScore = LoadGameHighScore();
 
             if (highScore > 0)
             {
@@ -334,6 +339,14 @@ int main(void)
                 SetMenuState(MENU_STATE_MAIN);
                 PlaySoundEffect(SOUND_CLICK);
             }
+        }
+        else if (currentMenuState == MENU_STATE_LEADERBOARD)
+        {
+            inGame = false;
+            ClearBackground(LIGHTGRAY);
+            UpdateMainMenu();
+            DrawMainMenu();
+            DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
         /**
          * Penanganan Status MENU_STATE_EXIT (Keluar)
@@ -603,6 +616,17 @@ int main(void)
             DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
                      backBtn.y + 15, 20, WHITE);
 
+            Rectangle scoreBtn = {
+                WINDOW_WIDTH / 2 - 100,
+                WINDOW_HEIGHT / 2 + 140,
+                200,
+                50};
+
+            DrawRectangleRec(scoreBtn, PURPLE);
+            DrawRectangleLinesEx(scoreBtn, 3, DARKPURPLE);
+            DrawText("LEADERBOARD", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
+                     scoreBtn.y + 15, 20, WHITE);
+
             // Penanganan hover dan klik tombol
             Vector2 mousePos = GetMousePosition();
 
@@ -615,7 +639,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveHighScore(&scoreData);
+                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     InitGameTimer();    
@@ -638,7 +662,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveHighScore(&scoreData);
+                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     InitGameTimer();
@@ -652,8 +676,29 @@ int main(void)
                 }
             }
 
+            if (CheckCollisionPointRec(mousePos, scoreBtn))
+            {
+                DrawRectangleRec(scoreBtn, Fade(PURPLE, 0.8f));
+                DrawText("LEADERBOARD", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
+                         scoreBtn.y + 15, 20, WHITE);
+
+                if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+                {
+                    InitLeaderboard(&leaderboard);
+                    SaveGameScore(&scoreData);
+                    InitBoard1(&board);
+                    InitScoring(&scoreData);
+                    gameOver = false;
+                    inGame = false;
+                    wasPreviouslyInGame = false;
+                    fallTimer = 0;
+                    SetMenuState(MENU_STATE_LEADERBOARD);
+                    PlaySoundEffect(SOUND_CLICK);
+                }
+            }
+
             // Simpan skor tertinggi
-            SaveHighScore(&scoreData);
+            SaveGameScore(&scoreData);
 
             // Restart dengan tombol R
             if (IsKeyPressed(KEY_R))
