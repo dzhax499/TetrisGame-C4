@@ -5,7 +5,7 @@
 #include "include/blocks.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "raylib.h"
+#include "raylib.h"   
 
 // Warna untuk setiap jenis blok Tetris
 // static const Color TETROMINO_COLORS[7] = {
