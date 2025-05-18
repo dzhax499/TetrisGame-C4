@@ -11,6 +11,7 @@
  #include "include/blocks.h"
  #include "include/rendering.h"
  #include "include/scoring.h"
+ #include "include/timer.h"
  
 //  // Konstanta untuk rendering
 //  #define BLOCK_SIZE 30
@@ -121,6 +122,9 @@ void DrawScore(TetrisBoard* board, ScoreData* scoreData) {
     DrawText(TextFormat("LEVEL: %d", scoreData->level), 
              offsetX, BOARD_OFFSET_Y + 60, 20, WHITE);
     
+    // Waktu - geser ke bawah
+    DrawText(TextFormat("TIME: %.1f s", GetElapsedGameTime()), offsetX, BOARD_OFFSET_Y + 90, 20, WHITE);
+
     // Batas area Next Block
     DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 100, 
                       150, 100, WHITE);

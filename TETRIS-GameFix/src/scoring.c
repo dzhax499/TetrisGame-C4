@@ -122,12 +122,13 @@ int LoadHighScore(void) {
     if (file) {
         if (fscanf(file, "%d", &highScore) != 1) {
             highScore = 0;
-        }     
+        }
         fclose(file);
-    
-    return highScore;
+        return highScore;
     }
+    return 0; 
 }
+
 
 // Mendapatkan high score saat ini
 int GetHighScore(ScoreData* scoreData) {
