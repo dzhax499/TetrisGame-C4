@@ -568,6 +568,10 @@ int main(void)
          */
         else if (gameOver)
         {
+            if (IsHighScore(&highscoreboard, scoreData.score))
+            {
+                AddHighScore(&highscoreboard, scoreData.score, scoreData.level);
+            }
             // Tampilkan teks Game Over dan skor akhir
             DrawText("GAME OVER", WINDOW_WIDTH / 2 - MeasureText("GAME OVER", 40) / 2,
                      WINDOW_HEIGHT / 2 - 100, 40, RED);
@@ -622,7 +626,6 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;
@@ -644,7 +647,6 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;
@@ -665,7 +667,6 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;

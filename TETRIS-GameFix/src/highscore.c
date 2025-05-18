@@ -63,23 +63,36 @@ void AddHighScore(HighScoreBoard* highscoreboard, int score, int level) {
     } else {
         // Cari posisi untuk menyisipkan (urutkan dari besar ke kecil)
         current = highscoreboard->highScores;
-        while (current->next && current->next->score >= score) {
+        HighScoreEntry* prev = NULL;
+        while (current && current->score >= score) {
+            prev = current;
             current = current->next;
         }
-        newEntry->next = current->next;
-        current->next = newEntry;
+        newEntry->next = current;
+        if (prev) {
+            prev->next = newEntry;
+        } else {
+            highscoreboard->highScores = newEntry;
+        }
     }
 
     // Batasi hingga 10 entri
-    if (count >= MAX_HIGH_SCORES) {
-        current = highscoreboard->highScores;
-        for (int i = 1; i < MAX_HIGH_SCORES; i++) {
-            current = current->next;
-        }
-        HighScoreEntry* toDelete = current->next;
-        current->next = NULL;
-        if (toDelete) {
+    count = 0;
+    current = highscoreboard->highScores;
+    HighScoreEntry* lastValid = NULL;
+    while (current && count < MAX_HIGH_SCORES) {
+        lastValid = current;
+        current = current->next;
+        count++;
+    }
+    if (lastValid) {
+        // Hapus entri setelah yang ke-10
+        HighScoreEntry* toDelete = lastValid->next;
+        lastValid->next = NULL;
+        while (toDelete) {
+            HighScoreEntry* next = toDelete->next;
             free(toDelete);
+            toDelete = next;
         }
     }
 
@@ -126,6 +139,9 @@ void LoadHighScore(HighScoreBoard* highscoreboard) {
 
 // Tampilkan daftar high score di layar
 void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int screenHeight) {
+    // Muat ulang highscore untuk memastikan data terbaru
+    LoadHighScore(highscoreboard);
+    // Gambar latar belakang
     DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
     // Buat persegi panjang untuk panel highscoreboard
     Rectangle panel = {
@@ -178,7 +194,7 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
     }
     
     // Tambahkan placeholder untuk entri kosong
-    while (rank <= MAX_HIGHSCORE_ENTRIES) {
+    while (rank <= MAX_HIGH_SCORES) {
         char rankText[5];
         sprintf(rankText, "%d", rank);
         DrawText(rankText, panel.x + 75, yPos, 20, WHITE);
@@ -212,50 +228,6 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
         }
     }
 }
-//     ClearBackground(LIGHTGRAY);
-//     DrawText("HIGHSCORES", WINDOW_WIDTH / 2 - MeasureText("HIGHSCORES", 40) / 2,
-//              WINDOW_HEIGHT / 2 - 150, 40, BLACK);
-
-//     int y = WINDOW_HEIGHT / 2 - 80;
-//     DrawText("Rank Level Score", WINDOW_WIDTH / 2 - MeasureText("Rank Level Score", 20) / 2, 
-//              y - 20, 20, BLACK);
-
-//     HighScoreEntry* current = highscoreboard->highScores;
-//     int rank = 1;
-//     while (current && rank <= MAX_HIGH_SCORES) {
-//         char buffer[100];
-//         sprintf(buffer, "%2d    %2d   %5d", rank, current->level, current->score);
-//         DrawText(buffer, WINDOW_WIDTH / 2 - MeasureText(buffer, 20) / 2, y, 20, BLACK);
-//         y += 30;
-//         current = current->next;
-//         rank++;
-//     }
-
-//     Rectangle backBtn = {
-//         WINDOW_WIDTH / 2 - 100,
-//         WINDOW_HEIGHT / 2 + 150,
-//         200,
-//         50
-//     };
-
-//     DrawRectangleRec(backBtn, DARKBLUE);
-//     DrawRectangleLinesEx(backBtn, 3, SKYBLUE);
-//     DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2 + 2,
-//              backBtn.y + 15 + 2, 20, BLACK);
-//     DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
-//              backBtn.y + 15, 20, WHITE);
-
-//     if (CheckCollisionPointRec(GetMousePosition(), backBtn)) {
-//         DrawRectangleRec(backBtn, Fade(BLUE, 0.7f));
-//         DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
-//                  backBtn.y + 15, 20, WHITE);
-
-//         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-//             SetMenuState(MENU_STATE_MAIN);
-//             PlaySoundEffect(SOUND_CLICK);
-//         }
-//     }
-// }
 
 // Bebaskan memori daftar high score
 void FreeHighScoreList(HighScoreBoard* highscoreboard) {
