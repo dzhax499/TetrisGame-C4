@@ -29,6 +29,7 @@
 #include "include/scoring.h"
 #include "include/main_menu.h"
 #include "include/game_sound.h"
+#include "include/highscore.h"
 #include "raylib.h"
 #include <time.h>
 
@@ -92,6 +93,9 @@ int main(void)
 
     ScoreData scoreData;
     InitScoring(&scoreData);
+
+    HighScoreBoard highscoreboard;
+    InitHighScore(&highscoreboard);
 
     /**
      * Variabel Status Permainan
@@ -272,54 +276,54 @@ int main(void)
         else if (currentMenuState == MENU_STATE_HIGHSCORE)
         {
             inGame = false;
+            DisplayHighScore(&highscoreboard, WINDOW_WIDTH, WINDOW_HEIGHT);
+            // ClearBackground(LIGHTGRAY);
+            // DrawText("HIGHSCORES", WINDOW_WIDTH / 2 - MeasureText("HIGHSCORES", 40) / 2,
+            //          WINDOW_HEIGHT / 2 - 150, 40, BLACK);
 
-            ClearBackground(LIGHTGRAY);
-            DrawText("HIGHSCORES", WINDOW_WIDTH / 2 - MeasureText("HIGHSCORES", 40) / 2,
-                     WINDOW_HEIGHT / 2 - 150, 40, BLACK);
+            // // Baca dan tampilkan high score
+            // int highScore = LoadGameHighScore();
 
-            // Baca dan tampilkan high score
-            int highScore = LoadHighScore();
+            // if (highScore > 0)
+            // {
+            //     char scoreText[50];
+            //     sprintf(scoreText, "Highest Score: %d", highScore);
+            //     DrawText(scoreText, WINDOW_WIDTH / 2 - MeasureText(scoreText, 30) / 2,
+            //              WINDOW_HEIGHT / 2 - 30, 30, BLACK);
+            // }
+            // else
+            // {
+            //     DrawText("No high scores yet!", WINDOW_WIDTH / 2 - MeasureText("No high scores yet!", 30) / 2,
+            //              WINDOW_HEIGHT / 2 - 30, 30, BLACK);
+            // }
 
-            if (highScore > 0)
-            {
-                char scoreText[50];
-                sprintf(scoreText, "Highest Score: %d", highScore);
-                DrawText(scoreText, WINDOW_WIDTH / 2 - MeasureText(scoreText, 30) / 2,
-                         WINDOW_HEIGHT / 2 - 30, 30, BLACK);
-            }
-            else
-            {
-                DrawText("No high scores yet!", WINDOW_WIDTH / 2 - MeasureText("No high scores yet!", 30) / 2,
-                         WINDOW_HEIGHT / 2 - 30, 30, BLACK);
-            }
+            // // Tombol kembali ke menu utama
+            // Rectangle backBtnHS = {
+            //     WINDOW_WIDTH / 2 - 100,
+            //     WINDOW_HEIGHT / 2 + 150,
+            //     200,
+            //     50};
 
-            // Tombol kembali ke menu utama
-            Rectangle backBtnHS = {
-                WINDOW_WIDTH / 2 - 100,
-                WINDOW_HEIGHT / 2 + 150,
-                200,
-                50};
-
-            DrawRectangleRec(backBtnHS, DARKBLUE);
-            DrawRectangleLinesEx(backBtnHS, 3, SKYBLUE);
-            DrawText("BACK TO MENU", backBtnHS.x + (backBtnHS.width / 2) - MeasureText("BACK TO MENU", 20) / 2 + 2,
-                     backBtnHS.y + 15 + 2, 20, BLACK);
-            DrawText("BACK TO MENU", backBtnHS.x + (backBtnHS.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
-                     backBtnHS.y + 15, 20, WHITE);
+            // DrawRectangleRec(backBtnHS, DARKBLUE);
+            // DrawRectangleLinesEx(backBtnHS, 3, SKYBLUE);
+            // DrawText("BACK TO MENU", backBtnHS.x + (backBtnHS.width / 2) - MeasureText("BACK TO MENU", 20) / 2 + 2,
+            //          backBtnHS.y + 15 + 2, 20, BLACK);
+            // DrawText("BACK TO MENU", backBtnHS.x + (backBtnHS.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
+            //          backBtnHS.y + 15, 20, WHITE);
 
             // Efek hover tombol
-            if (CheckCollisionPointRec(GetMousePosition(), backBtnHS))
-            {
-                DrawRectangleRec(backBtnHS, Fade(BLUE, 0.7f));
-                DrawText("BACK TO MENU", backBtnHS.x + (backBtnHS.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
-                         backBtnHS.y + 15, 20, WHITE);
+            // if (CheckCollisionPointRec(GetMousePosition(), backBtnHS))
+            // {
+            //     DrawRectangleRec(backBtnHS, Fade(BLUE, 0.7f));
+            //     DrawText("BACK TO MENU", backBtnHS.x + (backBtnHS.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
+            //              backBtnHS.y + 15, 20, WHITE);
 
-                if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
-                {
-                    SetMenuState(MENU_STATE_MAIN);
-                    PlaySoundEffect(SOUND_CLICK);
-                }
-            }
+            //     if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+            //     {
+            //         SetMenuState(MENU_STATE_MAIN);
+            //         PlaySoundEffect(SOUND_CLICK);
+            //     }
+            // }
 
             if (IsKeyPressed(KEY_ESCAPE))
             {
@@ -595,6 +599,17 @@ int main(void)
             DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
                      backBtn.y + 15, 20, WHITE);
 
+            Rectangle scoreBtn = {
+                WINDOW_WIDTH / 2 - 100,
+                WINDOW_HEIGHT / 2 + 140,
+                200,
+                50};
+
+            DrawRectangleRec(scoreBtn, YELLOW);
+            DrawRectangleLinesEx(scoreBtn, 3, GOLD);
+            DrawText("HIGHSCORE", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("HIGHSCORE", 20) / 2,
+                     scoreBtn.y + 15, 20, WHITE);
+
             // Penanganan hover dan klik tombol
             Vector2 mousePos = GetMousePosition();
 
@@ -607,7 +622,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveHighScore(&scoreData);
+                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;
@@ -629,7 +644,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveHighScore(&scoreData);
+                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;
@@ -642,8 +657,28 @@ int main(void)
                 }
             }
 
+             if (CheckCollisionPointRec(mousePos, scoreBtn))
+            {
+                DrawRectangleRec(scoreBtn, Fade(YELLOW, 0.8f));
+                DrawText("HIGHSCORE", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
+                         scoreBtn.y + 15, 20, WHITE);
+
+                if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+                {
+                    SaveGameScore(&scoreData);
+                    InitBoard1(&board);
+                    InitScoring(&scoreData);
+                    gameOver = false;
+                    inGame = false;
+                    wasPreviouslyInGame = false;
+                    fallTimer = 0;
+                    SetMenuState(MENU_STATE_HIGHSCORE);
+                    PlaySoundEffect(SOUND_CLICK);
+                }
+            }
+
             // Simpan skor tertinggi
-            SaveHighScore(&scoreData);
+            SaveGameScore(&scoreData);
 
             // Restart dengan tombol R
             if (IsKeyPressed(KEY_R))
@@ -678,6 +713,7 @@ int main(void)
      */
     UnloadMainMenu();
     UnloadGameSound();
+    UnloadHighScore(&highscoreboard);
     CloseAudioDevice();
     CloseWindow();
 
