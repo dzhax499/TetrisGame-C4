@@ -188,24 +188,22 @@ void DisplayHighScore(HighScoreBoard* highscoreboard, int screenWidth, int scree
         rank++;
     }
     
-    // Gambar tombol kembali
-    Rectangle backButton = {
-        panel.x + panel.width/2 - 100,
-        panel.y + panel.height - 60,
-        200,
-        40
-    };
-    
-    DrawRectangleRec(backButton, BLUE);
-    DrawRectangleLinesEx(backButton, 2, SKYBLUE);
-    DrawText("BACK", backButton.x + backButton.width/2 - MeasureText("BACK", 20)/2,
-             backButton.y + 10, 20, WHITE);
-    
+    Rectangle backBtn = {
+                WINDOW_WIDTH / 2 - 100,
+                WINDOW_HEIGHT / 2 + 230,
+                200,
+                50};
+
+            DrawRectangleRec(backBtn, BLUE);
+            DrawRectangleLinesEx(backBtn, 3, SKYBLUE);
+            DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
+                     backBtn.y + 15, 20, WHITE);
+                     
     // Cek tombol kembali
-    if (CheckCollisionPointRec(GetMousePosition(), backButton)) {
-        DrawRectangleRec(backButton, Fade(BLUE, 0.7f));
-        DrawText("BACK", backButton.x + backButton.width/2 - MeasureText("BACK", 20)/2,
-                 backButton.y + 10, 20, WHITE);
+    if (CheckCollisionPointRec(GetMousePosition(), backBtn)) {
+        DrawRectangleRec(backBtn, Fade(BLUE, 0.7f));
+        DrawText("BACK TO MENU", backBtn.x + backBtn.width/2 - MeasureText("BACK TO MENU", 20)/2,
+                 backBtn.y + 15, 20, WHITE);
         
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
             // Kembali ke menu utama

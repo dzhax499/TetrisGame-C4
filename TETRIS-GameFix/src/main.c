@@ -660,7 +660,7 @@ int main(void)
              if (CheckCollisionPointRec(mousePos, scoreBtn))
             {
                 DrawRectangleRec(scoreBtn, Fade(YELLOW, 0.8f));
-                DrawText("HIGHSCORE", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
+                DrawText("HIGHSCORE", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("HIGHSCORE", 20) / 2,
                          scoreBtn.y + 15, 20, WHITE);
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
