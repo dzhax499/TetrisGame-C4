@@ -17,14 +17,18 @@ typedef enum {
     MENU_STATE_PAUSE
 } MenuState;
 
+// Forward declaration of the struct
+typedef struct MenuButton MenuButton;
+
 // Struktur untuk tombol menu
-typedef struct {
+struct MenuButton {
     Rectangle rect;
     const char *text;
     Color color;
     Color hoverColor;
     bool isHovered;
-} MenuButton;
+    MenuButton *next; // Pointer ke tombol berikutnya
+};
 
 // Fungsi-fungsi menu
 void InitMainMenu(void);
@@ -34,6 +38,9 @@ void UnloadMainMenu(void);
 MenuState GetCurrentMenuState(void);
 void SetMenuState(MenuState newState);
 
-
+// Fungsi untuk membuat dan mengelola tombol menu
+MenuButton* CreateMenuButton(float x, float y, float width, float height, const char* text, Color color, Color hoverColor);
+void AddMenuButton(MenuButton* button);
+void FreeAllMenuButtons(void);
 
 #endif // MAIN_MENU_H
