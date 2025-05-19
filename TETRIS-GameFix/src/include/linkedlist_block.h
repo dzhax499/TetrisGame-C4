@@ -22,5 +22,7 @@ void insert_AktifBlok(AktifBlok* list, TetrisBlock newBlock);
 void delete_AktifBlok(AktifBlok* list,BlockNode* node);
 void update_semuablok(AktifBlok* list, TetrisBoard* board);
 void gambar_semuablok(AktifBlok* list);
+bool cekBlokKosong(TetrisBlock* blk, TetrisBoard* board);
+
 
 #endif
