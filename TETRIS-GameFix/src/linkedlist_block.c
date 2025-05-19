@@ -1,10 +1,10 @@
 #include "include/linkedlist_block.h"
 
 
-void insert_AktifBlok(AktifBlok* list, TetrisBlock newBlock)
+void insert_AktifBlok(AktifBlokDzakir* list, TetrisBlock newBlock)
 {
-    BlockNode* NodeBaru;
-    NodeBaru = (BlockNode*)malloc(sizeof(BlockNode));
+    BlockNodeDzakir* NodeBaru;
+    NodeBaru = (BlockNodeDzakir*)malloc(sizeof(BlockNodeDzakir));
     NodeBaru->block = newBlock;
     NodeBaru->next = NULL;
     NodeBaru->prev = NULL;
@@ -19,9 +19,9 @@ void insert_AktifBlok(AktifBlok* list, TetrisBlock newBlock)
     }
 }
 
-void update_semuablok(AktifBlok* list, TetrisBoard* board)
+void update_semuablok(AktifBlokDzakir* list, TetrisBoard* board)
 {
-    BlockNode* Pcur;
+    BlockNodeDzakir* Pcur;
     Pcur=list->head;
 
     while (Pcur != NULL) {
@@ -45,7 +45,7 @@ void update_semuablok(AktifBlok* list, TetrisBoard* board)
     }
 }
 
-void delete_AktifBlok(AktifBlok* list, BlockNode* node) {
+void delete_AktifBlok(AktifBlokDzakir* list, BlockNodeDzakir* node) {
     if (!list || !node) return;
 
     if (node->prev) {
@@ -62,8 +62,8 @@ void delete_AktifBlok(AktifBlok* list, BlockNode* node) {
     free(node);
 }
 
-void gambar_semuablok(AktifBlok* list) {
-    BlockNode* curr = list->head;
+void gambar_semuablok(AktifBlokDzakir* list) {
+    BlockNodeDzakir* curr = list->head;
     while (curr) {
         TetrisBlock* blk = &curr->block;
 

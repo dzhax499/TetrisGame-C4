@@ -6,22 +6,22 @@
 #include "board.h"
 #include "rendering.h"
 
-typedef struct BlockNode {
+typedef struct BlockNodeDzakir {
     TetrisBlock block;
-    struct BlockNode* next;
-    struct BlockNode* prev;
-} BlockNode;
+    struct BlockNodeDzakir* next;
+    struct BlockNodeDzakir* prev;
+} BlockNodeDzakir;
 
 typedef struct {
-    BlockNode* head;
-    BlockNode* tail;
-} AktifBlok;
+    BlockNodeDzakir* head;
+    BlockNodeDzakir* tail;
+} AktifBlokDzakir;
 
 
-void insert_AktifBlok(AktifBlok* list, TetrisBlock newBlock);
-void delete_AktifBlok(AktifBlok* list,BlockNode* node);
-void update_semuablok(AktifBlok* list, TetrisBoard* board);
-void gambar_semuablok(AktifBlok* list);
+void insert_AktifBlok(AktifBlokDzakir* list, TetrisBlock newBlock);
+void delete_AktifBlok(AktifBlokDzakir* list,BlockNodeDzakir* node);
+void update_semuablok(AktifBlokDzakir* list, TetrisBoard* board);
+void gambar_semuablok(AktifBlokDzakir* list);
 bool cekBlokKosong(TetrisBlock* blk, TetrisBoard* board);
 
 
