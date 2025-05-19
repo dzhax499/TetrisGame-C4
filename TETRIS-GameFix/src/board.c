@@ -20,7 +20,7 @@ Color GetBlockColor(BlockType block) {
 }
 
 // Inisialisasi papan dengan penanganan error
-void InitBoard(TetrisBoard *board) {
+void InitBoard1(TetrisBoard *board) {
     if (!board) return;
 
     memset(board->grid, BLOCK_EMPTY, sizeof(board->grid));
@@ -137,3 +137,13 @@ void PrintNextBlocks(TetrisBoard* board) {
         current = current->next;
     } while (current != board->next_blocks && count < 10); // Prevent infinite loop
 }
+
+bool IsGameOver(TetrisBlock *block, TetrisBoard *board) {
+    (void)block; // Tidak digunakan saat ini
+    // Periksa baris paling atas
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        if (board->grid[0][x] != BLOCK_EMPTY) {
+            board->game_over = true;
+            return true;
+        }
+    }

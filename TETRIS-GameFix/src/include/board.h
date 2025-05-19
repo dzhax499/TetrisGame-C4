@@ -52,11 +52,11 @@ typedef struct {
 extern TetrisBoard *board;
 
 // Fungsi
-void InitBoard(TetrisBoard* board);
+void InitBoard1(TetrisBoard* board);
 int ClearFullLines(TetrisBoard* board);
 bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
 Color GetBlockColor(BlockType block);
-void PrintBoard(TetrisBoard* board);
+// void PrintNextBoard(TetrisBoard* board);
 void AddNextBlock(TetrisBoard* board, TetrisBlock newBlock);
 TetrisBlock PopNextBlock(TetrisBoard* board);
 void PrintNextBlocks(TetrisBoard* board);
