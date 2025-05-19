@@ -11,10 +11,8 @@
 #include "include/main_menu.h"
 #include "include/tetris.h"
 
-#define HIGH_SCORE_FILE "assets/log/highscore.dat"
+#define HIGH_SCORE_FILE "assets/log/leaderboard.dat"
 #define MAX_LEADERBOARD_ENTRIES 10
-#define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 768
 
 static Texture2D backgroundTexture;
 
@@ -29,32 +27,19 @@ void InitLeaderboard(Leaderboard* leaderboard) {
 void UnloadLeaderboard(Leaderboard* leaderboard) {
     // Membersihkan semua entri dalam linked list
     UnloadTexture (backgroundTexture);
-    LeaderboardEntry* current = leaderboard->highScores;
-    LeaderboardEntry* next;
-
-    while (current != NULL) {
-        next = current->next;
-        free(current);
-        current = next;
-    }
-
-    leaderboard->highScores = NULL;
+    FreeLeaderboardList(leaderboard);
 }
 
 // Tambahkan skor ke daftar leaderboard
 void AddLeaderboard(Leaderboard* leaderboard, int score, int level) {
     LeaderboardEntry* newEntry = (LeaderboardEntry*)malloc(sizeof(LeaderboardEntry));
+    if (!newEntry) {
+        printf("Gagal menambahkan entri leaderboard!\n");
+        return;
+    }
     newEntry->score = score;
     newEntry->level = level;
     newEntry->next = NULL;
-
-    // Hitung jumlah entri saat ini
-    int count = 0;
-    LeaderboardEntry* current = leaderboard->highScores;
-    while (current) {
-        count++;
-        current = current->next;
-    }
 
     // Jika daftar kosong atau skor baru lebih tinggi dari yang pertama
     if (!leaderboard->highScores || leaderboard->highScores->score < score) {
@@ -62,23 +47,19 @@ void AddLeaderboard(Leaderboard* leaderboard, int score, int level) {
         leaderboard->highScores = newEntry;
     } else {
         // Cari posisi untuk menyisipkan (urutkan dari besar ke kecil)
-        current = leaderboard->highScores;
+        LeaderboardEntry* current = leaderboard->highScores;
         LeaderboardEntry* prev = NULL;
         while (current && current->score >= score) {
             prev = current;
             current = current->next;
         }
         newEntry->next = current;
-        if (prev) {
-            prev->next = newEntry;
-        } else {
-            leaderboard->highScores = newEntry;
-        }
+        prev->next = newEntry;
     }
 
     // Batasi hingga 10 entri
-    count = 0;
-    current = leaderboard->highScores;
+    int count = 0;
+    LeaderboardEntry* current = leaderboard->highScores;
     LeaderboardEntry* lastValid = NULL;
     while (current && count < MAX_LEADERBOARD_ENTRIES) {
         lastValid = current;
@@ -102,7 +83,7 @@ void AddLeaderboard(Leaderboard* leaderboard, int score, int level) {
 
 // Simpan daftar leaderboard ke file
 void SaveLeaderboard(Leaderboard* leaderboard) {
-    FILE* file = fopen(HIGH_SCORE_FILE, "w");
+    FILE* file = fopen(LEADERBOARD_FILE, "w");
     if (!file) {
         printf("Gagal menyimpan leaderboard! Pastikan direktori tersedia.\n");
         return;
@@ -119,10 +100,10 @@ void SaveLeaderboard(Leaderboard* leaderboard) {
 // Muat daftar leaderboard dari file
 void LoadLeaderboard(Leaderboard* leaderboard) {
     FreeLeaderboardList(leaderboard); // Kosongkan daftar sebelum memuat
-    FILE* file = fopen(HIGH_SCORE_FILE, "r");
+    FILE* file = fopen(LEADERBOARD_FILE, "r");
     if (!file) {
         printf("File leaderboard tidak ditemukan, membuat file baru.\n");
-        file = fopen(HIGH_SCORE_FILE, "w");
+        file = fopen(LEADERBOARD_FILE, "w");
         if (file) fclose(file);
         return;
     }

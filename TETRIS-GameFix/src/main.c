@@ -684,7 +684,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    InitLeaderboard(&leaderboard);
+                    AddLeaderboard(&leaderboard, scoreData.score, scoreData.level);
                     SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);

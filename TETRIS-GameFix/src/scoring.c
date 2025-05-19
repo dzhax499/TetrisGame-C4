@@ -134,5 +134,3 @@ int LoadGameHighScore(void) {
 int GetHighScore(ScoreData* scoreData) {
     return scoreData->highScore;
 }
-
-
