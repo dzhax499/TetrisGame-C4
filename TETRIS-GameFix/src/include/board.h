@@ -40,6 +40,7 @@ typedef struct {
     BlockType grid[BOARD_HEIGHT][BOARD_WIDTH];
     TetrisBlock current_block;
     BlockNode* next_blocks;  // Circular linked list untuk next blocks
+    TetrisBlock next_block;
     HoldBlock hold_block;
     int current_score;
     int current_level;
