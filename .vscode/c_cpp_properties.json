@@ -4,7 +4,8 @@
       "name": "windows-gcc-x64",
       "includePath": [
         "${workspaceFolder}/**",
-        "C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/include/SDL3"
+        "C:/Users/Windows 11/Documents/GitHub/TetrisGame-C4/include/SDL3",
+        "C:\\Users\\Windows 11\\Documents\\GitHub\\TETRIS-GameFix"
       ],
       "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
       "cStandard": "${default}",

@@ -1,7 +1,7 @@
 // Nama file : main.c
 // Deskripsi : File utama yang menggabungkan semua komponen, menginisialisasi permainan, dan mengatur loop utama permainan.
 // Oleh      : Ibnu Hilmi 241511079
-//             Dzakir Tsabit 241511071
+//             Dzakir Tsabit 241511071 (github : dzhax4499)
 
 /**
  * ===================================
@@ -32,6 +32,7 @@
 #include "include/timer.h"
 #include "include/leaderboard.h"
 #include "raylib.h"
+#include "include/linkedlist_block.h"
 #include <time.h>
 
 /**
@@ -53,6 +54,10 @@
  * 2. Loop utama game
  * 3. Pembersihan sumber daya sebelum program berakhir
  */
+//global variabel untuk menyimpan data permainan
+AktifBlok activeBlocks;
+bool paused = false;
+
 int main(void)
 {
     /**
@@ -67,6 +72,9 @@ int main(void)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
     InitAudioDevice();
+    // inisialisasi linked list untuk menyimpan blok aktif
+    activeBlocks.head = NULL;
+    activeBlocks.tail = NULL;
 
     /**
      * Inisialisasi Generator Angka Acak
@@ -204,6 +212,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
             inGame = true;
+            paused = false;
 
             if (IsKeyPressed(KEY_P))
             {
@@ -367,6 +376,12 @@ int main(void)
          */
         else if (currentMenuState == MENU_STATE_PAUSE)
         {
+            if (!paused)
+            {
+                paused = true;
+                StopBackgroundMusic();
+                PlaySoundEffect(SOUND_CLICK);
+            }
             // Tetap menggambar elemen permainan tanpa memperbarui logika
             DrawBoard(&board);
             DrawBlockShadow(&board.current_block, &board);
@@ -404,6 +419,7 @@ int main(void)
             {
                 inGame = false;
                 SetMenuState(MENU_STATE_MAIN);
+                paused = false;
                 PlayBackgroundMusic(MUSIC_MENU);
                 PlaySoundEffect(SOUND_CLICK);
             }
@@ -449,7 +465,7 @@ int main(void)
          * - Memperbarui skor dan baris yang dihapus
          * - Menggambar semua elemen permainan
          */
-        if (inGame && !gameOver)
+        if (inGame && !gameOver && !paused)
         {
             if (!wasPreviouslyInGame)
             {
@@ -472,6 +488,10 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
+
+                    // tambah blok ke dalam aktif blok linked list
+                    insert_AktifBlok(&activeBlocks, board.current_block);
+                    
                     PlaceBlock(&board.current_block, &board);
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
@@ -533,14 +553,14 @@ int main(void)
             {
                 AddLineClearScore(&scoreData, linesCleared);
                 CheckLevelUp(&scoreData);
-                scoreData.level = board.current_level;
+                // scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
-
             // Menggambar elemen permainan
             DrawBlockShadow(&board.current_block, &board);
             DrawBoard(&board);
             DrawActiveTetromino(&board.current_block);
+            gambar_semuablok(&activeBlocks);
             DrawHoldBlock(&board);
             DrawNextBlock(&board);
             DrawScore(&board, &scoreData);

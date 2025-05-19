@@ -6,7 +6,6 @@
 #define TETRIS_H
 
 #include <stdbool.h>
-#include <raylib.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -29,7 +28,11 @@ typedef struct {
     int rotation; // Rotasi saat ini (0-3)
     int shape[4][4]; // Bentuk blok
     int x, y;     // Posisi pada papan
+    int ukuranblok; // Ukuran blok (4x4)
     Color color;  // Warna blok
+
+    bool efekmeledak;    // efek ledakan aktif
+    int waktumeledak;  // waktu animasi
 } TetrisBlock;
 
 // Tambahkan struktur untuk menyimpan hold block
