@@ -19,31 +19,31 @@ void insert_AktifBlok(AktifBlok* list, TetrisBlock newBlock)
     }
 }
 
-void update_semuablok(AktifBlok* list, TetrisBoard* board)
-{
-    BlockNode* Pcur;
-    Pcur=list->head;
+// void update_semuablok(AktifBlok* list, TetrisBoard* board)
+// {
+//     BlockNode* Pcur;
+//     Pcur=list->head;
 
-    while (Pcur != NULL) {
-        TetrisBlock* blk;
-        blk = &Pcur->block;
+//     while (Pcur != NULL) {
+//         TetrisBlock* blk;
+//         blk = &Pcur->block;
         
-        for (int i = 0; i < 4 ; i++) {
-            for (int j = 0; j < blk->ukuranblok; j++) {
-                if (blk->shape[i][j]) {
-                    int x = blk->x + j;
-                    int y = blk->y + i;
+//         for (int i = 0; i < 4 ; i++) {
+//             for (int j = 0; j < blk->ukuranblok; j++) {
+//                 if (blk->shape[i][j]) {
+//                     int x = blk->x + j;
+//                     int y = blk->y + i;
 
-                    if (y >= 0 && y < BOARD_HEIGHT && x >= 0 && x < BOARD_WIDTH) {
-                        board->grid[y][x] = blk->type;
-                    }
-                }
-            }
-        }
+//                     if (y >= 0 && y < BOARD_HEIGHT && x >= 0 && x < BOARD_WIDTH) {
+//                         board->grid[y][x] = blk->type;
+//                     }
+//                 }
+//             }
+//         }
 
-        Pcur = Pcur->next;
-    }
-}
+//         Pcur = Pcur->next;
+//     }
+// }
 
 void delete_AktifBlok(AktifBlok* list, BlockNode* node) {
     if (!list || !node) return;
@@ -67,14 +67,13 @@ void gambar_semuablok(AktifBlok* list) {
     while (curr) {
         TetrisBlock* blk = &curr->block;
 
-        for (int i = 0; i < blk->ukuranblok; i++) {
-            for (int j = 0; j < blk->ukuranblok; j++) {
+        for (int i = 0; i <4; i++) {
+            for (int j = 0; j <4; j++) {
                 if (blk->shape[i][j]) {
                     int x = blk->x + j;
                     int y = blk->y + i;
 
-                    // gambar kotak di (x, y) dengan warna blk->color
-                    DrawBlock(x, y, blk->type);
+                    DrawActiveTetromino(blk);
                 }
             }
         }

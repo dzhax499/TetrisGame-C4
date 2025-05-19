@@ -540,19 +540,17 @@ int main(void)
             {
                 AddLineClearScore(&scoreData, linesCleared);
                 CheckLevelUp(&scoreData);
-                scoreData.level = board.current_level;
+                // scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
-
-            update_semuablok(&activeBlocks, &board);
             // Menggambar elemen permainan
-            // DrawBlockShadow(&board.current_block, &board);
+            DrawBlockShadow(&board.current_block, &board);
             DrawBoard(&board);
-            // DrawActiveTetromino(&board.current_block);
+            DrawActiveTetromino(&board.current_block);
             gambar_semuablok(&activeBlocks);
-            // DrawHoldBlock(&board);
-            // DrawNextBlock(&board);
-            // DrawScore(&board, &scoreData);
+            DrawHoldBlock(&board);
+            DrawNextBlock(&board);
+            DrawScore(&board, &scoreData);
 
             // Tambahkan panel tips kontrol pemain
             // Posisikan di sisi kiri bawah layar
