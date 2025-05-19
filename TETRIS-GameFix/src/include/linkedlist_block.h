@@ -12,7 +12,7 @@ typedef struct BlockNodeDzakir {
     struct BlockNodeDzakir* prev;
 } BlockNodeDzakir;
 
-typedef struct {
+typedef struct AktifBlokDzakir {
     BlockNodeDzakir* head;
     BlockNodeDzakir* tail;
 } AktifBlokDzakir;
