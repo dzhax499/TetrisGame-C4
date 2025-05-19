@@ -37,10 +37,10 @@ int CheckLevelUp(ScoreData* scoreData);
 int GetDifficulty(ScoreData* scoreData);
 
 // Fungsi untuk menyimpan skor tertinggi ke dalam file
-void SaveHighScore(ScoreData* scoreData);
+void SaveGameScore(ScoreData* scoreData);
 
 // Fungsi untuk memuat skor tertinggi dari file
-int LoadHighScore(void);
+int LoadGameHighScore(void);
 
 // Tambahkan fungsi getter untuk high score
 int GetHighScore(ScoreData* scoreData); 

@@ -13,7 +13,8 @@ typedef enum {
     MENU_STATE_HIGHSCORE,
     MENU_STATE_CREDITS,
     MENU_STATE_EXIT,
-    MENU_STATE_PAUSE
+    MENU_STATE_PAUSE,
+    MENU_STATE_LEADERBOARD
 } MenuState;
 
 // Forward declaration of the struct

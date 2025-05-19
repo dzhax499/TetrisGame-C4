@@ -19,7 +19,7 @@ void InitScoring(ScoreData* scoreData) {
     scoreData->linesToNextLevel = 10;
     
     // Muat high score saat inisialisasi
-    scoreData->highScore = LoadHighScore();
+    scoreData->highScore = LoadGameHighScore();
 }
 
 // Perbarui kecepatan jatuh berdasarkan level saat ini
@@ -99,8 +99,8 @@ int GetDifficulty(ScoreData* scoreData) {
 }
 
 // Simpan skor tertinggi ke dalam file
-void SaveHighScore(ScoreData* scoreData) {
-    if (scoreData->score > LoadHighScore()) {  // Periksa langsung dari file
+void SaveGameScore(ScoreData* scoreData) {
+    if (scoreData->score > LoadGameHighScore()) {  // Periksa langsung dari file
         FILE* file = fopen(HIGH_SCORE_FILE, "w");
 
         if (file) {
@@ -115,7 +115,7 @@ void SaveHighScore(ScoreData* scoreData) {
 
 
 // Muat skor tertinggi dari file
-int LoadHighScore(void) {
+int LoadGameHighScore(void) {
     int highScore = 0;
     FILE* file = fopen(HIGH_SCORE_FILE, "r");
 
@@ -134,5 +134,3 @@ int LoadHighScore(void) {
 int GetHighScore(ScoreData* scoreData) {
     return scoreData->highScore;
 }
-
-
