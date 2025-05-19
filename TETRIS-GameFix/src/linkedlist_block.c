@@ -70,9 +70,6 @@ void gambar_semuablok(AktifBlokDzakir* list) {
         for (int i = 0; i <4; i++) {
             for (int j = 0; j <4; j++) {
                 if (blk->shape[i][j]) {
-                    int x = blk->x + j;
-                    int y = blk->y + i;
-
                     DrawActiveTetromino(blk);
                 }
             }
