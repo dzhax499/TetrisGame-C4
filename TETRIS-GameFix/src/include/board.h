@@ -11,17 +11,27 @@
 #include "scoring.h"
 #include <stdbool.h>
 
+// Konstanta ukuran papan
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
 #define BLOCK_SIZE 30
-#define BOARD_OFFSET_X 250
-#define BOARD_OFFSET_Y 50
+#define BOARD_OFFSET_X 250  // Geser ke tengah
+#define BOARD_OFFSET_Y 50   // Tetap sama
 
+
+// Tipe data untuk blok
 typedef enum {
     BLOCK_EMPTY = 0,
-    BLOCK_I, BLOCK_J, BLOCK_L, BLOCK_O, BLOCK_S, BLOCK_T, BLOCK_Z
+    BLOCK_I,     // Cyan
+    BLOCK_J,     // Blue
+    BLOCK_L,     // Orange
+    BLOCK_O,     // Yellow
+    BLOCK_S,     // Green
+    BLOCK_T,     // Purple
+    BLOCK_Z      // Red
 } BlockType;
 
+// Struktur untuk menyimpan informasi blok yang sedang jatuh
 typedef struct {
     BlockType type;
     int x;
@@ -29,19 +39,12 @@ typedef struct {
     int rotation;
 } CurrentBlock;
 
-// Node untuk circular linked list
-typedef struct BlockNode {
-    TetrisBlock block;
-    struct BlockNode* next;
-} BlockNode;
-
-// Satu definisi konsisten untuk TetrisBoard
+// Struktur untuk menyimpan informasi papan permainan
 typedef struct {
     BlockType grid[BOARD_HEIGHT][BOARD_WIDTH];
     TetrisBlock current_block;
-    BlockNode* next_blocks;  // Circular linked list untuk next blocks
     TetrisBlock next_block;
-    HoldBlock hold_block;
+    HoldBlock hold_block;  // Tambahkan ini
     int current_score;
     int current_level;
     int lines_cleared;
@@ -49,16 +52,22 @@ typedef struct {
     ScoreData score_data;
 } TetrisBoard;
 
+
 extern TetrisBoard *board;
 
-// Fungsi
-void InitBoard(TetrisBoard* board);
+// Fungsi inisialisasi papan permainan
+void InitBoard1(TetrisBoard* board);
+
+// Fungsi untuk menghapus baris yang penuh
 int ClearFullLines(TetrisBoard* board);
+
+// Fungsi untuk memeriksa game over
 bool IsGameOver(TetrisBlock *block, TetrisBoard *board);
+
+// Fungsi utilitas
 Color GetBlockColor(BlockType block);
+
+// Fungsi debug
 void PrintBoard(TetrisBoard* board);
-void AddNextBlock(TetrisBoard* board, TetrisBlock newBlock);
-TetrisBlock PopNextBlock(TetrisBoard* board);
-void PrintNextBlocks(TetrisBoard* board);
 
 #endif // BOARD_H
