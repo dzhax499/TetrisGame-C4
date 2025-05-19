@@ -1,6 +1,6 @@
 // Nama file : main_menu.h
 // Deskripsi : File header yang mendeklarasikan fungsi dan struktur data yang digunakan dalam sistem menu game Tetris, termasuk definisi tombol menu dan status menu.
-// Oleh      : Ibnu Hilmi 241511079
+// Oleh      : Ibnu Hilmi 241511079 cek
 
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
