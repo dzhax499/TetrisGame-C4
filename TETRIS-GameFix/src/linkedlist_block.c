@@ -18,14 +18,16 @@ static RotationList* rotationLists[7] = {NULL};
 RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     if (count <= 0) return NULL;
     
-    RotationList* list = (RotationList*)malloc(sizeof(RotationList));
+    RotationList* list;
+    list =  (RotationList*)malloc(sizeof(RotationList));
     if (!list) {
         printf("Gagal mengalokasikan memori untuk RotationList\n");
         return NULL;
     }
     
     // Buat node pertama
-    RotationNode* firstNode = (RotationNode*)malloc(sizeof(RotationNode));
+    RotationNode* firstNode;
+    firstNode = (RotationNode*)malloc(sizeof(RotationNode));
     if (!firstNode) {
         printf("Gagal mengalokasikan memori untuk RotationNode\n");
         free(list);
@@ -40,7 +42,8 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     list->rotationCount = count;
     
     // Node sebelumnya dimulai dari node pertama
-    RotationNode* prevNode = firstNode;
+    RotationNode* prevNode;
+    prevNode = firstNode;
     
     // Buat node-node lain dan sambungkan
     for (int i = 1; i < count; i++) {
@@ -92,7 +95,7 @@ void RotateToNext(RotationList* list) {
 }
 
 // Fungsi untuk mendapatkan bentuk blok saat ini 
-void GetCurrentShape(RotationList* list, int shape[4][4]) {
+void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
     if (list && list->current) {
         memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
     }

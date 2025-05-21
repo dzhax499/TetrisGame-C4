@@ -31,7 +31,7 @@ RotationList* GetRotationList(int blockType);
 void RotateToNext(RotationList* list);
 
 // Fungsi untuk mendapatkan bentuk blok saat ini 
-void GetCurrentShape(RotationList* list, int shape[4][4]);
+void AmbilBentukSaatIni(RotationList* list, int shape[4][4]);
 
 // Fungsi untuk membebaskan memori linked list
 void FreeRotationList(RotationList* list);
