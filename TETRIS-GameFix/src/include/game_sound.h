@@ -1,36 +1,68 @@
 // File: game_sound.h
-// Deskripsi: Header file untuk mengatur semua suara dalam game Tetris
-// Oleh: Abi
+// Deskripsi: Header file untuk mengatur semua suara dalam game Tetris dengan Linked List
+// Oleh: Abi (Dimodifikasi)
 
 #ifndef GAME_SOUND_H
 #define GAME_SOUND_H
 
 #include "raylib.h"
 #include <stdbool.h>
+#include "sound_node.h"
 
 // ID untuk efek suara
 typedef enum {
     SOUND_CLICK,       // Efek suara saat tombol ditekan
     SOUND_GAME_OVER,   // Efek suara saat permainan berakhir
     SOUND_LINE_CLEAR,   // Efek suara saat baris terhapus
-    SOUND_COUNT        // Jumlah total efek suara
+    SOUND_COUNT        // Jumlah total efek suara (untuk kompatibilitas)
 } SoundEffectType;
 
 // ID untuk trek musik
 typedef enum {
     MUSIC_MENU,       // Musik latar untuk menu
     MUSIC_GAMEPLAY,   // Musik latar saat permainan berlangsung
-    MUSIC_COUNT       // Jumlah total trek musik
+    MUSIC_COUNT       // Jumlah total trek musik (untuk kompatibilitas)
 } MusicTrackType;
 
-// Inisialisasi semua sumber daya suara
+// Node untuk linked list efek suara
+typedef struct SoundNode {
+    Sound sound;
+    SoundEffectType type;
+    char* name;
+    float volume;
+    struct SoundNode* next;
+} SoundNode;
+
+// Node untuk linked list trek musik
+typedef struct MusicNode {
+    Music music;
+    MusicTrackType type;
+    char* name;
+    float volume;
+    bool looping;
+    struct MusicNode* next;
+} MusicNode;
+
+// Inisialisasi sistem suara dengan linked list
 void InitGameSound(void);
 
-// Memainkan efek suara tertentu
+// Memainkan efek suara berdasarkan tipe
 void PlaySoundEffect(SoundEffectType soundType);
 
-// Memainkan musik latar untuk konteks yang ditentukan
+// Menambahkan efek suara baru ke linked list
+bool AddSoundEffect(const char* filepath, SoundEffectType type, const char* name);
+
+// Menghapus efek suara dari linked list
+bool RemoveSoundEffect(SoundEffectType type);
+
+// Memainkan musik latar berdasarkan tipe
 void PlayBackgroundMusic(MusicTrackType musicType);
+
+// Menambahkan trek musik baru ke linked list
+bool AddMusicTrack(const char* filepath, MusicTrackType type, const char* name, bool looping);
+
+// Menghapus trek musik dari linked list
+bool RemoveMusicTrack(MusicTrackType type);
 
 // Menghentikan semua musik yang sedang diputar
 void StopBackgroundMusic(void);
@@ -42,7 +74,7 @@ void UpdateGameSound(void);
 void ToggleBackgroundMusic(void);
 
 // Mengatur volume musik dan efek suara (0.0 hingga 1.0)
-void SetMusicVolume1(float volume);
+void SetMusicVolume(float volume);
 void SetSoundEffectsVolume(float volume);
 
 // Memeriksa apakah ada musik yang sedang diputar
