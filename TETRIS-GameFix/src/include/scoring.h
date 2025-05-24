@@ -31,17 +31,18 @@ void AddDropScore(ScoreData* scoreData, int dropDistance);
 void AddLineClearScore(ScoreData* scoreData, int lineCount);
 
 // Fungsi untuk memeriksa apakah level harus dinaikkan
-// int CheckLevelUp(ScoreData* scoreData);
+int CheckLevelUp(ScoreData* scoreData);
 
 // Fungsi untuk mendapatkan tingkat kesulitan saat ini
 int GetDifficulty(ScoreData* scoreData);
 
 // Fungsi untuk menyimpan skor tertinggi ke dalam file
-void SaveHighScore(ScoreData* scoreData);
+void SaveGameScore(ScoreData* scoreData);
 
 // Fungsi untuk memuat skor tertinggi dari file
-int LoadHighScore(void);
+int LoadGameHighScore(void);
 
 // Tambahkan fungsi getter untuk high score
-int GetHighScore(ScoreData* scoreData);  
+int GetHighScore(ScoreData* scoreData); 
+ 
 #endif // SCORING_H

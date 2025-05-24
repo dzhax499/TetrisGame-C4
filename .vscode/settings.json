@@ -58,7 +58,8 @@
     "tetris.h": "c",
     "stdbool.h": "c",
     "blocks.h": "c",
-    "game_sound.h": "c"
-  },
-  "C_Cpp.errorSquiggles": "disabled"
+    "game_sound.h": "c",
+    "highscore.h": "c",
+    "main_menu.h": "c"
+  }
 }

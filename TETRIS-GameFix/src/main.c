@@ -1,7 +1,7 @@
 // Nama file : main.c
 // Deskripsi : File utama yang menggabungkan semua komponen, menginisialisasi permainan, dan mengatur loop utama permainan.
 // Oleh      : Ibnu Hilmi 241511079
-//             Dzakir Tsabit 241511071
+//             Dzakir Tsabit 241511071 (github : dzhax4499)
 
 /**
  * ===================================
@@ -29,7 +29,10 @@
 #include "include/scoring.h"
 #include "include/main_menu.h"
 #include "include/game_sound.h"
+#include "include/timer.h"
+#include "include/leaderboard.h"
 #include "raylib.h"
+#include "include/linkedlist_block.h"
 #include <time.h>
 
 /**
@@ -51,6 +54,9 @@
  * 2. Loop utama game
  * 3. Pembersihan sumber daya sebelum program berakhir
  */
+//global variabel untuk menyimpan data permainan
+bool paused = false;
+
 int main(void)
 {
     /**
@@ -65,6 +71,7 @@ int main(void)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
     InitAudioDevice();
+    // inisialisasi linked list untuk menyimpan blok aktif
 
     /**
      * Inisialisasi Generator Angka Acak
@@ -92,6 +99,9 @@ int main(void)
 
     ScoreData scoreData;
     InitScoring(&scoreData);
+
+    Leaderboard leaderboard;
+    InitLeaderboard(&leaderboard);
 
     /**
      * Variabel Status Permainan
@@ -140,6 +150,13 @@ int main(void)
         UpdateGameSound();
 
         /**
+         * Memperbarui Timer Game
+         * ---------------------
+         * Memperbarui timer game untuk menghitung waktu yang telah berlalu
+         */
+        UpdateGameTimer();
+
+        /**
          * Penanganan Tombol ESC Global
          * ---------------------------
          * Mengatur perilaku tombol ESC berdasarkan status menu saat ini:
@@ -161,7 +178,8 @@ int main(void)
                 SetMenuState(MENU_STATE_PLAY);
             }
             else if (currentMenuState == MENU_STATE_CREDITS ||
-                     currentMenuState == MENU_STATE_HIGHSCORE)
+                     currentMenuState == MENU_STATE_HIGHSCORE ||
+                     currentMenuState == MENU_STATE_LEADERBOARD)
             {
                 SetMenuState(MENU_STATE_MAIN);
             }
@@ -191,6 +209,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
             inGame = true;
+            paused = false;
 
             if (IsKeyPressed(KEY_P))
             {
@@ -253,7 +272,7 @@ int main(void)
                     PlaySoundEffect(SOUND_CLICK);
                 }
             }
-
+        
             if (IsKeyPressed(KEY_ESCAPE))
             {
                 SetMenuState(MENU_STATE_MAIN);
@@ -278,7 +297,7 @@ int main(void)
                      WINDOW_HEIGHT / 2 - 150, 40, BLACK);
 
             // Baca dan tampilkan high score
-            int highScore = LoadHighScore();
+            int highScore = LoadGameHighScore();
 
             if (highScore > 0)
             {
@@ -327,6 +346,14 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
+        else if (currentMenuState == MENU_STATE_LEADERBOARD)
+        {
+            inGame = false;
+            ClearBackground(LIGHTGRAY);
+            UpdateMainMenu();
+            DrawMainMenu();
+            DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
+        }
         /**
          * Penanganan Status MENU_STATE_EXIT (Keluar)
          * ----------------------------------------
@@ -346,6 +373,12 @@ int main(void)
          */
         else if (currentMenuState == MENU_STATE_PAUSE)
         {
+            if (!paused)
+            {
+                paused = true;
+                StopBackgroundMusic();
+                PlaySoundEffect(SOUND_CLICK);
+            }
             // Tetap menggambar elemen permainan tanpa memperbarui logika
             DrawBoard(&board);
             DrawBlockShadow(&board.current_block, &board);
@@ -383,6 +416,7 @@ int main(void)
             {
                 inGame = false;
                 SetMenuState(MENU_STATE_MAIN);
+                paused = false;
                 PlayBackgroundMusic(MUSIC_MENU);
                 PlaySoundEffect(SOUND_CLICK);
             }
@@ -428,7 +462,7 @@ int main(void)
          * - Memperbarui skor dan baris yang dihapus
          * - Menggambar semua elemen permainan
          */
-        if (inGame && !gameOver)
+        if (inGame && !gameOver && !paused)
         {
             if (!wasPreviouslyInGame)
             {
@@ -451,6 +485,8 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
+
+                    
                     PlaceBlock(&board.current_block, &board);
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
@@ -484,7 +520,11 @@ int main(void)
 
             if (IsKeyPressed(KEY_SPACE))
             {
-                HardDropBlock(&board.current_block, &board);
+                int dropDistance = CalculateDropDistance(&board.current_block, &board);
+                board.current_block.y += dropDistance;
+                AddDropScore(&scoreData, dropDistance);
+                PlaceBlock(&board.current_block, &board);
+
                 board.current_block = board.next_block;
                 board.next_block = GenerateRandomBlock();
                 PlaySoundEffect(SOUND_CLICK);
@@ -507,9 +547,10 @@ int main(void)
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
+                CheckLevelUp(&scoreData);
+                // scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
-
             // Menggambar elemen permainan
             DrawBlockShadow(&board.current_block, &board);
             DrawBoard(&board);
@@ -540,13 +581,13 @@ int main(void)
             int fontSize = 16;
             Color textColor = RAYWHITE;
 
-            DrawText("< / >: Gerak Kiri/Kanan", textX, textY, fontSize, textColor);
-            DrawText("^    : Rotasi Blok", textX, textY + 20, fontSize, textColor);
-            DrawText("v    : Turun Cepat", textX, textY + 40, fontSize, textColor);
-            DrawText("SPACE: Hard Drop", textX, textY + 60, fontSize, textColor);
-            DrawText("C    : Hold Block", textX, textY + 80, fontSize, textColor);
-            DrawText("P/ESC: Pause Game", textX, textY + 100, fontSize, textColor);
-            DrawText("M    : Mute/Unmute Musik", textX, textY + 120, fontSize, textColor);
+            DrawText("< / >: Gerak Kiri/Kanan", textX, textY - 10, fontSize, textColor);
+            DrawText("^    : Rotasi Blok", textX, textY + 10, fontSize, textColor);
+            DrawText("v    : Turun Cepat", textX, textY + 30, fontSize, textColor);
+            DrawText("SPACE: Hard Drop", textX, textY + 50, fontSize, textColor);
+            DrawText("C    : Hold Block", textX, textY + 70, fontSize, textColor);
+            DrawText("P/ESC: Pause Game", textX, textY + 90, fontSize, textColor);
+            DrawText("M    : Mute/Unmute Musik", textX, textY + 110, fontSize, textColor);
         }
         /**
          * Penanganan Status Game Over
@@ -589,6 +630,17 @@ int main(void)
             DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
                      backBtn.y + 15, 20, WHITE);
 
+            Rectangle scoreBtn = {
+                WINDOW_WIDTH / 2 - 100,
+                WINDOW_HEIGHT / 2 + 140,
+                200,
+                50};
+
+            DrawRectangleRec(scoreBtn, PURPLE);
+            DrawRectangleLinesEx(scoreBtn, 3, DARKPURPLE);
+            DrawText("LEADERBOARD", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
+                     scoreBtn.y + 15, 20, WHITE);
+
             // Penanganan hover dan klik tombol
             Vector2 mousePos = GetMousePosition();
 
@@ -601,9 +653,10 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveHighScore(&scoreData);
+                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
+                    InitGameTimer();    
                     gameOver = false;
                     inGame = true; // Langsung mulai permainan baru
                     wasPreviouslyInGame = true;
@@ -623,9 +676,10 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveHighScore(&scoreData);
+                    SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
+                    InitGameTimer();
                     gameOver = false;
                     inGame = false;
                     wasPreviouslyInGame = false;
@@ -636,14 +690,36 @@ int main(void)
                 }
             }
 
+            if (CheckCollisionPointRec(mousePos, scoreBtn))
+            {
+                DrawRectangleRec(scoreBtn, Fade(PURPLE, 0.8f));
+                DrawText("LEADERBOARD", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
+                         scoreBtn.y + 15, 20, WHITE);
+
+                if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+                {
+                    AddLeaderboard(&leaderboard, scoreData.score, scoreData.level);
+                    SaveGameScore(&scoreData);
+                    InitBoard1(&board);
+                    InitScoring(&scoreData);
+                    gameOver = false;
+                    inGame = false;
+                    wasPreviouslyInGame = false;
+                    fallTimer = 0;
+                    SetMenuState(MENU_STATE_LEADERBOARD);
+                    PlaySoundEffect(SOUND_CLICK);
+                }
+            }
+
             // Simpan skor tertinggi
-            SaveHighScore(&scoreData);
+            SaveGameScore(&scoreData);
 
             // Restart dengan tombol R
             if (IsKeyPressed(KEY_R))
             {
                 InitBoard1(&board);
                 InitScoring(&scoreData);
+                InitGameTimer();
                 gameOver = false;
                 inGame = false;
                 wasPreviouslyInGame = false;
