@@ -18,59 +18,72 @@
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
-
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
-
 
 bool paused = false;
 
 int main(void)
 {
+    // Debug: Print initialization start
+    printf("Starting Tetris Game initialization...\n");
 
     SetExitKey(0); // Nonaktifkan tombol keluar bawaan
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
+    
+    // Check if audio initialization succeeds
     InitAudioDevice();
-    // inisialisasi linked list untuk menyimpan blok aktif
+    if (!IsAudioDeviceReady()) {
+        printf("Warning: Audio device could not be initialized\n");
+    }
 
     srand(time(NULL));
 
-
+    // Initialize components with error checking
+    printf("Initializing blocks...\n");
     InitBlocks();
+    
+    printf("Initializing main menu...\n");
     InitMainMenu();
+    
+    printf("Initializing game sound...\n");
     InitGameSound();
 
+    // Initialize game objects
     TetrisBoard board;
+    printf("Initializing board...\n");
     InitBoard1(&board);
 
     ScoreData scoreData;
+    printf("Initializing scoring...\n");
     InitScoring(&scoreData);
 
     Leaderboard leaderboard;
+    printf("Initializing leaderboard...\n");
     InitLeaderboard(&leaderboard);
 
-
+    // Game state variables
     bool inGame = false;
     bool gameOver = false;
     bool wasPreviouslyInGame = false;
     float fallTimer = 0.0f;
     float fallDelay = 1.0f; // Waktu jatuh awal
 
-
+    printf("Starting background music...\n");
     PlayBackgroundMusic(MUSIC_MENU);
+    
+    printf("Entering main game loop...\n");
 
     while (!WindowShouldClose())
     {
-
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
+        // Update audio and timer
         UpdateGameSound();
-
-
         UpdateGameTimer();
 
-
+        // Handle ESC key
         if (IsKeyPressed(KEY_ESCAPE))
         {
             MenuState currentMenuState = GetCurrentMenuState();
@@ -91,15 +104,25 @@ int main(void)
             }
         }
 
-
         MenuState currentMenuState = GetCurrentMenuState();
 
         if (currentMenuState == MENU_STATE_PLAY)
         {
             if (!inGame)
             {
+                printf("Entering PLAY state...\n");
                 PlayBackgroundMusic(MUSIC_GAMEPLAY);
                 PlaySoundEffect(SOUND_CLICK);
+                
+                // Reinitialize game objects when entering play mode
+                printf("Reinitializing game objects for new game...\n");
+                InitBoard1(&board);
+                InitScoring(&scoreData);
+                gameOver = false;
+                fallTimer = 0.0f;
+                fallDelay = 1.0f;
+                
+                printf("Game objects reinitialized successfully\n");
             }
             inGame = true;
             paused = false;
@@ -110,7 +133,6 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-
         else if (currentMenuState == MENU_STATE_CREDITS)
         {
             inGame = false;
@@ -165,7 +187,6 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-
         else if (currentMenuState == MENU_STATE_HIGHSCORE)
         {
             inGame = false;
@@ -232,12 +253,10 @@ int main(void)
             DrawMainMenu();
             DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
- 
         else if (currentMenuState == MENU_STATE_EXIT)
         {
             break;
         }
-
         else if (currentMenuState == MENU_STATE_PAUSE)
         {
             if (!paused)
@@ -295,7 +314,6 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-
         else if (currentMenuState == MENU_STATE_MAIN)
         {
             inGame = false;
@@ -310,7 +328,7 @@ int main(void)
             DrawMainMenu();
         }
 
-
+        // Main game logic
         if (inGame && !gameOver && !paused)
         {
             if (!wasPreviouslyInGame)
@@ -318,7 +336,7 @@ int main(void)
                 wasPreviouslyInGame = true;
             }
 
-// Perbarui kecepatan jatuh berdasarkan level saat ini
+            // Perbarui kecepatan jatuh berdasarkan level saat ini
 #ifdef HAVE_UPDATE_FALL_SPEED
             fallDelay = UpdateFallSpeed(&scoreData);
 #else
@@ -334,15 +352,17 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
-
-                    
+                    // Block has landed, place it
                     PlaceBlock(&board.current_block, &board);
+                    
+                    // Generate new blocks
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
 
-                    // Periksa kondisi game over
+                    // Check for game over
                     if (IsGameOver(&board.current_block, &board))
                     {
+                        printf("Game Over detected!\n");
                         gameOver = true;
                         StopBackgroundMusic();
                         PlaySoundEffect(SOUND_GAME_OVER);
@@ -351,7 +371,7 @@ int main(void)
                 fallTimer = 0; // Reset timer
             }
 
-            // Kontrol pemain untuk menggerakan dan merotasi blok
+            // Player controls
             if (IsKeyPressed(KEY_LEFT))
                 MoveBlockHorizontal(&board.current_block, &board, -1);
 
@@ -385,22 +405,22 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
 
-            // Tombol M untuk mute/unmute musik
+            // Toggle music
             if (IsKeyPressed(KEY_M))
             {
                 ToggleBackgroundMusic();
             }
 
-            // Logika pembersihan baris yang penuh
+            // Clear full lines
             int linesCleared = ClearFullLines(&board);
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
                 CheckLevelUp(&scoreData);
-                // scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
-            // Menggambar elemen permainan
+
+            // Draw game elements
             DrawBlockShadow(&board.current_block, &board);
             DrawBoard(&board);
             DrawActiveTetromino(&board.current_block);
@@ -408,8 +428,7 @@ int main(void)
             DrawNextBlock(&board);
             DrawScore(&board, &scoreData);
 
-            // Tambahkan panel tips kontrol pemain
-            // Posisikan di sisi kiri bawah layar
+            // Control tips panel
             Rectangle controlTipsRect = {
                 10,                  // Posisi X
                 WINDOW_HEIGHT - 180, // Posisi Y
@@ -417,14 +436,11 @@ int main(void)
                 170                  // Tinggi
             };
 
-            // Gambar panel dengan latar belakang semi-transparan
             DrawRectangleRec(controlTipsRect, Fade(BLACK, 0.7f));
             DrawRectangleLinesEx(controlTipsRect, 2, WHITE);
 
-            // Judul panel
             DrawText("KONTROL PEMAIN", controlTipsRect.x + 10, controlTipsRect.y + 10, 18, GOLD);
 
-            // Daftar kontrol pemain
             int textY = controlTipsRect.y + 40;
             int textX = controlTipsRect.x + 15;
             int fontSize = 16;
@@ -438,17 +454,16 @@ int main(void)
             DrawText("P/ESC: Pause Game", textX, textY + 90, fontSize, textColor);
             DrawText("M    : Mute/Unmute Musik", textX, textY + 110, fontSize, textColor);
         }
-
         else if (gameOver)
         {
-            // Tampilkan teks Game Over dan skor akhir
+            // Game over screen
             DrawText("GAME OVER", WINDOW_WIDTH / 2 - MeasureText("GAME OVER", 40) / 2,
                      WINDOW_HEIGHT / 2 - 100, 40, RED);
             DrawText(TextFormat("Final Score: %d", scoreData.score),
                      WINDOW_WIDTH / 2 - MeasureText(TextFormat("Final Score: %d", scoreData.score), 20) / 2,
                      WINDOW_HEIGHT / 2 - 40, 20, WHITE);
 
-            // Tombol Restart
+            // Restart button
             Rectangle restartBtn = {
                 WINDOW_WIDTH / 2 - 100,
                 WINDOW_HEIGHT / 2,
@@ -460,7 +475,7 @@ int main(void)
             DrawText("RESTART", restartBtn.x + (restartBtn.width / 2) - MeasureText("RESTART", 20) / 2,
                      restartBtn.y + 15, 20, WHITE);
 
-            // Tombol Back to Menu
+            // Back to menu button
             Rectangle backBtn = {
                 WINDOW_WIDTH / 2 - 100,
                 WINDOW_HEIGHT / 2 + 70,
@@ -472,6 +487,7 @@ int main(void)
             DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
                      backBtn.y + 15, 20, WHITE);
 
+            // Leaderboard button
             Rectangle scoreBtn = {
                 WINDOW_WIDTH / 2 - 100,
                 WINDOW_HEIGHT / 2 + 140,
@@ -483,10 +499,9 @@ int main(void)
             DrawText("LEADERBOARD", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
                      scoreBtn.y + 15, 20, WHITE);
 
-            // Penanganan hover dan klik tombol
             Vector2 mousePos = GetMousePosition();
 
-            // Tombol Restart
+            // Restart button handling
             if (CheckCollisionPointRec(mousePos, restartBtn))
             {
                 DrawRectangleRec(restartBtn, Fade(GREEN, 0.8f));
@@ -500,7 +515,7 @@ int main(void)
                     InitScoring(&scoreData);
                     InitGameTimer();    
                     gameOver = false;
-                    inGame = true; // Langsung mulai permainan baru
+                    inGame = true;
                     wasPreviouslyInGame = true;
                     fallTimer = 0;
                     PlaySoundEffect(SOUND_CLICK);
@@ -509,7 +524,7 @@ int main(void)
                 }
             }
 
-            // Tombol Back to Menu
+            // Back to menu button handling
             if (CheckCollisionPointRec(mousePos, backBtn))
             {
                 DrawRectangleRec(backBtn, Fade(BLUE, 0.8f));
@@ -532,6 +547,7 @@ int main(void)
                 }
             }
 
+            // Leaderboard button handling
             if (CheckCollisionPointRec(mousePos, scoreBtn))
             {
                 DrawRectangleRec(scoreBtn, Fade(PURPLE, 0.8f));
@@ -553,10 +569,9 @@ int main(void)
                 }
             }
 
-            // Simpan skor tertinggi
             SaveGameScore(&scoreData);
 
-            // Restart dengan tombol R
+            // Restart with R key
             if (IsKeyPressed(KEY_R))
             {
                 InitBoard1(&board);
@@ -568,15 +583,15 @@ int main(void)
                 fallTimer = 0;
                 PlaySoundEffect(SOUND_CLICK);
                 PlayBackgroundMusic(MUSIC_MENU);
-                SetWindowState(MENU_STATE_MAIN);
+                SetMenuState(MENU_STATE_MAIN);
             }
         }
-
 
         EndDrawing();
     }
 
-
+    // Cleanup
+    printf("Cleaning up resources...\n");
     UnloadMainMenu();
     UnloadGameSound();
     CloseAudioDevice();
