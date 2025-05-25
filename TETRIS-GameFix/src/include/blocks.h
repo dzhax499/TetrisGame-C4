@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 // Inisialisasi sistem blok
-void InitBlocks0(void);
+void InitBlocks(void);
 // Definisi bentuk-bentuk blok Tetris (bentuk I, J, L, O, S, T, Z)
 // Setiap bentuk memiliki 4 rotasi
 static const int TETROMINO_SHAPES[7][4][4][4] = {

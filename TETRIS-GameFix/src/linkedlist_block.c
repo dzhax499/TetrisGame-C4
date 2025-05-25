@@ -2,8 +2,8 @@
 // Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list
 // Oleh      : Dzakir Tsabit 241511071
 
-#include "linkedlist_block.h"
-#include "rotasi_data.h"
+#include "include/linkedlist_block.h"
+#include "include/rotasi_data.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -69,9 +69,9 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     return list;
 }
 
-// Inisialisasi sistem rotasi blok
+
 void InitRotationSystem(void) {
-    // Buat linked list untuk setiap jenis blok
+
     rotationLists[0] = CreateRotationList(I_TETROMINO, 2);  // I
     rotationLists[1] = CreateRotationList(J_TETROMINO, 4);  // J
     rotationLists[2] = CreateRotationList(L_TETROMINO, 4);  // L
@@ -81,41 +81,37 @@ void InitRotationSystem(void) {
     rotationLists[6] = CreateRotationList(Z_TETROMINO, 2);  // Z
 }
 
-// Fungsi untuk mendapatkan linked list rotasi sesuai tipe blok
+
 RotationList* GetRotationList(int blockType) {
     if (blockType < 0 || blockType >= 7) return NULL;
     return rotationLists[blockType];
 }
 
-// Fungsi untuk memutar ke rotasi berikutnya dalam linked list
 void RotateToNext(RotationList* list) {
     if (list && list->current) {
         list->current = list->current->next;
     }
 }
 
-// Fungsi untuk mendapatkan bentuk blok saat ini 
 void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
     if (list && list->current) {
         memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
     }
 }
 
-// Fungsi untuk membebaskan memori linked list
 void FreeRotationList(RotationList* list) {
     if (!list || !list->current) return;
     
     RotationNode* startNode = list->current;
     RotationNode* current = startNode;
     
-    // Ubah struktur circular menjadi linier untuk pembebasan memori
     list->current->next = NULL;
     
     while (current) {
         RotationNode* next = current->next;
         free(current);
         
-        if (next == startNode) break; // Sudah kembali ke awal
+        if (next == startNode) break; 
         current = next;
     }
     

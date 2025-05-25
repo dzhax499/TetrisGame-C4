@@ -123,7 +123,7 @@ bool RotateBlock(TetrisBlock *block, TetrisBoard *board) {
     RotateToNext(rotList);  // Coba rotasi berikutnya
     
     int tempShape[4][4];
-    GetCurrentShape(rotList, tempShape);
+    AmbilBentukSaatIni(rotList, tempShape);
     
     // Kembalikan rotasi dulu sebelum pemeriksaan
     rotList->current = savedRotation;
@@ -135,7 +135,7 @@ bool RotateBlock(TetrisBlock *block, TetrisBoard *board) {
         RotateToNext(rotList);  // Geser rotasi dalam list
         
         // Salin bentuk baru ke blok
-        GetCurrentShape(rotList, block->shape);
+        AmbilBentukSaatIni(rotList, block->shape);
         
         return true;
     }
@@ -143,7 +143,6 @@ bool RotateBlock(TetrisBlock *block, TetrisBoard *board) {
     return false;
 }
 
-// Fungsi untuk memutar blok dengan sistem wall kick
 bool RotateBlockWithWallKick(TetrisBlock* block, TetrisBoard* board) {
     int initialRotation = block->rotation;
     RotationList* rotList = GetRotationList(block->type);
@@ -156,9 +155,8 @@ bool RotateBlockWithWallKick(TetrisBlock* block, TetrisBoard* board) {
         block->rotation = newRotation;
         
         // Update bentuk blok
-        RotationNode* savedRotation = rotList->current;
         RotateToNext(rotList);
-        GetCurrentShape(rotList, block->shape);
+        AmbilBentukSaatIni(rotList, block->shape);
         
         return true;
     }
@@ -175,9 +173,8 @@ bool RotateBlockWithWallKick(TetrisBlock* block, TetrisBoard* board) {
             block->rotation = newRotation;
             
             // Update bentuk blok
-            RotationNode* savedRotation = rotList->current;
             RotateToNext(rotList);
-            GetCurrentShape(rotList, block->shape);
+            AmbilBentukSaatIni(rotList, block->shape);
             
             return true;
         }
@@ -249,7 +246,7 @@ void HoldCurrentBlock(TetrisBoard* board) {
             }
             
             // Ambil bentuk untuk rotasi 0
-            GetCurrentShape(rotList, board->hold_block.block.shape);
+            AmbilBentukSaatIni(rotList, board->hold_block.block.shape);
         }
 
         // Ganti blok saat ini dengan blok berikutnya
@@ -285,7 +282,7 @@ void HoldCurrentBlock(TetrisBoard* board) {
             }
             
             // Ambil bentuk untuk rotasi 0
-            GetCurrentShape(rotList, board->current_block.shape);
+            AmbilBentukSaatIni(rotList, board->current_block.shape);
         }
 
         // Blok yang sebelumnya aktif menjadi blok yang di-hold
@@ -304,7 +301,7 @@ void HoldCurrentBlock(TetrisBoard* board) {
             }
             
             // Ambil bentuk untuk rotasi 0
-            GetCurrentShape(rotList, board->hold_block.block.shape);
+            AmbilBentukSaatIni(rotList, board->hold_block.block.shape);
         }
     }
 }
@@ -316,7 +313,7 @@ void PlaceBlock(TetrisBlock *block, TetrisBoard *board) {
     
     // Dapatkan bentuk saat ini
     int shape[4][4];
-    GetCurrentShape(rotList, shape);
+    AmbilBentukSaatIni(rotList, shape);
     
     // Loop melalui setiap sel dalam matriks 4x4
     for (int y = 0; y < 4; y++) {
@@ -359,7 +356,7 @@ void ResetBlockRotation(TetrisBlock* block) {
     }
     
     block->rotation = 0;
-    GetCurrentShape(rotList, block->shape);
+    AmbilBentukSaatIni(rotList, block->shape);
 }
 
 // Fungsi untuk memeriksa apakah blok dapat spawn dengan aman
@@ -418,7 +415,7 @@ bool RotateBlockCounterClockwise(TetrisBlock* block, TetrisBoard* board) {
     
     if (IsValidBlockPosition(block, board, block->x, block->y, newRotation)) {
         block->rotation = newRotation;
-        GetCurrentShape(rotList, block->shape);
+        AmbilBentukSaatIni(rotList, block->shape);
         return true;
     }
     
@@ -458,5 +455,5 @@ void PrintBlockShape(TetrisBlock* block) {
 
 // Fungsi cleanup untuk membebaskan memori
 void CleanupBlocks(void) {
-    CleanupRotationSystem();
+    //CleanupRotationSystem();
 }

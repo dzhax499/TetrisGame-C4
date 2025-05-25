@@ -3,25 +3,6 @@
 // Oleh      : Ibnu Hilmi 241511079
 //             Dzakir Tsabit 241511071 (github : dzhax4499)
 
-/**
- * ===================================
- * KOMENTAR PENJELASAN KODE PROGRAM
- * ===================================
- */
-
-/**
- * Include Header Files
- * -------------------
- * Header-header berikut mencakup semua komponen game:
- * - tetris.h: Definisi utama dan konstanta game
- * - board.h: Struktur dan fungsi untuk papan permainan
- * - blocks.h: Definisi dan fungsi untuk blok Tetris
- * - rendering.h: Fungsi-fungsi untuk menggambar elemen game
- * - scoring.h: Sistem skor dan level
- * - main_menu.h: Sistem menu game
- * - game_sound.h: Sistem audio dan efek suara
- * - raylib.h: Library grafis untuk menggambar game
- */
 #include "include/tetris.h"
 #include "include/board.h"
 #include "include/blocks.h"
@@ -35,62 +16,27 @@
 #include "include/linkedlist_block.h"
 #include <time.h>
 
-/**
- * Definisi Konstanta
- * -----------------
- * - WINDOW_WIDTH, WINDOW_HEIGHT: Ukuran jendela game
- * - HIGH_SCORE_FILE: Lokasi file untuk menyimpan skor tertinggi
- */
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
 
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
 
-/**
- * Fungsi Utama (main)
- * ------------------
- * Fungsi utama game yang berisi:
- * 1. Inisialisasi komponen game
- * 2. Loop utama game
- * 3. Pembersihan sumber daya sebelum program berakhir
- */
-//global variabel untuk menyimpan data permainan
+
 bool paused = false;
 
 int main(void)
 {
-    /**
-     * Pengaturan Awal
-     * --------------
-     * - SetExitKey(0): Menonaktifkan tombol ESC bawaan agar bisa dikustomisasi
-     * - InitWindow(): Membuat jendela game dengan ukuran dan judul tertentu
-     * - SetTargetFPS(): Mengatur batas frame per detik
-     * - InitAudioDevice(): Menginisialisasi sistem audio
-     */
+
     SetExitKey(0); // Nonaktifkan tombol keluar bawaan
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
     InitAudioDevice();
     // inisialisasi linked list untuk menyimpan blok aktif
 
-    /**
-     * Inisialisasi Generator Angka Acak
-     * --------------------------------
-     * Menggunakan waktu saat ini sebagai seed untuk generator angka acak,
-     * memastikan blok yang muncul selalu berbeda setiap kali game dimainkan
-     */
     srand(time(NULL));
 
-    /**
-     * Inisialisasi Komponen Game
-     * -------------------------
-     * - InitBlocks0(): Menyiapkan sistem blok Tetris
-     * - InitMainMenu(): Menyiapkan menu utama
-     * - InitGameSound(): Menyiapkan sistem audio
-     * - InitBoard1(): Menyiapkan papan permainan kosong
-     * - InitScoring(): Menyiapkan sistem skor dan level
-     */
-    InitBlocks0();
+
+    InitBlocks();
     InitMainMenu();
     InitGameSound();
 
@@ -103,68 +49,28 @@ int main(void)
     Leaderboard leaderboard;
     InitLeaderboard(&leaderboard);
 
-    /**
-     * Variabel Status Permainan
-     * ------------------------
-     * - inGame: Menandakan apakah sedang di dalam permainan aktif
-     * - gameOver: Menandakan apakah permainan berakhir (kalah)
-     * - wasPreviouslyInGame: Pelacak status sebelumnya untuk transisi musik
-     * - fallTimer: Penghitung waktu untuk gerakan blok ke bawah
-     * - fallDelay: Waktu tunggu antara gerakan blok ke bawah (dipengaruhi level)
-     */
+
     bool inGame = false;
     bool gameOver = false;
     bool wasPreviouslyInGame = false;
     float fallTimer = 0.0f;
     float fallDelay = 1.0f; // Waktu jatuh awal
 
-    /**
-     * Mulai dengan Musik Menu
-     * ----------------------
-     * Memulai game dengan memainkan musik menu utama
-     */
+
     PlayBackgroundMusic(MUSIC_MENU);
 
-    /**
-     * Loop Utama Game
-     * --------------
-     * Loop ini berjalan terus selama jendela game masih terbuka.
-     * Di dalamnya terdapat logika game, pemrosesan input, dan penggambaran.
-     */
     while (!WindowShouldClose())
     {
-        /**
-         * Memulai Frame Gambar Baru
-         * -------------------------
-         * - BeginDrawing(): Menandai awal proses menggambar frame baru
-         * - ClearBackground(): Mengisi layar dengan warna latar belakang
-         */
+
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
-        /**
-         * Update Audio
-         * -----------
-         * Memperbarui status music stream yang sedang diputar
-         */
         UpdateGameSound();
 
-        /**
-         * Memperbarui Timer Game
-         * ---------------------
-         * Memperbarui timer game untuk menghitung waktu yang telah berlalu
-         */
+
         UpdateGameTimer();
 
-        /**
-         * Penanganan Tombol ESC Global
-         * ---------------------------
-         * Mengatur perilaku tombol ESC berdasarkan status menu saat ini:
-         * - Saat bermain: Jeda permainan
-         * - Saat jeda: Lanjutkan permainan
-         * - Saat di kredit/highscore: Kembali ke menu utama
-         * - Saat di menu utama: Tidak melakukan apa-apa
-         */
+
         if (IsKeyPressed(KEY_ESCAPE))
         {
             MenuState currentMenuState = GetCurrentMenuState();
@@ -185,22 +91,9 @@ int main(void)
             }
         }
 
-        /**
-         * Mendapatkan Status Menu Saat Ini
-         * -------------------------------
-         * Variabel currentMenuState digunakan untuk menentukan tampilan dan
-         * logika yang akan dijalankan pada frame ini
-         */
+
         MenuState currentMenuState = GetCurrentMenuState();
 
-        /**
-         * Penanganan Status MENU_STATE_PLAY (Bermain)
-         * ------------------------------------------
-         * Logika saat status menu adalah PLAY (bermain):
-         * - Memainkan musik gameplay jika baru masuk permainan
-         * - Mengatur flag inGame menjadi true
-         * - Menangani tombol P untuk jeda
-         */
         if (currentMenuState == MENU_STATE_PLAY)
         {
             if (!inGame)
@@ -217,14 +110,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-        /**
-         * Penanganan Status MENU_STATE_CREDITS (Layar Kredit)
-         * -------------------------------------------------
-         * Menampilkan informasi kredit dan tim pengembang:
-         * - Menggambar judul dan nama-nama anggota tim
-         * - Menampilkan tombol kembali ke menu utama
-         * - Menangani input mouse dan keyboard
-         */
+
         else if (currentMenuState == MENU_STATE_CREDITS)
         {
             inGame = false;
@@ -279,15 +165,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-        /**
-         * Penanganan Status MENU_STATE_HIGHSCORE (Layar Skor Tertinggi)
-         * -----------------------------------------------------------
-         * Menampilkan skor tertinggi yang pernah dicapai:
-         * - Membaca skor tertinggi dari file
-         * - Menggambar tampilan skor
-         * - Menampilkan tombol kembali ke menu utama
-         * - Menangani input mouse dan keyboard
-         */
+
         else if (currentMenuState == MENU_STATE_HIGHSCORE)
         {
             inGame = false;
@@ -354,23 +232,12 @@ int main(void)
             DrawMainMenu();
             DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
-        /**
-         * Penanganan Status MENU_STATE_EXIT (Keluar)
-         * ----------------------------------------
-         * Menghentikan loop permainan untuk keluar dari aplikasi
-         */
+ 
         else if (currentMenuState == MENU_STATE_EXIT)
         {
             break;
         }
-        /**
-         * Penanganan Status MENU_STATE_PAUSE (Jeda)
-         * ---------------------------------------
-         * Menampilkan menu jeda dan overlay saat permainan dijeda:
-         * - Menggambar permainan yang sedang berlangsung di latar belakang
-         * - Menampilkan menu jeda dengan tombol Resume dan Exit
-         * - Menangani input mouse dan keyboard
-         */
+
         else if (currentMenuState == MENU_STATE_PAUSE)
         {
             if (!paused)
@@ -428,14 +295,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-        /**
-         * Penanganan Status MENU_STATE_MAIN (Menu Utama)
-         * --------------------------------------------
-         * Menampilkan dan mengelola menu utama:
-         * - Mengatur flag inGame menjadi false
-         * - Memainkan musik menu jika sebelumnya dalam permainan
-         * - Mengupdate dan menggambar menu utama
-         */
+
         else if (currentMenuState == MENU_STATE_MAIN)
         {
             inGame = false;
@@ -450,18 +310,7 @@ int main(void)
             DrawMainMenu();
         }
 
-        /**
-         * Logika Utama Permainan
-         * ---------------------
-         * Menjalankan logika permainan saat status inGame aktif dan tidak game over:
-         * - Mengatur kecepatan jatuh blok berdasarkan level
-         * - Memperbarui timer jatuh blok
-         * - Menangani penjatuhan dan penempatan blok
-         * - Memeriksa kondisi game over
-         * - Menangani input pemain (gerakan dan rotasi blok)
-         * - Memperbarui skor dan baris yang dihapus
-         * - Menggambar semua elemen permainan
-         */
+
         if (inGame && !gameOver && !paused)
         {
             if (!wasPreviouslyInGame)
@@ -589,14 +438,7 @@ int main(void)
             DrawText("P/ESC: Pause Game", textX, textY + 90, fontSize, textColor);
             DrawText("M    : Mute/Unmute Musik", textX, textY + 110, fontSize, textColor);
         }
-        /**
-         * Penanganan Status Game Over
-         * -------------------------
-         * Menampilkan layar game over dengan opsi restart dan kembali ke menu:
-         * - Menggambar teks game over dan skor akhir
-         * - Menampilkan tombol restart dan back to menu
-         * - Menangani input pemain untuk kedua tombol tersebut
-         */
+
         else if (gameOver)
         {
             // Tampilkan teks Game Over dan skor akhir
@@ -730,22 +572,11 @@ int main(void)
             }
         }
 
-        /**
-         * Akhiri Frame Gambar
-         * ------------------
-         * EndDrawing(): Menyelesaikan proses menggambar dan menampilkan frame ke layar
-         */
+
         EndDrawing();
     }
 
-    /**
-     * Pembersihan Sumber Daya
-     * ----------------------
-     * - UnloadMainMenu(): Membersihkan sumber daya menu
-     * - UnloadGameSound(): Membersihkan sumber daya audio
-     * - CloseAudioDevice(): Menutup perangkat audio
-     * - CloseWindow(): Menutup jendela aplikasi
-     */
+
     UnloadMainMenu();
     UnloadGameSound();
     CloseAudioDevice();
