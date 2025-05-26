@@ -138,7 +138,7 @@ void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHei
     
     // Gambar judul
     DrawText("LEADERBOARD", panel.x + panel.width/2 - MeasureText("LEADERBOARD", 38)/2, 
-             panel.y + 20, 40, PURPLE);
+             panel.y + 20, 40, YELLOW);
     
     // Gambar header tabel
     DrawText("RANK", panel.x + 50, panel.y + 80, 20, WHITE);

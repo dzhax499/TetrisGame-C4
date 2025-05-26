@@ -44,6 +44,7 @@
 #define WINDOW_HEIGHT 768
 
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
+static Texture2D backgroundTexture;
 
 /**
  * Fungsi Utama (main)
@@ -223,21 +224,39 @@ int main(void)
         {
             inGame = false;
 
-            ClearBackground(LIGHTGRAY);
-            DrawText("CREDITS", WINDOW_WIDTH / 2 - MeasureText("CREDITS", 40) / 2,
-                     WINDOW_HEIGHT / 2 - 150, 40, BLACK);
+            // Draw background texture
+            DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
+            backgroundTexture = LoadTexture("assets/textures/bg.png");
 
-            // Tampilkan nama dan ID anggota tim
-            DrawText("Dzakir Tsabit \t\t 241511071", WINDOW_WIDTH / 2 - MeasureText("Dzakir Tsabit 241511071", 20) / 2,
-                     WINDOW_HEIGHT / 2 - 50, 20, BLACK);
-            DrawText("Fatimah Hawwa \t\t 241511074", WINDOW_WIDTH / 2 - MeasureText("Fatimah Hawwa 241511074", 20) / 2,
-                     WINDOW_HEIGHT / 2 - 20, 20, BLACK);
-            DrawText("Ibnu Hilmi \t\t\t\t 241511079", WINDOW_WIDTH / 2 - MeasureText("Ibnu Hilmi 241511079", 20) / 2,
-                     WINDOW_HEIGHT / 2 - -10, 20, BLACK);
-            DrawText("Rizky Satria \t\t\t 241511089", WINDOW_WIDTH / 2 - MeasureText("Rizky Satria 241511089", 20) / 2,
-                     WINDOW_HEIGHT / 2 - -40, 20, BLACK);
-            DrawText("Varian Abidarma \t 241511091", WINDOW_WIDTH / 2 - MeasureText("Varian Abidarma 241511091", 20) / 2,
-                     WINDOW_HEIGHT / 2 - -70, 20, BLACK);
+            // Create panel for Credits
+            Rectangle panel = {
+                WINDOW_WIDTH / 2 - 250,
+                WINDOW_HEIGHT / 2 - 210,
+                500,
+                425
+            };
+
+            // Draw panel with background
+            DrawRectangleRec(panel, Fade(DARKBLUE, 0.9f));
+            DrawRectangleLinesEx(panel, 3, SKYBLUE);
+
+            // Draw title
+            DrawText("CREDITS", panel.x + panel.width/2 - MeasureText("CREDITS", 38)/2, 
+                     panel.y + 20, 40, YELLOW);
+            
+            // Display team members
+            int yPos = panel.y + 100;
+            const char* credits[] = {
+                "241511071   Dzakir Tsabit Asy-syafiq",
+                "241511074   Fatimah Hawwa Alkhansa",
+                "241511079   Ibnu Hilmi Athaillah",
+                "241511089   Rizky Satria Gunawan",
+                "241511091   Varian Abidarma Syuhada"
+            };
+            for (int i = 0; i < 5; i++) {
+                DrawText(credits[i], panel.x + 50, yPos, 20, WHITE);
+                yPos += 40;
+            }
 
             // Tombol kembali ke menu utama
             Rectangle backBtnCR = {
@@ -286,30 +305,42 @@ int main(void)
         {
             inGame = false;
 
-            ClearBackground(LIGHTGRAY);
-            DrawText("HIGHSCORES", WINDOW_WIDTH / 2 - MeasureText("HIGHSCORES", 40) / 2,
-                     WINDOW_HEIGHT / 2 - 150, 40, BLACK);
+            DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
+            backgroundTexture = LoadTexture("assets/textures/bg.png");
+
+            Rectangle panel = {
+                WINDOW_WIDTH / 2 - 200,
+                WINDOW_HEIGHT / 2 - 200,
+                400,
+                350
+            };
+
+            // Draw panel with background
+            DrawRectangleRec(panel, Fade(DARKBLUE, 0.9f));
+            DrawRectangleLinesEx(panel, 2, SKYBLUE);
+
+            DrawText("HIGHSCORES", panel.x + panel.width/2 - MeasureText("HIGHSCORE", 43)/2, 
+                     panel.y + 20, 40, YELLOW);
 
             // Baca dan tampilkan high score
             int highScore = LoadGameHighScore();
+            int yPos = panel.y + 100;
 
             if (highScore > 0)
             {
                 char scoreText[50];
                 sprintf(scoreText, "Highest Score: %d", highScore);
-                DrawText(scoreText, WINDOW_WIDTH / 2 - MeasureText(scoreText, 30) / 2,
-                         WINDOW_HEIGHT / 2 - 30, 30, BLACK);
+                DrawText(scoreText, panel.x + 50, yPos, 30, WHITE);
             }
             else
             {
-                DrawText("No high scores yet!", WINDOW_WIDTH / 2 - MeasureText("No high scores yet!", 30) / 2,
-                         WINDOW_HEIGHT / 2 - 30, 30, BLACK);
+                DrawText("No high scores yet!", panel.x + 50, yPos, 20, WHITE);
             }
 
             // Tombol kembali ke menu utama
             Rectangle backBtnHS = {
                 WINDOW_WIDTH / 2 - 100,
-                WINDOW_HEIGHT / 2 + 150,
+                WINDOW_HEIGHT / 2 + 50,
                 200,
                 50};
 
