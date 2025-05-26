@@ -11,37 +11,21 @@
 
 // ID untuk efek suara
 typedef enum {
-    SOUND_CLICK,       // Efek suara saat tombol ditekan
-    SOUND_GAME_OVER,   // Efek suara saat permainan berakhir
+    SOUND_CLICK,        // Efek suara saat tombol ditekan
+    SOUND_GAME_OVER,    // Efek suara saat permainan berakhir
     SOUND_LINE_CLEAR,   // Efek suara saat baris terhapus
-    SOUND_COUNT        // Jumlah total efek suara (untuk kompatibilitas)
+    SOUND_COUNT         // Jumlah total efek suara (untuk kompatibilitas)
 } SoundEffectType;
 
 // ID untuk trek musik
 typedef enum {
-    MUSIC_MENU,       // Musik latar untuk menu
-    MUSIC_GAMEPLAY,   // Musik latar saat permainan berlangsung
-    MUSIC_COUNT       // Jumlah total trek musik (untuk kompatibilitas)
+    MUSIC_MENU,         // Musik latar untuk menu
+    MUSIC_GAMEPLAY,     // Musik latar saat permainan berlangsung
+    MUSIC_COUNT         // Jumlah total trek musik (untuk kompatibilitas)
 } MusicTrackType;
 
-// Node untuk linked list efek suara
-typedef struct SoundNode {
-    Sound sound;
-    SoundEffectType type;
-    char* name;
-    float volume;
-    struct SoundNode* next;
-} SoundNode;
-
-// Node untuk linked list trek musik
-typedef struct MusicNode {
-    Music music;
-    MusicTrackType type;
-    char* name;
-    float volume;
-    bool looping;
-    struct MusicNode* next;
-} MusicNode;
+// HAPUS REDEFINISI STRUCT - sudah didefinisikan di sound_node.h
+// Struct SoundNode dan MusicNode sudah tersedia dari sound_node.h
 
 // Inisialisasi sistem suara dengan linked list
 void InitGameSound(void);
@@ -74,7 +58,8 @@ void UpdateGameSound(void);
 void ToggleBackgroundMusic(void);
 
 // Mengatur volume musik dan efek suara (0.0 hingga 1.0)
-void SetMusicVolume(float volume);
+// RENAME function untuk menghindari konflik dengan raylib
+void SetGameMusicVolume(float volume);
 void SetSoundEffectsVolume(float volume);
 
 // Memeriksa apakah ada musik yang sedang diputar
