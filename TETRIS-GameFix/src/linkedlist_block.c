@@ -3,6 +3,7 @@
 // Oleh      : Dzakir Tsabit 241511071
 
 #include "include/linkedlist_block.h"
+#include "include/blocks.h"
 #include "include/rotasi_data.h"
 #include <stdio.h>
 #include <string.h>
@@ -52,7 +53,9 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
             printf("Gagal mengalokasikan memori untuk RotationNode\n");
             // Seharusnya kita membersihkan memori yang sudah dialokasikan sebelumnya di sini
             // Tapi untuk menjaga kode tetap sederhana, kita lewati
-            return list;
+            free(list);
+            free(firstNode);
+            return NULL;
         }
         
         // Salin bentuk ke node baru
@@ -79,6 +82,12 @@ void InitRotationSystem(void) {
     rotationLists[4] = CreateRotationList(S_TETROMINO, 2);  // S
     rotationLists[5] = CreateRotationList(T_TETROMINO, 4);  // T
     rotationLists[6] = CreateRotationList(Z_TETROMINO, 2);  // Z
+
+    if (rotationLists[0] == NULL) {
+    printf("ERROR: Failed to create rotation list for I_TETROMINO\n");
+    // Handle error, mungkin exit(1) jika kritis
+    exit(1);
+}
 }
 
 
@@ -94,8 +103,13 @@ void RotateToNext(RotationList* list) {
 }
 
 void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
-    if (list && list->current) {
+    if (list && list->current) { // Pemeriksaan sudah ada, pastikan selalu benar
         memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
+    } else {
+        // Tambahkan penanganan atau log jika list atau list->current NULL
+        printf("WARNING: Attempted to get shape from NULL list or current node in AmbilBentukSaatIni\n");
+        // Mungkin isi shape dengan array kosong atau default
+        memset(shape, 0, sizeof(int) * 4 * 4);
     }
 }
 

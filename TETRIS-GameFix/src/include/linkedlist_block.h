@@ -36,6 +36,8 @@ void AmbilBentukSaatIni(RotationList* list, int shape[4][4]);
 // Fungsi untuk membebaskan memori linked list
 void FreeRotationList(RotationList* list);
 
+void CleanupRotationSystem(void);
+
 // Fungsi untuk membuat linked list dari array posisi
 RotationList* CreateRotationList(const int shapes[][4][4], int count);
 
