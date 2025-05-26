@@ -1,6 +1,6 @@
 // Nama file : linkedlist_block.c
 // Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list
-// Oleh      : Dzakir Tsabit 241511071
+// Oleh      : Dzakir Tsabit 241511071 cek
 
 #include "include/linkedlist_block.h"
 #include "include/rotasi_data.h"
