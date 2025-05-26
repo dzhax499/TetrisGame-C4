@@ -49,26 +49,44 @@ TetrisBlock GenerateRandomBlock(void)
     block.y = -1; // Mulai di atas papan
 
     // Dapatkan rotasi list untuk tipe blok ini
+    printf(">> [DEBUG] block.type = %d\n", block.type);
     RotationList *rotList;
     rotList = GetRotationList(block.type);
+    printf(">> [DEBUG] rotList = %p\n", rotList);
 
-    if (rotList == NULL)
-    { // Periksa rotList dulu
-        printf("ERROR di GenerateRandomBlock: rotList adalah NULL untuk tipe %d!\n", block.type);
+
+    if (rotList == NULL || rotList->current == NULL)
+    {
+        printf("ERROR: rotList NULL saat generate blok\n");
         memset(block.shape, 0, sizeof(block.shape));
-    }
-    else if (rotList->current == NULL)
-    { 
-        printf("ERROR di GenerateRandomBlock: rotList->current adalah NULL untuk tipe %d!\n", block.type);
-        memset(block.shape, 0, sizeof(block.shape));
+        block.rotationNode = NULL;
     }
     else
     {
-        AmbilBentukSaatIni(rotList, block.shape);
+        block.rotationNode = rotList->current;
+        memcpy(block.shape, block.rotationNode->shape, sizeof(block.shape));
     }
 
     // Tetapkan warna
     block.color = TETROMINO_COLORS[block.type];
+
+    if (rotList && rotList->current)
+    {
+        printf(">> [DEBUG] rotList->current = %p\n", rotList->current);
+        printf(">> [DEBUG] shape preview:\n");
+        for (int y = 0; y < 4; y++)
+        {
+            for (int x = 0; x < 4; x++)
+            {
+                printf("%d ", rotList->current->shape[y][x]);
+            }
+            printf("\n");
+        }
+    }
+    else
+    {
+        printf(">> [DEBUG] rotList or current is NULL!\n");
+    }
 
     return block;
 }
@@ -170,47 +188,46 @@ bool RotateBlock(TetrisBlock *block, TetrisBoard *board)
 bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board)
 {
     int initialRotation = block->rotation;
-    RotationList *rotList = GetRotationList(block->type);
-    if (!rotList)
-        return false;
+    int rotationCount = GetRotationList(block->type)->rotationCount;
+    int newRotation = (block->rotation + 1) % rotationCount;
 
-    int newRotation = (block->rotation + 1) % rotList->rotationCount;
+    // Simulasi bentuk hasil rotasi (tanpa mengubah state)
+    RotationNode *nextRotationNode = block->rotationNode->next;
+    int tempShape[4][4];
+    memcpy(tempShape, nextRotationNode->shape, sizeof(tempShape));
 
-    // Coba rotasi normal tanpa wall kick
+    // Uji rotasi di posisi sekarang tanpa wall kick
     if (IsValidBlockPosition(block, board, block->x, block->y, newRotation))
     {
+        block->rotationNode = nextRotationNode;
         block->rotation = newRotation;
-
-        // Update bentuk blok
-        RotateToNext(rotList);
-        AmbilBentukSaatIni(rotList, block->shape);
-
+        memcpy(block->shape, tempShape, sizeof(block->shape));
         return true;
     }
 
-    // Coba wall kick dengan 5 kemungkinan pergeseran
+    // Uji wall kick
     for (int testIndex = 0; testIndex < 5; testIndex++)
     {
         int kickX = WallKickTests[initialRotation % 4][testIndex][0];
         int kickY = WallKickTests[initialRotation % 4][testIndex][1];
 
-        // Jika posisi dengan wall kick valid, terapkan pergeseran
-        if (IsValidBlockPosition(block, board, block->x + kickX, block->y + kickY, newRotation))
+        int testX = block->x + kickX;
+        int testY = block->y + kickY;
+
+        if (IsValidBlockPosition(block, board, testX, testY, newRotation))
         {
-            block->x += kickX;
-            block->y += kickY;
+            block->x = testX;
+            block->y = testY;
             block->rotation = newRotation;
-
-            // Update bentuk blok
-            RotateToNext(rotList);
-            AmbilBentukSaatIni(rotList, block->shape);
-
+            block->rotationNode = nextRotationNode;
+            memcpy(block->shape, tempShape, sizeof(block->shape));
             return true;
         }
     }
 
-    return false; // Rotasi gagal dilakukan
+    return false; // Tidak bisa rotasi
 }
+
 
 // Fungsi untuk menghitung seberapa jauh blok bisa jatuh sebelum bertabrakan
 int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board)

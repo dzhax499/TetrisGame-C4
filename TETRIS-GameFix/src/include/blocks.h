@@ -234,4 +234,6 @@ int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board);
 
 bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board);
 
+void PrintBlockShape(TetrisBlock *block);
+
 #endif

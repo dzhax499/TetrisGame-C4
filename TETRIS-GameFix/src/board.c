@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "raylib.h"
 
-TetrisBoard *board = NULL;
+// TetrisBoard *board = NULL;   
 
 Color GetBlockColor(BlockType block) {
     static const Color BLOCK_COLORS[] = {

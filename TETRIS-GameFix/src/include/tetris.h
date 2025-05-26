@@ -33,6 +33,8 @@ typedef struct {
 
     bool efekmeledak;    // efek ledakan aktif
     int waktumeledak;  // waktu animasi
+
+    RotationNode *rotationNode;
 } TetrisBlock;
 
 // Tambahkan struktur untuk menyimpan hold block

@@ -30,36 +30,38 @@ int main(void)
     SetExitKey(0); // Nonaktifkan tombol keluar bawaan
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
-    
+
     // Check if audio initialization succeeds
     InitAudioDevice();
-    if (!IsAudioDeviceReady()) {
+    if (!IsAudioDeviceReady())
+    {
         printf("Warning: Audio device could not be initialized\n");
     }
 
     srand(time(NULL));
 
     // Initialize components with error checking
-    printf("Initializing blocks...\n");
-    InitBlocks();
-    
-    printf("Initializing main menu...\n");
+
+    printf(">> Initializing main menu...\n");
     InitMainMenu();
-    
-    printf("Initializing game sound...\n");
+
+    printf(">> Initializing game sound...\n");
     InitGameSound();
 
     // Initialize game objects
     TetrisBoard board;
-    printf("Initializing board...\n");
+    printf(">> Initializing board...\n");
+    printf(">> Alamat board utama di main: %p\n", &board);
+    InitBlocks();
+    printf(">> Inisialisasi blok-blok Tetris...\n");
     InitBoard1(&board);
-
+    printf(">> Board initialized at address: %p\n", &board);
     ScoreData scoreData;
-    printf("Initializing scoring...\n");
+    printf(">> Initializing scoring...\n");
     InitScoring(&scoreData);
 
     Leaderboard leaderboard;
-    printf("Initializing leaderboard...\n");
+    printf(">> Initializing leaderboard...\n");
     InitLeaderboard(&leaderboard);
 
     // Game state variables
@@ -71,7 +73,7 @@ int main(void)
 
     printf("Starting background music...\n");
     PlayBackgroundMusic(MUSIC_MENU);
-    
+
     printf("Entering main game loop...\n");
 
     while (!WindowShouldClose())
@@ -110,19 +112,23 @@ int main(void)
         {
             if (!inGame)
             {
-                printf("Entering PLAY state...\n");
+                printf(">> Masuk ke MENU_STATE_PLAY\n");
+
                 PlayBackgroundMusic(MUSIC_GAMEPLAY);
                 PlaySoundEffect(SOUND_CLICK);
-                
-                // Reinitialize game objects when entering play mode
-                printf("Reinitializing game objects for new game...\n");
+
+                printf(">> InitBoard1\n");
                 InitBoard1(&board);
+                printf(">> InitScoring\n");
                 InitScoring(&scoreData);
-                gameOver = false;
-                fallTimer = 0.0f;
-                fallDelay = 1.0f;
-                
-                printf("Game objects reinitialized successfully\n");
+
+                printf(">> Generate current_block\n");
+                board.current_block = GenerateRandomBlock();
+
+                printf(">> Generate next_block\n");
+                board.next_block = GenerateRandomBlock();
+
+                printf(">> SELESAI semua setup\n");
             }
             inGame = true;
             paused = false;
@@ -180,7 +186,7 @@ int main(void)
                     PlaySoundEffect(SOUND_CLICK);
                 }
             }
-        
+
             if (IsKeyPressed(KEY_ESCAPE))
             {
                 SetMenuState(MENU_STATE_MAIN);
@@ -354,7 +360,7 @@ int main(void)
                 {
                     // Block has landed, place it
                     PlaceBlock(&board.current_block, &board);
-                    
+
                     // Generate new blocks
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
@@ -420,13 +426,26 @@ int main(void)
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
 
-            // Draw game elements
-            DrawBlockShadow(&board.current_block, &board);
+            printf(">> Mulai render elemen\n");
+
+            // Coba satu-satu
             DrawBoard(&board);
+            printf(">> Setelah DrawBoard\n");
+
             DrawActiveTetromino(&board.current_block);
+            printf(">> Setelah DrawActiveTetromino\n");
+
+            DrawBlockShadow(&board.current_block, &board);
+            printf(">> Setelah DrawBlockShadow\n");
+
             DrawHoldBlock(&board);
+            printf(">> Setelah DrawHoldBlock\n");
+
             DrawNextBlock(&board);
+            printf(">> Setelah DrawNextBlock\n");
+
             DrawScore(&board, &scoreData);
+            printf(">> Setelah DrawScore\n");
 
             // Control tips panel
             Rectangle controlTipsRect = {
@@ -513,7 +532,7 @@ int main(void)
                     SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
-                    InitGameTimer();    
+                    InitGameTimer();
                     gameOver = false;
                     inGame = true;
                     wasPreviouslyInGame = true;
