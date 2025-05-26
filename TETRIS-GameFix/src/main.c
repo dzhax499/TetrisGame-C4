@@ -69,6 +69,8 @@ int main(void)
     float fallTimer = 0.0f;
     float fallDelay = 1.0f; // Waktu jatuh awal
 
+    MenuState lastMenuState = MENU_STATE_MAIN;
+
     printf("Starting background music...\n");
     PlayBackgroundMusic(MUSIC_MENU);
     
@@ -105,6 +107,15 @@ int main(void)
         }
 
         MenuState currentMenuState = GetCurrentMenuState();
+        if (lastMenuState != currentMenuState) {
+            if (currentMenuState == MENU_STATE_PAUSE) {
+                PauseGameTimer();
+            } else if (currentMenuState == MENU_STATE_PLAY && lastMenuState == MENU_STATE_PAUSE) {
+                ResumeGameTimer();
+            }
+            lastMenuState = currentMenuState;
+}
+
 
         if (currentMenuState == MENU_STATE_PLAY)
         {
@@ -118,6 +129,7 @@ int main(void)
                 printf("Reinitializing game objects for new game...\n");
                 InitBoard1(&board);
                 InitScoring(&scoreData);
+                InitGameTimer();
                 gameOver = false;
                 fallTimer = 0.0f;
                 fallDelay = 1.0f;
