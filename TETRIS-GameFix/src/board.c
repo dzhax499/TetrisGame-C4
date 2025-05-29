@@ -31,22 +31,33 @@ Color GetBlockColor(BlockType block) {
 }
 
 // Inisialisasi papan permainan
-void InitBoard1(TetrisBoard *board) {
-    // Bersihkan grid
-    memset(board->grid, BLOCK_EMPTY, sizeof(board->grid));
+void InitBoard1(TetrisBoard *board)
+{
+    if (!board) {
+        printf("ERROR: board is NULL in InitBoard1\n");
+        return;
+    }
     
-    // Reset skor, level, dan status game over
-    board->current_score = 0;
-    board->current_level = 1;
-    board->lines_cleared = 0;
-    board->game_over = false;
+    printf(">> [DEBUG] InitBoard1 started, board address: %p\n", board);
     
-    // Initialize hold block state
-    board->hold_block.hasHeld = false;
+    // Inisialisasi grid
+    for (int y = 0; y < BOARD_HEIGHT; y++)
+    {
+        for (int x = 0; x < BOARD_WIDTH; x++)
+        {
+            board->grid[y][x] = BLOCK_EMPTY;
+        }
+    }
 
-    // Buat blok baru
-    board->current_block = GenerateRandomBlock();
-    board->next_block = GenerateRandomBlock();
+    // Inisialisasi hold block
+    memset(&board->hold_block, 0, sizeof(HoldBlock));
+    board->hold_block.hasHeld = false;
+    
+    // Reset current_block dan next_block (akan diisi di main.c)
+    memset(&board->current_block, 0, sizeof(TetrisBlock));
+    memset(&board->next_block, 0, sizeof(TetrisBlock));
+    
+    printf(">> [DEBUG] InitBoard1 completed successfully\n");
 }
 
 // Hapus baris yang penuh dan update skor

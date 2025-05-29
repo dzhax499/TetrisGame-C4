@@ -124,9 +124,25 @@ int main(void)
 
                 printf(">> Generate current_block\n");
                 board.current_block = GenerateRandomBlock();
+                // Validasi current_block
+                if (board.current_block.type < 0 || board.current_block.type >= 7)
+                {
+                    printf("ERROR: Invalid current_block generated, type = %d\n", board.current_block.type);
+                    // Fallback ke I-block
+                    board.current_block.type = 0;
+                    board.current_block = GenerateRandomBlock();
+                }
 
                 printf(">> Generate next_block\n");
                 board.next_block = GenerateRandomBlock();
+                // Validasi next_block
+                if (board.next_block.type < 0 || board.next_block.type >= 7)
+                {
+                    printf("ERROR: Invalid next_block generated, type = %d\n", board.next_block.type);
+                    // Fallback ke I-block
+                    board.next_block.type = 0;
+                    board.next_block = GenerateRandomBlock();
+                }
 
                 printf(">> SELESAI semua setup\n");
             }
@@ -386,7 +402,7 @@ int main(void)
 
             if (IsKeyPressed(KEY_UP))
             {
-                RotateBlock(&board.current_block, &board);
+                RotateBlockWithWallKick(&board.current_block, &board);
                 PlaySoundEffect(SOUND_CLICK);
             }
 
