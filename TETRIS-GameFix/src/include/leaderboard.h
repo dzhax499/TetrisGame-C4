@@ -27,6 +27,7 @@ typedef struct {
 
 void InitLeaderboard(Leaderboard* leaderboard);
 void AddLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time);
+void AddOrUpdateLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time);
 void SaveLeaderboard(Leaderboard* leaderboard);
 void LoadLeaderboard(Leaderboard* leaderboard);
 void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHeight);

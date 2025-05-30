@@ -133,6 +133,33 @@ void LoadLeaderboard(Leaderboard* leaderboard) {
     fclose(file);
 }
 
+void AddOrUpdateLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time) {
+    LeaderboardEntry* current = leaderboard->highScores;
+    LeaderboardEntry* existingEntry = NULL;
+
+    // Cek apakah nama sudah ada
+    while (current) {
+        if (strcmp(current->name, name) == 0) {
+            existingEntry = current;
+            break;
+        }
+        current = current->next;
+    }
+
+    // Jika ada dan skor baru lebih tinggi, update
+    if (existingEntry) {
+        if (score > existingEntry->score) {
+            existingEntry->score = score;
+            existingEntry->level = level;
+            existingEntry->time = time;
+            SaveLeaderboard(leaderboard);
+        }
+    } else {
+        // Kalau belum ada, tambahkan baru
+        AddLeaderboard(leaderboard, score, level, name, time);
+    }
+}
+
 // Tampilkan daftar leaderboard di layar
 void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHeight) {
     // Muat ulang leaderboard untuk memastikan data terbaru

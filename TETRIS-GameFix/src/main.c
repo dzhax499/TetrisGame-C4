@@ -3,6 +3,10 @@
 // Oleh      : Ibnu Hilmi 241511079
 //             Dzakir Tsabit 241511071 (github : dzhax4499)
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "include/tetris.h"
 #include "include/board.h"
 #include "include/blocks.h"
@@ -21,6 +25,8 @@
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
 
 bool paused = false;
+char playerName[50] = "";
+bool hasEnteredName = false;
 
 int main(void)
 {
@@ -110,6 +116,32 @@ int main(void)
 
         if (currentMenuState == MENU_STATE_PLAY)
         {
+            if (!hasEnteredName) {
+                DrawText("ENTER YOUR NAME:", WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2 - 60, 30, WHITE);
+                DrawRectangle(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2, 300, 50, RAYWHITE);
+                DrawText(playerName, WINDOW_WIDTH / 2 - 140, WINDOW_HEIGHT / 2 + 10, 30, BLACK);
+
+                int key = GetCharPressed();
+                while (key > 0) {
+                    if (strlen(playerName) < 49 && key != '\n') {
+                        int len = strlen(playerName);
+                        playerName[len] = (char)key;
+                        playerName[len + 1] = '\0';
+                    }
+                    key = GetCharPressed();
+                }
+
+                if (IsKeyPressed(KEY_BACKSPACE) && strlen(playerName) > 0) {
+                    playerName[strlen(playerName) - 1] = '\0';
+                }
+
+                if (IsKeyPressed(KEY_ENTER) && strlen(playerName) > 0) {
+                    hasEnteredName = true;
+                }
+
+                EndDrawing(); continue; // Tahan loop sampai nama diisi
+            }
+
             if (!inGame)
             {
                 printf(">> Masuk ke MENU_STATE_PLAY\n");
@@ -551,7 +583,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveGameScore(&scoreData);
+                    AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     InitGameTimer();
@@ -574,7 +606,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    SaveGameScore(&scoreData);
+                    AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     InitGameTimer();
@@ -597,8 +629,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    void AddLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time);
-                    SaveGameScore(&scoreData);
+                    AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;
@@ -610,7 +641,8 @@ int main(void)
                 }
             }
 
-            SaveGameScore(&scoreData);
+            AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
+
 
             // Restart with R key
             if (IsKeyPressed(KEY_R))
