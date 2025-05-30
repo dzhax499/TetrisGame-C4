@@ -295,8 +295,6 @@ int main(void)
         {
             inGame = false;
             ClearBackground(LIGHTGRAY);
-            UpdateMainMenu();
-            DrawMainMenu();
             DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
         else if (currentMenuState == MENU_STATE_EXIT)
