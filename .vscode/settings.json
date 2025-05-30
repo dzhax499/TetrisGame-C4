@@ -63,6 +63,7 @@
     "blocks.h": "c",
     "game_sound.h": "c",
     "highscore.h": "c",
-    "main_menu.h": "c"
+    "main_menu.h": "c",
+    "rendering.h": "c"
   }
 }
