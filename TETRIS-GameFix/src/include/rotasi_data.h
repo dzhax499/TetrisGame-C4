@@ -14,5 +14,4 @@ extern const int T_TETROMINO[4][4][4];  // Blok T punya 4 posisi
 extern const int Z_TETROMINO[2][4][4];  // Blok Z punya 2 posisi unik
 
 extern const int ROTATION_COUNT[7];
-
 #endif

@@ -3,25 +3,6 @@
 // Oleh      : Ibnu Hilmi 241511079
 //             Dzakir Tsabit 241511071 (github : dzhax4499)
 
-/**
- * ===================================
- * KOMENTAR PENJELASAN KODE PROGRAM
- * ===================================
- */
-
-/**
- * Include Header Files
- * -------------------
- * Header-header berikut mencakup semua komponen game:
- * - tetris.h: Definisi utama dan konstanta game
- * - board.h: Struktur dan fungsi untuk papan permainan
- * - blocks.h: Definisi dan fungsi untuk blok Tetris
- * - rendering.h: Fungsi-fungsi untuk menggambar elemen game
- * - scoring.h: Sistem skor dan level
- * - main_menu.h: Sistem menu game
- * - game_sound.h: Sistem audio dan efek suara
- * - raylib.h: Library grafis untuk menggambar game
- */
 #include "include/tetris.h"
 #include "include/board.h"
 #include "include/blocks.h"
@@ -35,136 +16,76 @@
 #include "include/linkedlist_block.h"
 #include <time.h>
 
-/**
- * Definisi Konstanta
- * -----------------
- * - WINDOW_WIDTH, WINDOW_HEIGHT: Ukuran jendela game
- * - HIGH_SCORE_FILE: Lokasi file untuk menyimpan skor tertinggi
- */
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
-
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
 
-/**
- * Fungsi Utama (main)
- * ------------------
- * Fungsi utama game yang berisi:
- * 1. Inisialisasi komponen game
- * 2. Loop utama game
- * 3. Pembersihan sumber daya sebelum program berakhir
- */
-//global variabel untuk menyimpan data permainan
 bool paused = false;
 
 int main(void)
 {
-    /**
-     * Pengaturan Awal
-     * --------------
-     * - SetExitKey(0): Menonaktifkan tombol ESC bawaan agar bisa dikustomisasi
-     * - InitWindow(): Membuat jendela game dengan ukuran dan judul tertentu
-     * - SetTargetFPS(): Mengatur batas frame per detik
-     * - InitAudioDevice(): Menginisialisasi sistem audio
-     */
+    // Debug: Print initialization start
+    printf("Starting Tetris Game initialization...\n");
+
     SetExitKey(0); // Nonaktifkan tombol keluar bawaan
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
-    InitAudioDevice();
-    // inisialisasi linked list untuk menyimpan blok aktif
 
-    /**
-     * Inisialisasi Generator Angka Acak
-     * --------------------------------
-     * Menggunakan waktu saat ini sebagai seed untuk generator angka acak,
-     * memastikan blok yang muncul selalu berbeda setiap kali game dimainkan
-     */
+    // Check if audio initialization succeeds
+    InitAudioDevice();
+    if (!IsAudioDeviceReady())
+    {
+        printf("Warning: Audio device could not be initialized\n");
+    }
+
     srand(time(NULL));
 
-    /**
-     * Inisialisasi Komponen Game
-     * -------------------------
-     * - InitBlocks0(): Menyiapkan sistem blok Tetris
-     * - InitMainMenu(): Menyiapkan menu utama
-     * - InitGameSound(): Menyiapkan sistem audio
-     * - InitBoard1(): Menyiapkan papan permainan kosong
-     * - InitScoring(): Menyiapkan sistem skor dan level
-     */
-    InitBlocks0();
+    // Initialize components with error checking
+
+    printf(">> Initializing main menu...\n");
     InitMainMenu();
+
+    printf(">> Initializing game sound...\n");
     InitGameSound();
 
+    // Initialize game objects
     TetrisBoard board;
+    printf(">> Initializing board...\n");
+    printf(">> Alamat board utama di main: %p\n", &board);
+    InitBlocks();
+    printf(">> Inisialisasi blok-blok Tetris...\n");
     InitBoard1(&board);
-
+    printf(">> Board initialized at address: %p\n", &board);
     ScoreData scoreData;
+    printf(">> Initializing scoring...\n");
     InitScoring(&scoreData);
 
     Leaderboard leaderboard;
+    printf(">> Initializing leaderboard...\n");
     InitLeaderboard(&leaderboard);
 
-    /**
-     * Variabel Status Permainan
-     * ------------------------
-     * - inGame: Menandakan apakah sedang di dalam permainan aktif
-     * - gameOver: Menandakan apakah permainan berakhir (kalah)
-     * - wasPreviouslyInGame: Pelacak status sebelumnya untuk transisi musik
-     * - fallTimer: Penghitung waktu untuk gerakan blok ke bawah
-     * - fallDelay: Waktu tunggu antara gerakan blok ke bawah (dipengaruhi level)
-     */
+    // Game state variables
     bool inGame = false;
     bool gameOver = false;
     bool wasPreviouslyInGame = false;
     float fallTimer = 0.0f;
     float fallDelay = 1.0f; // Waktu jatuh awal
 
-    /**
-     * Mulai dengan Musik Menu
-     * ----------------------
-     * Memulai game dengan memainkan musik menu utama
-     */
+    printf("Starting background music...\n");
     PlayBackgroundMusic(MUSIC_MENU);
 
-    /**
-     * Loop Utama Game
-     * --------------
-     * Loop ini berjalan terus selama jendela game masih terbuka.
-     * Di dalamnya terdapat logika game, pemrosesan input, dan penggambaran.
-     */
+    printf("Entering main game loop...\n");
+
     while (!WindowShouldClose())
     {
-        /**
-         * Memulai Frame Gambar Baru
-         * -------------------------
-         * - BeginDrawing(): Menandai awal proses menggambar frame baru
-         * - ClearBackground(): Mengisi layar dengan warna latar belakang
-         */
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
-        /**
-         * Update Audio
-         * -----------
-         * Memperbarui status music stream yang sedang diputar
-         */
+        // Update audio and timer
         UpdateGameSound();
-
-        /**
-         * Memperbarui Timer Game
-         * ---------------------
-         * Memperbarui timer game untuk menghitung waktu yang telah berlalu
-         */
         UpdateGameTimer();
 
-        /**
-         * Penanganan Tombol ESC Global
-         * ---------------------------
-         * Mengatur perilaku tombol ESC berdasarkan status menu saat ini:
-         * - Saat bermain: Jeda permainan
-         * - Saat jeda: Lanjutkan permainan
-         * - Saat di kredit/highscore: Kembali ke menu utama
-         * - Saat di menu utama: Tidak melakukan apa-apa
-         */
+        // Handle ESC key
         if (IsKeyPressed(KEY_ESCAPE))
         {
             MenuState currentMenuState = GetCurrentMenuState();
@@ -185,28 +106,45 @@ int main(void)
             }
         }
 
-        /**
-         * Mendapatkan Status Menu Saat Ini
-         * -------------------------------
-         * Variabel currentMenuState digunakan untuk menentukan tampilan dan
-         * logika yang akan dijalankan pada frame ini
-         */
         MenuState currentMenuState = GetCurrentMenuState();
 
-        /**
-         * Penanganan Status MENU_STATE_PLAY (Bermain)
-         * ------------------------------------------
-         * Logika saat status menu adalah PLAY (bermain):
-         * - Memainkan musik gameplay jika baru masuk permainan
-         * - Mengatur flag inGame menjadi true
-         * - Menangani tombol P untuk jeda
-         */
         if (currentMenuState == MENU_STATE_PLAY)
         {
             if (!inGame)
             {
+                printf(">> Masuk ke MENU_STATE_PLAY\n");
+
                 PlayBackgroundMusic(MUSIC_GAMEPLAY);
                 PlaySoundEffect(SOUND_CLICK);
+
+                printf(">> InitBoard1\n");
+                InitBoard1(&board);
+                printf(">> InitScoring\n");
+                InitScoring(&scoreData);
+
+                printf(">> Generate current_block\n");
+                board.current_block = GenerateRandomBlock();
+                // Validasi current_block
+                if (board.current_block.type < 0 || board.current_block.type >= 7)
+                {
+                    printf("ERROR: Invalid current_block generated, type = %d\n", board.current_block.type);
+                    // Fallback ke I-block
+                    board.current_block.type = 0;
+                    board.current_block = GenerateRandomBlock();
+                }
+
+                printf(">> Generate next_block\n");
+                board.next_block = GenerateRandomBlock();
+                // Validasi next_block
+                if (board.next_block.type < 0 || board.next_block.type >= 7)
+                {
+                    printf("ERROR: Invalid next_block generated, type = %d\n", board.next_block.type);
+                    // Fallback ke I-block
+                    board.next_block.type = 0;
+                    board.next_block = GenerateRandomBlock();
+                }
+
+                printf(">> SELESAI semua setup\n");
             }
             inGame = true;
             paused = false;
@@ -217,14 +155,6 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-        /**
-         * Penanganan Status MENU_STATE_CREDITS (Layar Kredit)
-         * -------------------------------------------------
-         * Menampilkan informasi kredit dan tim pengembang:
-         * - Menggambar judul dan nama-nama anggota tim
-         * - Menampilkan tombol kembali ke menu utama
-         * - Menangani input mouse dan keyboard
-         */
         else if (currentMenuState == MENU_STATE_CREDITS)
         {
             inGame = false;
@@ -272,22 +202,13 @@ int main(void)
                     PlaySoundEffect(SOUND_CLICK);
                 }
             }
-        
+
             if (IsKeyPressed(KEY_ESCAPE))
             {
                 SetMenuState(MENU_STATE_MAIN);
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-        /**
-         * Penanganan Status MENU_STATE_HIGHSCORE (Layar Skor Tertinggi)
-         * -----------------------------------------------------------
-         * Menampilkan skor tertinggi yang pernah dicapai:
-         * - Membaca skor tertinggi dari file
-         * - Menggambar tampilan skor
-         * - Menampilkan tombol kembali ke menu utama
-         * - Menangani input mouse dan keyboard
-         */
         else if (currentMenuState == MENU_STATE_HIGHSCORE)
         {
             inGame = false;
@@ -354,23 +275,10 @@ int main(void)
             DrawMainMenu();
             DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
-        /**
-         * Penanganan Status MENU_STATE_EXIT (Keluar)
-         * ----------------------------------------
-         * Menghentikan loop permainan untuk keluar dari aplikasi
-         */
         else if (currentMenuState == MENU_STATE_EXIT)
         {
             break;
         }
-        /**
-         * Penanganan Status MENU_STATE_PAUSE (Jeda)
-         * ---------------------------------------
-         * Menampilkan menu jeda dan overlay saat permainan dijeda:
-         * - Menggambar permainan yang sedang berlangsung di latar belakang
-         * - Menampilkan menu jeda dengan tombol Resume dan Exit
-         * - Menangani input mouse dan keyboard
-         */
         else if (currentMenuState == MENU_STATE_PAUSE)
         {
             if (!paused)
@@ -428,14 +336,6 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
-        /**
-         * Penanganan Status MENU_STATE_MAIN (Menu Utama)
-         * --------------------------------------------
-         * Menampilkan dan mengelola menu utama:
-         * - Mengatur flag inGame menjadi false
-         * - Memainkan musik menu jika sebelumnya dalam permainan
-         * - Mengupdate dan menggambar menu utama
-         */
         else if (currentMenuState == MENU_STATE_MAIN)
         {
             inGame = false;
@@ -450,18 +350,7 @@ int main(void)
             DrawMainMenu();
         }
 
-        /**
-         * Logika Utama Permainan
-         * ---------------------
-         * Menjalankan logika permainan saat status inGame aktif dan tidak game over:
-         * - Mengatur kecepatan jatuh blok berdasarkan level
-         * - Memperbarui timer jatuh blok
-         * - Menangani penjatuhan dan penempatan blok
-         * - Memeriksa kondisi game over
-         * - Menangani input pemain (gerakan dan rotasi blok)
-         * - Memperbarui skor dan baris yang dihapus
-         * - Menggambar semua elemen permainan
-         */
+        // Main game logic
         if (inGame && !gameOver && !paused)
         {
             if (!wasPreviouslyInGame)
@@ -469,7 +358,7 @@ int main(void)
                 wasPreviouslyInGame = true;
             }
 
-// Perbarui kecepatan jatuh berdasarkan level saat ini
+            // Perbarui kecepatan jatuh berdasarkan level saat ini
 #ifdef HAVE_UPDATE_FALL_SPEED
             fallDelay = UpdateFallSpeed(&scoreData);
 #else
@@ -485,15 +374,17 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
-
-                    
+                    // Block has landed, place it
                     PlaceBlock(&board.current_block, &board);
+
+                    // Generate new blocks
                     board.current_block = board.next_block;
                     board.next_block = GenerateRandomBlock();
 
-                    // Periksa kondisi game over
+                    // Check for game over
                     if (IsGameOver(&board.current_block, &board))
                     {
+                        printf("Game Over detected!\n");
                         gameOver = true;
                         StopBackgroundMusic();
                         PlaySoundEffect(SOUND_GAME_OVER);
@@ -502,7 +393,7 @@ int main(void)
                 fallTimer = 0; // Reset timer
             }
 
-            // Kontrol pemain untuk menggerakan dan merotasi blok
+            // Player controls
             if (IsKeyPressed(KEY_LEFT))
                 MoveBlockHorizontal(&board.current_block, &board, -1);
 
@@ -511,7 +402,7 @@ int main(void)
 
             if (IsKeyPressed(KEY_UP))
             {
-                RotateBlock(&board.current_block, &board);
+                RotateBlockWithWallKick(&board.current_block, &board);
                 PlaySoundEffect(SOUND_CLICK);
             }
 
@@ -536,31 +427,43 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
 
-            // Tombol M untuk mute/unmute musik
+            // Toggle music
             if (IsKeyPressed(KEY_M))
             {
                 ToggleBackgroundMusic();
             }
 
-            // Logika pembersihan baris yang penuh
+            // Clear full lines
             int linesCleared = ClearFullLines(&board);
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
                 CheckLevelUp(&scoreData);
-                // scoreData.level = board.current_level;
                 PlaySoundEffect(SOUND_LINE_CLEAR);
             }
-            // Menggambar elemen permainan
-            DrawBlockShadow(&board.current_block, &board);
-            DrawBoard(&board);
-            DrawActiveTetromino(&board.current_block);
-            DrawHoldBlock(&board);
-            DrawNextBlock(&board);
-            DrawScore(&board, &scoreData);
 
-            // Tambahkan panel tips kontrol pemain
-            // Posisikan di sisi kiri bawah layar
+            printf(">> Mulai render elemen\n");
+
+            // Coba satu-satu
+            DrawBoard(&board);
+            printf(">> Setelah DrawBoard\n");
+
+            DrawActiveTetromino(&board.current_block);
+            printf(">> Setelah DrawActiveTetromino\n");
+
+            DrawBlockShadow(&board.current_block, &board);
+            printf(">> Setelah DrawBlockShadow\n");
+
+            DrawHoldBlock(&board);
+            printf(">> Setelah DrawHoldBlock\n");
+
+            DrawNextBlock(&board);
+            printf(">> Setelah DrawNextBlock\n");
+
+            DrawScore(&board, &scoreData);
+            printf(">> Setelah DrawScore\n");
+
+            // Control tips panel
             Rectangle controlTipsRect = {
                 10,                  // Posisi X
                 WINDOW_HEIGHT - 180, // Posisi Y
@@ -568,14 +471,11 @@ int main(void)
                 170                  // Tinggi
             };
 
-            // Gambar panel dengan latar belakang semi-transparan
             DrawRectangleRec(controlTipsRect, Fade(BLACK, 0.7f));
             DrawRectangleLinesEx(controlTipsRect, 2, WHITE);
 
-            // Judul panel
             DrawText("KONTROL PEMAIN", controlTipsRect.x + 10, controlTipsRect.y + 10, 18, GOLD);
 
-            // Daftar kontrol pemain
             int textY = controlTipsRect.y + 40;
             int textX = controlTipsRect.x + 15;
             int fontSize = 16;
@@ -589,24 +489,16 @@ int main(void)
             DrawText("P/ESC: Pause Game", textX, textY + 90, fontSize, textColor);
             DrawText("M    : Mute/Unmute Musik", textX, textY + 110, fontSize, textColor);
         }
-        /**
-         * Penanganan Status Game Over
-         * -------------------------
-         * Menampilkan layar game over dengan opsi restart dan kembali ke menu:
-         * - Menggambar teks game over dan skor akhir
-         * - Menampilkan tombol restart dan back to menu
-         * - Menangani input pemain untuk kedua tombol tersebut
-         */
         else if (gameOver)
         {
-            // Tampilkan teks Game Over dan skor akhir
+            // Game over screen
             DrawText("GAME OVER", WINDOW_WIDTH / 2 - MeasureText("GAME OVER", 40) / 2,
                      WINDOW_HEIGHT / 2 - 100, 40, RED);
             DrawText(TextFormat("Final Score: %d", scoreData.score),
                      WINDOW_WIDTH / 2 - MeasureText(TextFormat("Final Score: %d", scoreData.score), 20) / 2,
                      WINDOW_HEIGHT / 2 - 40, 20, WHITE);
 
-            // Tombol Restart
+            // Restart button
             Rectangle restartBtn = {
                 WINDOW_WIDTH / 2 - 100,
                 WINDOW_HEIGHT / 2,
@@ -618,7 +510,7 @@ int main(void)
             DrawText("RESTART", restartBtn.x + (restartBtn.width / 2) - MeasureText("RESTART", 20) / 2,
                      restartBtn.y + 15, 20, WHITE);
 
-            // Tombol Back to Menu
+            // Back to menu button
             Rectangle backBtn = {
                 WINDOW_WIDTH / 2 - 100,
                 WINDOW_HEIGHT / 2 + 70,
@@ -630,6 +522,7 @@ int main(void)
             DrawText("BACK TO MENU", backBtn.x + (backBtn.width / 2) - MeasureText("BACK TO MENU", 20) / 2,
                      backBtn.y + 15, 20, WHITE);
 
+            // Leaderboard button
             Rectangle scoreBtn = {
                 WINDOW_WIDTH / 2 - 100,
                 WINDOW_HEIGHT / 2 + 140,
@@ -641,10 +534,9 @@ int main(void)
             DrawText("LEADERBOARD", scoreBtn.x + (scoreBtn.width / 2) - MeasureText("LEADERBOARD", 20) / 2,
                      scoreBtn.y + 15, 20, WHITE);
 
-            // Penanganan hover dan klik tombol
             Vector2 mousePos = GetMousePosition();
 
-            // Tombol Restart
+            // Restart button handling
             if (CheckCollisionPointRec(mousePos, restartBtn))
             {
                 DrawRectangleRec(restartBtn, Fade(GREEN, 0.8f));
@@ -656,9 +548,9 @@ int main(void)
                     SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);
-                    InitGameTimer();    
+                    InitGameTimer();
                     gameOver = false;
-                    inGame = true; // Langsung mulai permainan baru
+                    inGame = true;
                     wasPreviouslyInGame = true;
                     fallTimer = 0;
                     PlaySoundEffect(SOUND_CLICK);
@@ -667,7 +559,7 @@ int main(void)
                 }
             }
 
-            // Tombol Back to Menu
+            // Back to menu button handling
             if (CheckCollisionPointRec(mousePos, backBtn))
             {
                 DrawRectangleRec(backBtn, Fade(BLUE, 0.8f));
@@ -690,6 +582,7 @@ int main(void)
                 }
             }
 
+            // Leaderboard button handling
             if (CheckCollisionPointRec(mousePos, scoreBtn))
             {
                 DrawRectangleRec(scoreBtn, Fade(PURPLE, 0.8f));
@@ -711,10 +604,9 @@ int main(void)
                 }
             }
 
-            // Simpan skor tertinggi
             SaveGameScore(&scoreData);
 
-            // Restart dengan tombol R
+            // Restart with R key
             if (IsKeyPressed(KEY_R))
             {
                 InitBoard1(&board);
@@ -726,26 +618,15 @@ int main(void)
                 fallTimer = 0;
                 PlaySoundEffect(SOUND_CLICK);
                 PlayBackgroundMusic(MUSIC_MENU);
-                SetWindowState(MENU_STATE_MAIN);
+                SetMenuState(MENU_STATE_MAIN);
             }
         }
 
-        /**
-         * Akhiri Frame Gambar
-         * ------------------
-         * EndDrawing(): Menyelesaikan proses menggambar dan menampilkan frame ke layar
-         */
         EndDrawing();
     }
 
-    /**
-     * Pembersihan Sumber Daya
-     * ----------------------
-     * - UnloadMainMenu(): Membersihkan sumber daya menu
-     * - UnloadGameSound(): Membersihkan sumber daya audio
-     * - CloseAudioDevice(): Menutup perangkat audio
-     * - CloseWindow(): Menutup jendela aplikasi
-     */
+    // Cleanup
+    printf("Cleaning up resources...\n");
     UnloadMainMenu();
     UnloadGameSound();
     CloseAudioDevice();
