@@ -591,7 +591,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    AddLeaderboard(&leaderboard, scoreData.score, scoreData.level);
+                    void AddLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time);
                     SaveGameScore(&scoreData);
                     InitBoard1(&board);
                     InitScoring(&scoreData);

@@ -15,6 +15,8 @@
 typedef struct LeaderboardEntry {
     int score;              // Skor
     int level;              // Level yang dicapai
+    float time;              // Waktu permainan
+    char name[50];        // Nama pemain
     struct LeaderboardEntry* next; // Pointer ke entri berikutnya
 } LeaderboardEntry;
 
@@ -23,28 +25,13 @@ typedef struct {
     LeaderboardEntry* highScores; // Daftar high score (linked list)
 } Leaderboard;
 
-// Fungsi untuk menginisialisasi leaderboard
 void InitLeaderboard(Leaderboard* leaderboard);
-
-// Fungsi untuk menambahkan skor ke daftar leaderboard
-void AddLeaderboard(Leaderboard* leaderboard, int score, int level);
-
-// Fungsi untuk menyimpan daftar high score ke file
+void AddLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time);
 void SaveLeaderboard(Leaderboard* leaderboard);
-
-// Fungsi untuk memuat daftar high score dari file
 void LoadLeaderboard(Leaderboard* leaderboard);
-
-// Fungsi untuk menampilkan daftar leaderboard di layar
 void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHeight);
-
-// Fungsi untuk membebaskan memori daftar leaderboard
-void FreeLeaderboardList(Leaderboard* leaderboard);
-
-// Fungsi untuk menghapus entri setelah entri ke-10
+void FreeLeaderboardList(Leaderboard* leaderboard);   // <--- Tambahkan ini!
 void UnloadLeaderboard(Leaderboard* leaderboard);
-
-// Fungsi untuk memeriksa apakah skor adalah leaderboard
 bool IsLeaderboard(Leaderboard* leaderboard, int score);
 
 #endif // LEADERBOARD_H
