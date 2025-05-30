@@ -16,11 +16,14 @@ static bool isMusicEnabled = true;
 static float globalMusicVolume = 0.7f;
 static float globalSoundVolume = 1.0f;
 
+// Forward declaration untuk menghindari implicit declaration error
+void SetGameMusicVolume(float volume);
+
 // Fungsi utilitas untuk mencari node suara berdasarkan tipe
 static SoundNode* FindSoundNode(SoundEffectType type) {
     SoundNode* current = soundHead;
     while (current != NULL) {
-        if (current->type == type) {
+        if (current->type == (int)type) {  // Cast untuk menghindari warning
             return current;
         }
         current = current->next;
@@ -32,7 +35,7 @@ static SoundNode* FindSoundNode(SoundEffectType type) {
 static MusicNode* FindMusicNode(MusicTrackType type) {
     MusicNode* current = musicHead;
     while (current != NULL) {
-        if (current->type == type) {
+        if (current->type == (int)type) {  // Cast untuk menghindari warning
             return current;
         }
         current = current->next;
@@ -53,8 +56,8 @@ void InitGameSound(void) {
     AddMusicTrack("assets/sounds/game_menu1.mp3", MUSIC_MENU, "Menu Music", true);
     AddMusicTrack("assets/sounds/game_menu2.mp3", MUSIC_GAMEPLAY, "Gameplay Music", true);
     
-    // Mengatur volume awal
-    SetMusicVolume1(globalMusicVolume);
+    // Mengatur volume awal - gunakan nama fungsi yang benar dari header
+    SetGameMusicVolume(globalMusicVolume);
     SetSoundEffectsVolume(globalSoundVolume);
 }
 
@@ -81,7 +84,7 @@ bool AddSoundEffect(const char* filepath, SoundEffectType type, const char* name
     
     // Muat suara dari file
     newNode->sound = LoadSound(filepath);
-    newNode->type = type;
+    newNode->type = (int)type;  // Cast ke int sesuai dengan definisi struct
     strcpy(newNode->name, name);
     newNode->volume = globalSoundVolume;
     newNode->next = NULL;
@@ -109,13 +112,13 @@ bool RemoveSoundEffect(SoundEffectType type) {
     SoundNode* toRemove = NULL;
     
     // Jika node yang akan dihapus adalah head
-    if (soundHead->type == type) {
+    if (soundHead->type == (int)type) {  // Cast untuk konsistensi
         toRemove = soundHead;
         soundHead = soundHead->next;
     } else {
         // Cari node yang akan dihapus
         SoundNode* current = soundHead;
-        while (current->next != NULL && current->next->type != type) {
+        while (current->next != NULL && current->next->type != (int)type) {
             current = current->next;
         }
         
@@ -167,7 +170,7 @@ bool AddMusicTrack(const char* filepath, MusicTrackType type, const char* name, 
     
     // Muat musik dari file
     newNode->music = LoadMusicStream(filepath);
-    newNode->type = type;
+    newNode->type = (int)type;  // Cast ke int sesuai dengan definisi struct
     strcpy(newNode->name, name);
     newNode->volume = globalMusicVolume;
     newNode->looping = looping;
@@ -197,7 +200,7 @@ bool RemoveMusicTrack(MusicTrackType type) {
     }
     
     // Jika musik yang akan dihapus sedang diputar, hentikan dulu
-    if (currentMusic != NULL && currentMusic->type == type) {
+    if (currentMusic != NULL && currentMusic->type == (int)type) {
         StopMusicStream(currentMusic->music);
         currentMusic = NULL;
     }
@@ -205,13 +208,13 @@ bool RemoveMusicTrack(MusicTrackType type) {
     MusicNode* toRemove = NULL;
     
     // Jika node yang akan dihapus adalah head
-    if (musicHead->type == type) {
+    if (musicHead->type == (int)type) {
         toRemove = musicHead;
         musicHead = musicHead->next;
     } else {
         // Cari node yang akan dihapus
         MusicNode* current = musicHead;
-        while (current->next != NULL && current->next->type != type) {
+        while (current->next != NULL && current->next->type != (int)type) {
             current = current->next;
         }
         
@@ -272,7 +275,8 @@ void ToggleBackgroundMusic(void) {
     }
 }
 
-void SetMusicVolume1(float volume) {
+// Implementasi fungsi yang sesuai dengan nama di header file
+void SetGameMusicVolume(float volume) {
     globalMusicVolume = volume;
     
     // Perbarui volume semua trek musik
