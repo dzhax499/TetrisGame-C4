@@ -121,6 +121,8 @@ int main(void)
                 InitBoard1(&board);
                 printf(">> InitScoring\n");
                 InitScoring(&scoreData);
+                printf(">> InitGameTimer\n");
+                InitGameTimer();
 
                 printf(">> Generate current_block\n");
                 board.current_block = GenerateRandomBlock();
@@ -152,6 +154,7 @@ int main(void)
             if (IsKeyPressed(KEY_P))
             {
                 SetMenuState(MENU_STATE_PAUSE);
+                ResumeGameTimer();
                 PlaySoundEffect(SOUND_CLICK);
             }
         }
@@ -284,6 +287,7 @@ int main(void)
             if (!paused)
             {
                 paused = true;
+                PauseGameTimer();
                 StopBackgroundMusic();
                 PlaySoundEffect(SOUND_CLICK);
             }
@@ -316,6 +320,8 @@ int main(void)
             if (CheckCollisionPointRec(mousePoint, resumeBtn) && IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
             {
                 SetMenuState(MENU_STATE_PLAY);
+                PlayBackgroundMusic(MUSIC_GAMEPLAY);
+                ResumeGameTimer();
                 PlaySoundEffect(SOUND_CLICK);
             }
 
