@@ -113,18 +113,16 @@ void DrawScore(TetrisBoard *board, ScoreData *scoreData)
     DrawText(TextFormat("TIME: %.1f s", GetElapsedGameTime()), offsetX, BOARD_OFFSET_Y + 90, 20, WHITE);
 
     // Batas area Next Block
-    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 100,
-                       150, 100, WHITE);
+    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 165, 150, 100, WHITE);
 
     // Label Next Block - HAPUS DARI SINI, PINDAH KE DrawNextBlock
-    DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 100, 15, WHITE);
+    DrawText("NEXT:", offsetX + 5, BOARD_OFFSET_Y + 170, 15, WHITE);
 
     // Batas area Hold Block
-    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 230,
-                       150, 100, WHITE);
+    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 280, 150, 100, WHITE);
 
     // Label Hold Block
-    DrawText("HOLD:", offsetX, BOARD_OFFSET_Y + 230, 15, WHITE);
+    DrawText("HOLD:", offsetX + 5, BOARD_OFFSET_Y + 285, 15, WHITE);
 }
 
 void DrawHoldBlock(TetrisBoard *board)
@@ -138,7 +136,7 @@ void DrawHoldBlock(TetrisBoard *board)
 
         // Posisi tengah untuk hold block (25 = offset untuk tengah kotak 150px)
         int blockOffsetX = offsetX + 25;
-        int blockOffsetY = BOARD_OFFSET_Y + 250;
+        int blockOffsetY = BOARD_OFFSET_Y + 310;
 
         // Dapatkan rotation list untuk tipe blok yang sedang di-hold
         RotationList *rotList = GetRotationList(holdBlock->type);

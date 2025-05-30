@@ -38,7 +38,10 @@
   "C_Cpp_Runner.compilerArgs": [],
   "C_Cpp_Runner.linkerArgs": [],
   "C_Cpp_Runner.includePaths": [],
-  "C_Cpp_Runner.includeSearch": ["*", "**/*"],
+  "C_Cpp_Runner.includeSearch": [
+    "*",
+    "**/*"
+  ],
   "C_Cpp_Runner.excludeSearch": [
     "**/build",
     "**/build/**",
@@ -60,6 +63,7 @@
     "blocks.h": "c",
     "game_sound.h": "c",
     "highscore.h": "c",
-    "main_menu.h": "c"
+    "main_menu.h": "c",
+    "rendering.h": "c"
   }
 }
