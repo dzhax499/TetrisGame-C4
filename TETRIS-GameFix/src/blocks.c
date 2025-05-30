@@ -1,332 +1,318 @@
-//Nama file : blocks.c
-//Deskripsi : Implementasi blok-blok game Tetris
-//Oleh      : Dzakit Tsabit 241511071
+// FIXED: blocks.c - Auto rotation bug diperbaiki
+// Nama file : blocks.c
+// Deskripsi : Implementasi blok-blok game Tetris (FIXED - NO AUTO ROTATION BUG)
+// Oleh      : Dzakit Tsabit 241511071
+
 #include <string.h>
+#include <time.h>
 #include "include/blocks.h"
 #include "include/rotasi_data.h"
 #include "include/linkedlist_block.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "raylib.h"   
+#include "raylib.h"
+
+// Forward declaration for static functions
+static void UpdateBlockShape(TetrisBlock *block);
 
 static const Color TETROMINO_COLORS[7] = {
-    SKYBLUE,    // I
-    DARKBLUE,   // J
-    ORANGE,     // L
-    YELLOW,     // O
-    LIME,       // S
-    PURPLE,     // T
-    RED         // Z
+    SKYBLUE,  // I
+    DARKBLUE, // J
+    ORANGE,   // L
+    YELLOW,   // O
+    LIME,     // S
+    PURPLE,   // T
+    RED       // Z
 };
 
 static const int WallKickTests[4][5][2] = {
     // 0 -> R (Dari posisi awal ke kanan)
-    {{0,0}, {-1,0}, {-1,1}, {0,-2}, {-1,-2}},
+    {{0, 0}, {-1, 0}, {-1, 1}, {0, -2}, {-1, -2}},
     // R -> 2 (Dari kanan ke posisi terbalik)
-    {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}},
+    {{0, 0}, {1, 0}, {1, -1}, {0, 2}, {1, 2}},
     // 2 -> L (Dari posisi terbalik ke kiri)
-    {{0,0}, {1,0}, {1,1}, {0,-2}, {1,-2}},
+    {{0, 0}, {1, 0}, {1, 1}, {0, -2}, {1, -2}},
     // L -> 0 (Dari kiri kembali ke posisi awal)
-    {{0,0}, {-1,0}, {-1,-1}, {0,2}, {-1,2}}
+    {{0, 0}, {-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}
 };
 
-
-void InitBlocks(void) {
+void InitBlocks(void)
+{
     // Inisialisasi random seed
     srand(time(NULL));
-    
+
     // Inisialisasi sistem rotasi blok
     InitRotationSystem();
 }
 
-TetrisBlock GenerateRandomBlock(void) {
+TetrisBlock GenerateRandomBlock(void)
+{
     TetrisBlock block;
+    
+    // Inisialisasi semua field dengan nilai default
+    memset(&block, 0, sizeof(TetrisBlock));
+    
     block.type = rand() % 7;
-    block.rotation = 0;
-    
-    // Sesuaikan posisi awal agar blok muncul di bagian atas papan
-    block.x = BOARD_WIDTH / 2 - 2;
-    block.y = -1;  // Mulai di atas papan
-    
-    // Dapatkan rotasi list untuk tipe blok ini
-    RotationList* rotList;
-    rotList = GetRotationList(block.type);
-    
-    // Salin bentuk blok dari rotasi list
-    AmbilBentukSaatIni(rotList, block.shape);
-    
+    block.rotation = 0;  // ALWAYS start at rotation 0
+    block.ukuranblok = 4;
+    block.efekmeledak = false;
+    block.waktumeledak = 0;
+
+    // FIXED: Proper initial positioning
+    switch(block.type) {
+        case 0: // I-piece
+            block.x = BOARD_WIDTH / 2 - 2;
+            block.y = -1;
+            break;
+        case 3: // O-piece
+            block.x = BOARD_WIDTH / 2 - 2;
+            block.y = 0;
+            break;
+        default: // J, L, S, T, Z pieces
+            block.x = BOARD_WIDTH / 2 - 2;
+            block.y = 0;
+            break;
+    }
+
+    // CRITICAL FIX: Set rotation list to rotation 0 dan JANGAN panggil sync
+    RotationList *rotList = GetRotationList(block.type);
+    if (rotList == NULL)
+    {
+        printf("ERROR: rotList NULL saat generate blok type %d\n", block.type);
+        // Emergency fallback
+        block.type = 0;
+        memset(block.shape, 0, sizeof(block.shape));
+        block.shape[1][0] = 1;
+        block.shape[1][1] = 1;
+        block.shape[1][2] = 1;
+        block.shape[1][3] = 1;
+        block.rotationNode = NULL;
+    }
+    else
+    {
+        // FIXED: Pastikan rotList di posisi 0 tanpa memanggil sync yang berbahaya
+        SetRotation(rotList, 0); // Set ke rotation 0
+        block.rotationNode = rotList->current;
+        UpdateBlockShape(&block);
+    }
+
     // Tetapkan warna
     block.color = TETROMINO_COLORS[block.type];
-    
+
     return block;
 }
 
-// Fungsi untuk memeriksa apakah blok dapat ditempatkan pada posisi tertentu
-bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation) {
-    // Dapatkan rotasi list untuk tipe blok ini
-    RotationList* rotList;
-    rotList =  GetRotationList(block->type);
+// FIXED: IsValidBlockPosition yang tidak mengubah rotasi current
+bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation)
+{
+    if (!block || !board) return false;
+    
+    RotationList *rotList = GetRotationList(block->type);
     if (!rotList) return false;
-    
-    // Simpan rotasi current
-    RotationNode* savedRotation;
-    savedRotation = rotList->current;
-    
-    // Pindahkan ke rotasi yang diinginkan
-    for (int i = 0; i < testRotation; i++) {
-        RotateToNext(rotList);
-    }
-    
-    // Ambil bentuk blok untuk rotasi yang diinginkan
+
+    // CRITICAL FIX: Dapatkan shape untuk test rotation TANPA mengubah current state
     int bentuk[4][4];
-    AmbilBentukSaatIni(rotList, bentuk);
     
-    // Kembalikan rotasi ke posisi semula
-    rotList->current = savedRotation;
-    
-    // Loop melalui matriks 4x4 yang merepresentasikan bentuk tetromino
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            // Lewati sel kosong
+    // Jika test rotation sama dengan current rotation, gunakan shape yang sudah ada
+    if (testRotation == block->rotation) {
+        memcpy(bentuk, block->shape, sizeof(int) * 4 * 4);
+    } else {
+        // FIXED: Untuk test rotation yang berbeda, kita perlu navigasi manual
+        // Simpan current state
+        RotationNode *originalCurrent = rotList->current;
+        int originalIndex = rotList->currentRotationIndex;
+        
+        // Navigate ke test rotation
+        SetRotation(rotList, testRotation);
+        AmbilBentukSaatIni(rotList, bentuk);
+        
+        // CRITICAL: Restore original state
+        rotList->current = originalCurrent;
+        rotList->currentRotationIndex = originalIndex;
+    }
+
+    // Test collision dengan retrieved shape
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
             if (bentuk[y][x] == 0) continue;
 
-            // Hitung koordinat absolut di papan
             int boardX = testX + x;
             int boardY = testY + y;
 
-            // Cek apakah posisi berada di luar batas papan
-            if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT) {
-                return false;
-            }
+            // Check bounds
+            if (boardX < 0 || boardX >= BOARD_WIDTH) return false;
+            if (boardY >= BOARD_HEIGHT) return false;
+            if (boardY < 0) continue; // Allow spawning above visible area
 
-            // Jika posisi masih di atas papan, lanjutkan
-            if (boardY < 0) continue;
-
-            // Cek apakah posisi bertabrakan dengan blok lain
-            if (board->grid[boardY][boardX] != BLOCK_EMPTY) {
-                return false;
-            }
+            // Check collision with existing blocks
+            if (board->grid[boardY][boardX] != BLOCK_EMPTY) return false;
         }
     }
 
     return true;
 }
 
-// Fungsi untuk memutar blok ke rotasi berikutnya jika memungkinkan
-bool RotateBlock(TetrisBlock *block, TetrisBoard *board) {
-    // Dapatkan rotasi list untuk tipe blok ini
-    RotationList* rotList = GetRotationList(block->type);
+// FIXED: RotateBlock yang hanya berubah saat dipanggil
+bool RotateBlock(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return false;
+    
+    RotationList *rotList = GetRotationList(block->type);
     if (!rotList) return false;
-    
-    // Cek apakah posisi setelah rotasi valid
-    RotationNode* savedRotation = rotList->current;
-    RotateToNext(rotList);  // Coba rotasi berikutnya
-    
-    int tempShape[4][4];
-    AmbilBentukSaatIni(rotList, tempShape);
-    
-    // Kembalikan rotasi dulu sebelum pemeriksaan
-    rotList->current = savedRotation;
-    
-    // Cek validitas
-    if (IsValidBlockPosition(block, board, block->x, block->y, (block->rotation + 1) % rotList->rotationCount)) {
-        // Jika valid, perbarui rotasi blok
-        block->rotation = (block->rotation + 1) % rotList->rotationCount;
-        RotateToNext(rotList);  // Geser rotasi dalam list
+
+    int currentRotation = block->rotation;
+    int newRotation = (currentRotation + 1) % rotList->rotationCount;
+
+    // Test if rotation is valid at current position
+    if (IsValidBlockPosition(block, board, block->x, block->y, newRotation))
+    {
+        // CRITICAL: Update block rotation
+        block->rotation = newRotation;
         
-        // Salin bentuk baru ke blok
-        AmbilBentukSaatIni(rotList, block->shape);
+        // FIXED: Set rotation list ke new rotation
+        SetRotation(rotList, newRotation);
+        block->rotationNode = rotList->current;
+        UpdateBlockShape(block);
         
+        printf("DEBUG: Block rotated to %d\n", newRotation);
         return true;
     }
-    
+
+    printf("DEBUG: Rotation blocked\n");
     return false;
 }
 
-bool RotateBlockWithWallKick(TetrisBlock* block, TetrisBoard* board) {
-    int initialRotation = block->rotation;
-    RotationList* rotList = GetRotationList(block->type);
-    if (!rotList) return false;
+bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return false;
     
-    int newRotation = (block->rotation + 1) % rotList->rotationCount;
+    if (block->type < 0 || block->type >= 7) {
+        printf("ERROR: Invalid block type %d in RotateBlockWithWallKick\n", block->type);
+        return false;
+    }
+    
+    RotationList *rotList = GetRotationList(block->type);
+    if (!rotList) {
+        printf("ERROR: rotList is NULL for block type %d\n", block->type);
+        return false;
+    }
 
-    // Coba rotasi normal tanpa wall kick
-    if (IsValidBlockPosition(block, board, block->x, block->y, newRotation)) {
+    int initialRotation = block->rotation;
+    int rotationCount = rotList->rotationCount;
+    int newRotation = (block->rotation + 1) % rotationCount;
+
+    // Test rotation at current position without wall kick
+    if (IsValidBlockPosition(block, board, block->x, block->y, newRotation))
+    {
         block->rotation = newRotation;
-        
-        // Update bentuk blok
-        RotateToNext(rotList);
-        AmbilBentukSaatIni(rotList, block->shape);
-        
+        SetRotation(rotList, newRotation);
+        block->rotationNode = rotList->current;
+        UpdateBlockShape(block);
         return true;
     }
 
-    // Coba wall kick dengan 5 kemungkinan pergeseran
-    for (int testIndex = 0; testIndex < 5; testIndex++) {
-        int kickX = WallKickTests[initialRotation % 4][testIndex][0];
-        int kickY = WallKickTests[initialRotation % 4][testIndex][1];
+    // Try wall kick tests
+    int wallKickIndex = initialRotation % 4;
+    for (int testIndex = 0; testIndex < 5; testIndex++)
+    {
+        int kickX = WallKickTests[wallKickIndex][testIndex][0];
+        int kickY = WallKickTests[wallKickIndex][testIndex][1];
 
-        // Jika posisi dengan wall kick valid, terapkan pergeseran
-        if (IsValidBlockPosition(block, board, block->x + kickX, block->y + kickY, newRotation)) {
-            block->x += kickX;
-            block->y += kickY;
+        int testX = block->x + kickX;
+        int testY = block->y + kickY;
+
+        if (IsValidBlockPosition(block, board, testX, testY, newRotation))
+        {
+            block->x = testX;
+            block->y = testY;
             block->rotation = newRotation;
-            
-            // Update bentuk blok
-            RotateToNext(rotList);
-            AmbilBentukSaatIni(rotList, block->shape);
-            
+            SetRotation(rotList, newRotation);
+            block->rotationNode = rotList->current;
+            UpdateBlockShape(block);
             return true;
         }
     }
 
-    return false; // Rotasi gagal dilakukan
+    return false;
 }
 
-// Fungsi untuk menghitung seberapa jauh blok bisa jatuh sebelum bertabrakan
-int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board) {
+// FIXED: Calculate drop distance yang tidak mengubah rotasi
+int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return 0;
+    
     int dropDistance = 0;
 
-    while (IsValidBlockPosition(block, board, block->x, block->y + dropDistance + 1, block->rotation)) {
+    // CRITICAL: Gunakan rotasi current block, JANGAN ubah apapun
+    while (IsValidBlockPosition(block, board, block->x, block->y + dropDistance + 1, block->rotation))
+    {
         dropDistance++;
     }
 
     return dropDistance;
 }
 
-// Fungsi untuk menggerakkan blok secara horizontal
-bool MoveBlockHorizontal(TetrisBlock *block, TetrisBoard *board, int dx) {
+bool MoveBlockHorizontal(TetrisBlock *block, TetrisBoard *board, int dx)
+{
+    if (!block || !board) return false;
+    
     int newX = block->x + dx;
 
-    if (IsValidBlockPosition(block, board, newX, block->y, block->rotation)) {
+    // CRITICAL: Gunakan rotasi current saja
+    if (IsValidBlockPosition(block, board, newX, block->y, block->rotation))
+    {
         block->x = newX;
         return true;
     }
     return false;
 }
 
-// Fungsi untuk menggerakkan blok turun satu langkah
-bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board) {
+bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return false;
+    
     int newY = block->y + 1;
 
-    if (IsValidBlockPosition(block, board, block->x, newY, block->rotation)) {
+    // CRITICAL: Gunakan rotasi current saja - JANGAN ubah rotasi
+    if (IsValidBlockPosition(block, board, block->x, newY, block->rotation))
+    {
         block->y = newY;
         return true;
     }
     return false;
 }
 
-// Fungsi untuk melakukan Hard Drop
-void HardDropBlock(TetrisBlock *block, TetrisBoard *board) {
-    while (MoveBlockDown(block, board)) {}
+void HardDropBlock(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return;
+    
+    while (MoveBlockDown(block, board))
+    {
+        // Keep dropping until it can't move down anymore
+    }
     PlaceBlock(block, board);
 }
 
-// Fungsi untuk menahan blok (hold)
-void HoldCurrentBlock(TetrisBoard* board) {
-    // Jika belum pernah memegang blok sebelumnya
-    if (!board->hold_block.hasHeld) {
-        // Simpan blok saat ini ke hold_block
-        board->hold_block.block = board->current_block;
-        board->hold_block.hasHeld = true;
-
-        // Reset posisi dan rotasi blok yang ditahan
-        board->hold_block.block.rotation = 0;
-        board->hold_block.block.x = BOARD_WIDTH / 2 - 2;
-        board->hold_block.block.y = 0;
-
-        // Perbarui bentuk blok yang di-hold berdasarkan rotasi awal
-        RotationList* rotList = GetRotationList(board->hold_block.block.type);
-        
-        // Kembalikan ke rotasi awal (posisi awal linked list)
-        if (rotList) {
-            // Cari node awal (jika rotasi sekarang bukan 0)
-            for (int i = 0; i < rotList->rotationCount - (board->hold_block.block.rotation % rotList->rotationCount); i++) {
-                RotateToNext(rotList);
-            }
-            
-            // Ambil bentuk untuk rotasi 0
-            AmbilBentukSaatIni(rotList, board->hold_block.block.shape);
-        }
-
-        // Ganti blok saat ini dengan blok berikutnya
-        board->current_block = board->next_block;
-
-        // Reset posisi blok baru
-        board->current_block.x = BOARD_WIDTH / 2 - 2;
-        board->current_block.y = 0;
-
-        // Generate blok berikutnya secara acak
-        board->next_block = GenerateRandomBlock();
-    } 
-    // Jika sudah ada blok yang di-hold, lakukan pertukaran blok
-    else {
-        // Simpan blok saat ini ke dalam variabel sementara
-        TetrisBlock tempBlock = board->current_block;
-
-        // Ganti blok saat ini dengan blok yang sedang di-hold
-        board->current_block = board->hold_block.block;
-
-        // Reset rotasi dan posisi blok
-        board->current_block.rotation = 0;
-        board->current_block.x = BOARD_WIDTH / 2 - 2;
-        board->current_block.y = 0;
-
-        // Perbarui bentuk blok berdasarkan rotasi awal
-        RotationList* rotList = GetRotationList(board->current_block.type);
-        
-        if (rotList) {
-            // Cari node awal (jika rotasi sekarang bukan 0)
-            for (int i = 0; i < rotList->rotationCount - (board->current_block.rotation % rotList->rotationCount); i++) {
-                RotateToNext(rotList);
-            }
-            
-            // Ambil bentuk untuk rotasi 0
-            AmbilBentukSaatIni(rotList, board->current_block.shape);
-        }
-
-        // Blok yang sebelumnya aktif menjadi blok yang di-hold
-        board->hold_block.block = tempBlock;
-
-        // Reset rotasi blok yang di-hold
-        board->hold_block.block.rotation = 0;
-
-        // Perbarui bentuk blok yang di-hold
-        rotList = GetRotationList(board->hold_block.block.type);
-        
-        if (rotList) {
-            // Cari node awal (jika rotasi sekarang bukan 0)
-            for (int i = 0; i < rotList->rotationCount - (board->hold_block.block.rotation % rotList->rotationCount); i++) {
-                RotateToNext(rotList);
-            }
-            
-            // Ambil bentuk untuk rotasi 0
-            AmbilBentukSaatIni(rotList, board->hold_block.block.shape);
-        }
-    }
-}
-
-// Fungsi untuk menempatkan blok ke papan permainan
-void PlaceBlock(TetrisBlock *block, TetrisBoard *board) {
-    RotationList* rotList = GetRotationList(block->type);
-    if (!rotList) return;
+// FIXED: PlaceBlock yang menggunakan current shape
+void PlaceBlock(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return;
     
-    // Dapatkan bentuk saat ini
-    int shape[4][4];
-    AmbilBentukSaatIni(rotList, shape);
-    
-    // Loop melalui setiap sel dalam matriks 4x4
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            // Hanya tempatkan sel yang tidak kosong
-            if (shape[y][x] != 0) {
+    // CRITICAL: Gunakan shape yang sudah ada di block, JANGAN sync ulang
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            if (block->shape[y][x] != 0)
+            {
                 int boardX = block->x + x;
                 int boardY = block->y + y;
-                
-                // Pastikan koordinat berada dalam batas papan
-                if (boardY >= 0 && boardY < BOARD_HEIGHT && 
-                    boardX >= 0 && boardX < BOARD_WIDTH) {
-                    // Simpan tipe blok dalam grid papan
+
+                if (boardY >= 0 && boardY < BOARD_HEIGHT &&
+                    boardX >= 0 && boardX < BOARD_WIDTH)
+                {
                     board->grid[boardY][boardX] = block->type + 1;
                 }
             }
@@ -334,60 +320,80 @@ void PlaceBlock(TetrisBlock *block, TetrisBoard *board) {
     }
 }
 
-// Fungsi untuk mendapatkan warna berdasarkan tipe blok
-Color GetTetrominoColor(int blockType) {
-    if (blockType < 0 || blockType >= 7) {
-        return WHITE; // Warna default jika tipe tidak valid
+// FIXED: UpdateBlockShape yang aman
+static void UpdateBlockShape(TetrisBlock *block) {
+    if (!block) return;
+    
+    RotationList *rotList = GetRotationList(block->type);
+    if (!rotList) return;
+    
+    // CRITICAL: JANGAN panggil SetRotation lagi, langsung copy shape
+    AmbilBentukSaatIni(rotList, block->shape);
+}
+
+// Other utility functions
+Color GetTetrominoColor(int blockType)
+{
+    if (blockType < 0 || blockType >= 7)
+    {
+        return WHITE;
     }
     return TETROMINO_COLORS[blockType];
 }
 
-// Fungsi untuk mengembalikan blok ke rotasi awal
-void ResetBlockRotation(TetrisBlock* block) {
-    RotationList* rotList = GetRotationList(block->type);
+void ResetBlockRotation(TetrisBlock *block)
+{
+    if (!block) return;
+    
+    RotationList *rotList = GetRotationList(block->type);
     if (!rotList) return;
-    
-    // Hitung berapa kali perlu rotate untuk kembali ke posisi awal
-    int rotationsToReset = rotList->rotationCount - (block->rotation % rotList->rotationCount);
-    
-    // Rotate hingga kembali ke posisi awal
-    for (int i = 0; i < rotationsToReset; i++) {
-        RotateToNext(rotList);
-    }
-    
+
     block->rotation = 0;
-    AmbilBentukSaatIni(rotList, block->shape);
+    SetRotation(rotList, 0);
+    block->rotationNode = rotList->current;
+    UpdateBlockShape(block);
 }
 
-// Fungsi untuk memeriksa apakah blok dapat spawn dengan aman
-bool CanSpawnBlock(TetrisBlock* block, TetrisBoard* board) {
+bool CanSpawnBlock(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return false;
     return IsValidBlockPosition(block, board, block->x, block->y, block->rotation);
 }
 
-// Fungsi untuk mendapatkan blok ghost (preview posisi jatuh)
-TetrisBlock GetGhostBlock(TetrisBlock* block, TetrisBoard* board) {
+TetrisBlock GetGhostBlock(TetrisBlock *block, TetrisBoard *board)
+{
     TetrisBlock ghost = *block;
     
-    // Hitung jarak jatuh maksimal
-    int dropDistance = CalculateDropDistance(block, board);
-    ghost.y += dropDistance;
-    
+    if (block && board) {
+        int dropDistance = CalculateDropDistance(block, board);
+        ghost.y += dropDistance;
+    }
+
     return ghost;
 }
 
-// Fungsi untuk memeriksa apakah ada collision dengan blok lain pada posisi spesifik
-bool HasCollisionAt(TetrisBlock* block, TetrisBoard* board, int x, int y) {
+bool HasCollisionAt(TetrisBlock *block, TetrisBoard *board, int x, int y)
+{
+    if (!block || !board) return true;
     return !IsValidBlockPosition(block, board, x, y, block->rotation);
 }
 
-// Fungsi untuk mendapatkan bounding box blok
-void GetBlockBounds(TetrisBlock* block, int* minX, int* maxX, int* minY, int* maxY) {
-    *minX = 4; *maxX = -1;
-    *minY = 4; *maxY = -1;
+void GetBlockBounds(TetrisBlock *block, int *minX, int *maxX, int *minY, int *maxY)
+{
+    if (!block || !minX || !maxX || !minY || !maxY) return;
     
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
-            if (block->shape[y][x] != 0) {
+    *minX = 4;
+    *maxX = -1;
+    *minY = 4;
+    *maxY = -1;
+
+    // FIXED: Gunakan shape yang sudah ada di block
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            if (block->shape[y][x] != 0)
+            {
                 if (x < *minX) *minX = x;
                 if (x > *maxX) *maxX = x;
                 if (y < *minY) *minY = y;
@@ -397,55 +403,59 @@ void GetBlockBounds(TetrisBlock* block, int* minX, int* maxX, int* minY, int* ma
     }
 }
 
-// Fungsi untuk memeriksa apakah rotasi counter-clockwise memungkinkan
-bool RotateBlockCounterClockwise(TetrisBlock* block, TetrisBoard* board) {
-    RotationList* rotList = GetRotationList(block->type);
+bool RotateBlockCounterClockwise(TetrisBlock *block, TetrisBoard *board)
+{
+    if (!block || !board) return false;
+    
+    RotationList *rotList = GetRotationList(block->type);
     if (!rotList) return false;
-    
-    // Untuk rotasi counter-clockwise, kita perlu mundur dalam circular list
-    // Karena linked list searah, kita harus maju sebanyak (rotationCount - 1) steps
-    RotationNode* savedRotation = rotList->current;
-    
-    // Mundur satu rotasi (maju rotationCount - 1 kali)
-    for (int i = 0; i < rotList->rotationCount - 1; i++) {
-        RotateToNext(rotList);
-    }
-    
-    int newRotation = (block->rotation - 1 + rotList->rotationCount) % rotList->rotationCount;
-    
-    if (IsValidBlockPosition(block, board, block->x, block->y, newRotation)) {
+
+    int currentRotation = block->rotation;
+    int rotationCount = rotList->rotationCount;
+    int newRotation = (currentRotation - 1 + rotationCount) % rotationCount;
+
+    if (IsValidBlockPosition(block, board, block->x, block->y, newRotation))
+    {
         block->rotation = newRotation;
-        AmbilBentukSaatIni(rotList, block->shape);
+        SetRotation(rotList, newRotation);
+        block->rotationNode = rotList->current;
+        UpdateBlockShape(block);
         return true;
     }
-    
-    // Kembalikan ke posisi semula jika rotasi gagal
-    rotList->current = savedRotation;
+
     return false;
 }
 
-// Fungsi untuk soft drop (drop lebih cepat)
-bool SoftDropBlock(TetrisBlock* block, TetrisBoard* board) {
+bool SoftDropBlock(TetrisBlock *block, TetrisBoard *board)
+{
     return MoveBlockDown(block, board);
 }
 
-// Fungsi untuk menghitung skor berdasarkan jenis drop
-int CalculateDropScore(int dropDistance, bool isHardDrop) {
-    if (isHardDrop) {
-        return dropDistance * 2; // Hard drop memberikan 2 poin per sel
-    } else {
-        return dropDistance; // Soft drop memberikan 1 poin per sel
+int CalculateDropScore(int dropDistance, bool isHardDrop)
+{
+    if (isHardDrop)
+    {
+        return dropDistance * 2;
+    }
+    else
+    {
+        return dropDistance;
     }
 }
 
-// Fungsi untuk debugging - print bentuk blok ke console
-void PrintBlockShape(TetrisBlock* block) {
+void PrintBlockShape(TetrisBlock *block)
+{
+    if (!block) return;
+    
     printf("Block Type: %d, Rotation: %d\n", block->type, block->rotation);
     printf("Position: (%d, %d)\n", block->x, block->y);
     printf("Shape:\n");
-    
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
+
+    // FIXED: Gunakan shape yang sudah ada di block
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
             printf("%c ", block->shape[y][x] ? '#' : '.');
         }
         printf("\n");
@@ -453,7 +463,40 @@ void PrintBlockShape(TetrisBlock* block) {
     printf("\n");
 }
 
-// Fungsi cleanup untuk membebaskan memori
-void CleanupBlocks(void) {
-    //CleanupRotationSystem();
+void HoldCurrentBlock(TetrisBoard *board)
+{
+    if (!board) return;
+    
+    if (!board->hold_block.hasHeld)
+    {
+        board->hold_block.block = board->current_block;
+        board->hold_block.hasHeld = true;
+
+        ResetBlockRotation(&board->hold_block.block);
+        board->hold_block.block.x = BOARD_WIDTH / 2 - 2;
+        board->hold_block.block.y = 0;
+
+        board->current_block = board->next_block;
+        board->current_block.x = BOARD_WIDTH / 2 - 2;
+        board->current_block.y = 0;
+
+        board->next_block = GenerateRandomBlock();
+    }
+    else
+    {
+        TetrisBlock tempBlock = board->current_block;
+
+        board->current_block = board->hold_block.block;
+        ResetBlockRotation(&board->current_block);
+        board->current_block.x = BOARD_WIDTH / 2 - 2;
+        board->current_block.y = 0;
+
+        board->hold_block.block = tempBlock;
+        ResetBlockRotation(&board->hold_block.block);
+    }
+}
+
+void CleanupBlocks(void)
+{
+    CleanupRotationSystem();
 }
