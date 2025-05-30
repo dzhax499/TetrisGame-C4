@@ -1,8 +1,9 @@
 /**
- * rendering.c
+ * rendering.c - FIXED VERSION
  *
  * Bertanggung jawab untuk semua proses rendering grafis dalam permainan Tetris
- * Penulis: Abi
+ * FIXED: Hold Block dan Next Block tidak mengikuti rotasi blok aktif
+ * Penulis: Abi (Fixed by Assistant)
  */
 
 #include <raylib.h>
@@ -12,26 +13,9 @@
 #include "include/rendering.h"
 #include "include/scoring.h"
 #include "include/timer.h"
-
-//  // Konstanta untuk rendering
-//  #define BLOCK_SIZE 30
-//  #define BOARD_OFFSET_X 300
-//  #define BOARD_OFFSET_Y 40
-//  #define PREVIEW_OFFSET_X 550
-//  #define PREVIEW_OFFSET_Y 100
-
-// Warna untuk setiap blok tetromino
-// static const Color BLOCK_COLORS[] = {
-//     BLANK,    // Ruang kosong (0)
-//     SKYBLUE,  // Blok I (1)
-//     DARKBLUE, // Blok J (2)
-//     ORANGE,   // Blok L (3)
-//     YELLOW,   // Blok O (4)
-//     LIME,     // Blok S (5)
-//     PURPLE,   // Blok T (6)
-//     RED       // Blok Z (7)
-// };
-
+#include "include/linkedlist_block.h"
+#include "include/rotasi_data.h"
+#include <string.h>
 // Deklarasi variabel global untuk font dan tekstur
 static Font gameFont;
 static Texture2D backgroundTexture;
@@ -39,7 +23,6 @@ static Texture2D backgroundTexture;
 // Inisialisasi sumber daya untuk rendering
 void InitRendering(void)
 {
-    // Memuat tekstur, font, dll.
     InitWindow(800, 600, "Tetris Game");
     SetTargetFPS(60);
 
@@ -48,15 +31,14 @@ void InitRendering(void)
     Font gameFont = LoadFontEx("../assets/fonts/game_font.ttf", 32, fontChars, 0);
     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
 }
+
 // Membersihkan sumber daya rendering
 void CloseRendering(void)
 {
-    // Melepaskan tekstur, font, dll.
     UnloadFont(gameFont);
     UnloadTexture(backgroundTexture);
     CloseWindow();
 }
-
 
 // Render papan ke layar
 void DrawBoard(TetrisBoard *board)
@@ -65,23 +47,18 @@ void DrawBoard(TetrisBoard *board)
     {
         for (int x = 0; x < BOARD_WIDTH; x++)
         {
-            // **Dapatkan warna berdasarkan isi grid**
             Color cellColor = GetBlockColor(board->grid[y][x]);
-
-            // **Sesuaikan posisi berdasarkan offset yang dipakai**
             int drawX = BOARD_OFFSET_X + x * BLOCK_SIZE;
             int drawY = BOARD_OFFSET_Y + y * BLOCK_SIZE;
 
-            // **Gambar hanya jika bukan blok kosong**
             if (board->grid[y][x] != BLOCK_EMPTY)
             {
                 DrawRectangle(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, cellColor);
-                DrawRectangleLines(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, BLACK); // Outline
+                DrawRectangleLines(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, BLACK);
             }
         }
     }
 
-    // **Gambar batas papan**
     DrawRectangleLines(BOARD_OFFSET_X, BOARD_OFFSET_Y, BOARD_WIDTH * BLOCK_SIZE, BOARD_HEIGHT * BLOCK_SIZE, BLACK);
 }
 
@@ -90,10 +67,9 @@ void DrawScore(TetrisBoard *board, ScoreData *scoreData)
 {
     (void)board; // Tidak digunakan
 
-    // Ubah posisi - Geser lebih jauh dari board
     int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
 
-    // Tambahkan background untuk area informasi
+    // Background untuk area informasi
     DrawRectangle(offsetX - 20, BOARD_OFFSET_Y - 20,
                   200, BOARD_HEIGHT * BLOCK_SIZE + 40,
                   Fade(DARKGRAY, 0.7f));
@@ -101,96 +77,83 @@ void DrawScore(TetrisBoard *board, ScoreData *scoreData)
     // Header informasi
     DrawText("GAME INFO", offsetX, BOARD_OFFSET_Y - 10, 20, WHITE);
 
-    // Skor - geser ke bawah
+    // Skor
     DrawText(TextFormat("SCORE: %d", scoreData->score),
              offsetX, BOARD_OFFSET_Y + 30, 20, WHITE);
 
-    // Level - geser ke bawah
+    // Level
     DrawText(TextFormat("LEVEL: %d", scoreData->level),
              offsetX, BOARD_OFFSET_Y + 60, 20, WHITE);
 
-    // Waktu - geser ke bawah
+    // Waktu
     DrawText(TextFormat("TIME: %.1f s", GetElapsedGameTime()), offsetX, BOARD_OFFSET_Y + 90, 20, WHITE);
 
     // Batas area Next Block
-    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 100,
+    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 120,
                        150, 100, WHITE);
 
-    // Label Next Block - HAPUS DARI SINI, PINDAH KE DrawNextBlock
-    DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 100, 15, WHITE);
+    // Label Next Block
+    DrawText("NEXT:", offsetX + 5, BOARD_OFFSET_Y + 125, 15, WHITE);
 
     // Batas area Hold Block
-    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 230,
+    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 240,
                        150, 100, WHITE);
 
     // Label Hold Block
-    DrawText("HOLD:", offsetX, BOARD_OFFSET_Y + 230, 15, WHITE);
+    DrawText("HOLD:", offsetX + 5, BOARD_OFFSET_Y + 245, 15, WHITE);
 }
 
+// FIXED: DrawHoldBlock - Selalu tampilkan di rotasi 0
 void DrawHoldBlock(TetrisBoard *board)
 {
-    if (board->hold_block.hasHeld)
-    {
-        // Gunakan cara perhitungan yang sama dengan DrawScore
-        int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
+    if (!board || !board->hold_block.hasHeld) return;
 
-        TetrisBlock *holdBlock = &board->hold_block.block;
+    int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
+    TetrisBlock *holdBlock = &board->hold_block.block;
 
-        // Posisi tengah untuk hold block (25 = offset untuk tengah kotak 150px)
-        int blockOffsetX = offsetX + 25;
-        int blockOffsetY = BOARD_OFFSET_Y + 250;
+    // Posisi tengah untuk hold block
+    int blockOffsetX = offsetX + 40;  // Center dalam kotak 150px
+    int blockOffsetY = BOARD_OFFSET_Y + 265;
 
-        // Dapatkan rotation list untuk tipe blok yang sedang di-hold
-        RotationList *rotList = GetRotationList(holdBlock->type);
+    // CRITICAL FIX: Dapatkan shape untuk rotasi 0 TANPA mengubah rotation system
+    RotationList *rotList = GetRotationList(holdBlock->type);
+    int displayShape[4][4];
+    
+    if (rotList && rotList->rotationCount > 0) {
+        // FIXED: Ambil bentuk rotasi 0 secara langsung tanpa mengubah current state
+        // Simpan current state terlebih dahulu
+        RotationNode *originalCurrent = rotList->current;
+        int originalIndex = rotList->currentRotationIndex;
         
-        if (rotList && rotList->current)
-        {
-            // Ambil bentuk saat ini dari rotation system
-            int currentShape[4][4];
-            AmbilBentukSaatIni(rotList, currentShape);
+        // Sementara set ke rotasi 0 untuk mengambil shape
+        SetRotation(rotList, 0);
+        AmbilBentukSaatIni(rotList, displayShape);
+        
+        // CRITICAL: Restore state asli segera
+        rotList->current = originalCurrent;
+        rotList->currentRotationIndex = originalIndex;
+    } else {
+        // Fallback: gunakan shape default dari hold block
+        memcpy(displayShape, holdBlock->shape, sizeof(int) * 4 * 4);
+    }
 
-            // Render blok berdasarkan bentuk dari rotation system
-            for (int y = 0; y < 4; y++)
-            {
-                for (int x = 0; x < 4; x++)
-                {
-                    if (currentShape[y][x] != 0)
-                    {
-                        DrawRectangle(
-                            blockOffsetX + x * BLOCK_SIZE,
-                            blockOffsetY + y * BLOCK_SIZE,
-                            BLOCK_SIZE, BLOCK_SIZE,
-                            holdBlock->color);
-                        DrawRectangleLines(
-                            blockOffsetX + x * BLOCK_SIZE,
-                            blockOffsetY + y * BLOCK_SIZE,
-                            BLOCK_SIZE, BLOCK_SIZE,
-                            BLACK);
-                    }
-                }
-            }
-        }
-        else
+    // Render blok dengan shape rotasi 0
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
         {
-            // Fallback: gunakan shape yang tersimpan di holdBlock jika rotation system gagal
-            for (int y = 0; y < 4; y++)
+            if (displayShape[y][x] != 0)
             {
-                for (int x = 0; x < 4; x++)
-                {
-                    if (holdBlock->shape[y][x] != 0)
-                    {
-                        DrawRectangle(
-                            blockOffsetX + x * BLOCK_SIZE,
-                            blockOffsetY + y * BLOCK_SIZE,
-                            BLOCK_SIZE, BLOCK_SIZE,
-                            holdBlock->color);
-                        DrawRectangleLines(
-                            blockOffsetX + x * BLOCK_SIZE,
-                            blockOffsetY + y * BLOCK_SIZE,
-                            BLOCK_SIZE, BLOCK_SIZE,
-                            BLACK);
-                    }
-                }
+                DrawRectangle(
+                    blockOffsetX + x * (BLOCK_SIZE - 5),  // Slightly smaller for preview
+                    blockOffsetY + y * (BLOCK_SIZE - 5),
+                    BLOCK_SIZE - 5, BLOCK_SIZE - 5,
+                    holdBlock->color);
+                DrawRectangleLines(
+                    blockOffsetX + x * (BLOCK_SIZE - 5),
+                    blockOffsetY + y * (BLOCK_SIZE - 5),
+                    BLOCK_SIZE - 5, BLOCK_SIZE - 5,
+                    BLACK);
             }
         }
     }
@@ -245,46 +208,12 @@ void DrawBlockShadow(TetrisBlock *block, TetrisBoard *board)
             }
         }
     }
-    else
-    {
-        // Fallback: gunakan shape yang tersimpan di block jika rotation system gagal
-        for (int y = 0; y < 4; y++)
-        {
-            for (int x = 0; x < 4; x++)
-            {
-                if (block->shape[y][x] != 0)
-                {
-                    int drawY = shadowBlock.y + y;
-
-                    if (drawY >= 0)
-                    {
-                        Color shadowColor = Fade(block->color, 0.3f);
-                        DrawRectangle(
-                            BOARD_OFFSET_X + (shadowBlock.x + x) * BLOCK_SIZE,
-                            BOARD_OFFSET_Y + drawY * BLOCK_SIZE,
-                            BLOCK_SIZE,
-                            BLOCK_SIZE,
-                            shadowColor);
-
-                        DrawRectangleLines(
-                            BOARD_OFFSET_X + (shadowBlock.x + x) * BLOCK_SIZE,
-                            BOARD_OFFSET_Y + drawY * BLOCK_SIZE,
-                            BLOCK_SIZE,
-                            BLOCK_SIZE,
-                            DARKGRAY);
-                    }
-                }
-            }
-        }
-    }
 }
 
 void DrawActiveTetromino(TetrisBlock *tetromino)
 {
     // Dapatkan rotation list untuk tipe blok
     RotationList *rotList = GetRotationList(tetromino->type);
-    
-    PrintBlockShape(tetromino); // Debug: cetak bentuk blok
     
     if (rotList && rotList->current)
     {
@@ -297,12 +226,10 @@ void DrawActiveTetromino(TetrisBlock *tetromino)
         {
             for (int x = 0; x < 4; x++)
             {
-                // Gambar hanya sel yang terisi dan dalam batas papan
                 if (currentShape[y][x] != 0)
                 {
                     int drawY = tetromino->y + y;
 
-                    // Gambar hanya jika sel berada dalam batas vertikal papan
                     if (drawY >= 0)
                     {
                         DrawRectangle(
@@ -312,7 +239,6 @@ void DrawActiveTetromino(TetrisBlock *tetromino)
                             BLOCK_SIZE,
                             tetromino->color);
 
-                        // Tambahkan outline
                         DrawRectangleLines(
                             BOARD_OFFSET_X + (tetromino->x + x) * BLOCK_SIZE,
                             BOARD_OFFSET_Y + drawY * BLOCK_SIZE,
@@ -326,17 +252,15 @@ void DrawActiveTetromino(TetrisBlock *tetromino)
     }
     else
     {
-        // Fallback: gunakan shape yang tersimpan di tetromino jika rotation system gagal
+        // Fallback: gunakan shape yang tersimpan di tetromino
         for (int y = 0; y < 4; y++)
         {
             for (int x = 0; x < 4; x++)
             {
-                // Gambar hanya sel yang terisi dan dalam batas papan
                 if (tetromino->shape[y][x] != 0)
                 {
                     int drawY = tetromino->y + y;
 
-                    // Gambar hanya jika sel berada dalam batas vertikal papan
                     if (drawY >= 0)
                     {
                         DrawRectangle(
@@ -346,7 +270,6 @@ void DrawActiveTetromino(TetrisBlock *tetromino)
                             BLOCK_SIZE,
                             tetromino->color);
 
-                        // Tambahkan outline
                         DrawRectangleLines(
                             BOARD_OFFSET_X + (tetromino->x + x) * BLOCK_SIZE,
                             BOARD_OFFSET_Y + drawY * BLOCK_SIZE,
@@ -402,11 +325,9 @@ void DrawPauseOverlay(void)
              GetScreenHeight() - 50, 20, GRAY);
 }
 
-// Render blok berikutnya
+// FIXED: DrawNextBlock - Selalu tampilkan di rotasi 0 dan berfungsi penuh
 void DrawNextBlock(TetrisBoard *board)
 {
-    printf(">> [DEBUG] Mulai DrawNextBlock\n");
-    
     if (!board) {
         printf("ERROR: board is NULL in DrawNextBlock\n");
         return;
@@ -414,59 +335,104 @@ void DrawNextBlock(TetrisBoard *board)
     
     // Validasi next_block
     if (board->next_block.type < 0 || board->next_block.type >= 7) {
-        printf("ERROR: Invalid next_block type %d, skipping DrawNextBlock\n", board->next_block.type);
+        printf("ERROR: Invalid next_block type %d\n", board->next_block.type);
         return;
     }
     
-    // Debug info
-    printf("Block Type: %d, Rotation: %d\n", board->next_block.type, board->next_block.rotation);
-    printf("Position: (%d, %d)\n", board->next_block.x, board->next_block.y);
+    int offsetX = BOARD_OFFSET_X + BOARD_WIDTH * BLOCK_SIZE + 70;
+    TetrisBlock *nextBlock = &board->next_block;
+
+    // Posisi tengah untuk next block
+    int blockOffsetX = offsetX + 40;  // Center dalam kotak 150px
+    int blockOffsetY = BOARD_OFFSET_Y + 145;
+
+    // CRITICAL FIX: Dapatkan shape untuk rotasi 0 TANPA mengubah rotation system
+    RotationList *rotList = GetRotationList(nextBlock->type);
+    int displayShape[4][4];
     
-    // Validasi shape
-    bool hasValidShape = false;
-    for (int y = 0; y < 4 && !hasValidShape; y++) {
+    if (rotList && rotList->rotationCount > 0) {
+        // FIXED: Ambil bentuk rotasi 0 secara langsung tanpa mengubah current state
+        // Simpan current state terlebih dahulu
+        RotationNode *originalCurrent = rotList->current;
+        int originalIndex = rotList->currentRotationIndex;
+        
+        // Sementara set ke rotasi 0 untuk mengambil shape
+        SetRotation(rotList, 0);
+        AmbilBentukSaatIni(rotList, displayShape);
+        
+        // CRITICAL: Restore state asli segera
+        rotList->current = originalCurrent;
+        rotList->currentRotationIndex = originalIndex;
+        
+        printf("DEBUG: DrawNextBlock type %d - successfully got rotation 0 shape\n", nextBlock->type);
+    } else {
+        printf("ERROR: Cannot get rotation list for next block type %d\n", nextBlock->type);
+        // Emergency fallback - generate minimal shape
+        memset(displayShape, 0, sizeof(displayShape));
+        displayShape[1][1] = 1; // Single block as fallback
+    }
+
+    // Debug: Print shape yang akan di-render
+    printf("Next Block Shape (type %d):\n", nextBlock->type);
+    for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
-            if (board->next_block.shape[y][x] != 0) {
-                hasValidShape = true;
-                break;
-            }
+            printf("%c ", displayShape[y][x] ? '#' : '.');
         }
+        printf("\n");
     }
-    
-    if (!hasValidShape) {
-        printf("WARNING: next_block has empty shape, regenerating...\n");
-        board->next_block = GenerateRandomBlock();
-        return;
-    }
-    
-    // Print shape untuk debug
-    printf("Shape:\n");
+
+    // Render blok dengan shape rotasi 0
+    bool hasRenderedBlock = false;
     for (int y = 0; y < 4; y++)
     {
         for (int x = 0; x < 4; x++)
         {
-            printf("%c ", board->next_block.shape[y][x] ? '#' : '.');
+            if (displayShape[y][x] != 0)
+            {
+                hasRenderedBlock = true;
+                DrawRectangle(
+                    blockOffsetX + x * (BLOCK_SIZE - 5),  // Slightly smaller for preview
+                    blockOffsetY + y * (BLOCK_SIZE - 5),
+                    BLOCK_SIZE - 5, BLOCK_SIZE - 5,
+                    nextBlock->color);
+                DrawRectangleLines(
+                    blockOffsetX + x * (BLOCK_SIZE - 5),
+                    blockOffsetY + y * (BLOCK_SIZE - 5),
+                    BLOCK_SIZE - 5, BLOCK_SIZE - 5,
+                    BLACK);
+            }
         }
-        printf("\n");
     }
     
-    // Lanjutkan dengan rendering normal...
-    // (sisanya kode DrawNextBlock yang sudah ada)
+    if (!hasRenderedBlock) {
+        printf("WARNING: No blocks rendered for next block type %d\n", nextBlock->type);
+    } else {
+        printf("SUCCESS: Next block rendered successfully\n");
+    }
 }
-
 
 void DrawGame(TetrisBoard *board)
 {
     BeginDrawing();
-    ClearBackground(DARKGRAY); // Latar belakang lebih nyaman
+    ClearBackground(DARKGRAY);
 
     // Header Judul
     DrawText("TETRIS", 350, 10, 30, RAYWHITE);
 
     // Menggambar papan permainan
     DrawBoard(board);
+    
+    // Gambar shadow terlebih dahulu (di belakang blok aktif)
+    DrawBlockShadow(&board->current_block, board);
+    
+    // Gambar blok aktif
     DrawActiveTetromino(&board->current_block);
+    
+    // Gambar preview blocks
     DrawNextBlock(board);
+    DrawHoldBlock(board);
+    
+    // Gambar informasi skor
     DrawScore(board, &board->score_data);
 
     // Garis pemisah UI
