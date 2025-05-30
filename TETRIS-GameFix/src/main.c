@@ -245,18 +245,11 @@ int main(void)
                      panel.y + 20, 40, YELLOW);
             
             // Display team members
-            int yPos = panel.y + 100;
-            const char* credits[] = {
-                "241511071   Dzakir Tsabit Asy-syafiq",
-                "241511074   Fatimah Hawwa Alkhansa",
-                "241511079   Ibnu Hilmi Athaillah",
-                "241511089   Rizky Satria Gunawan",
-                "241511091   Varian Abidarma Syuhada"
-            };
-            for (int i = 0; i < 5; i++) {
-                DrawText(credits[i], panel.x + 50, yPos, 20, WHITE);
-                yPos += 40;
-            }
+            DrawText("241511071     Dzakir Tsabit Asy-syafiq", panel.x + 50, panel.y + 100, 20, WHITE);
+            DrawText("241511074     Fatimah Hawwa Alkhansa", panel.x + 50, panel.y + 140, 20, WHITE);
+            DrawText("241511079     Ibnu Hilmi Athaillah", panel.x + 50, panel.y + 180, 20, WHITE);
+            DrawText("241511089     Rizky Satria Gunawan", panel.x + 50, panel.y + 220, 20, WHITE);
+            DrawText("241511091     Varian Abidarma Syuhada", panel.x + 50, panel.y + 260, 20, WHITE);
 
             // Tombol kembali ke menu utama
             Rectangle backBtnCR = {

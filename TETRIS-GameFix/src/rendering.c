@@ -126,18 +126,18 @@ void DrawScore(TetrisBoard* board, ScoreData* scoreData) {
     DrawText(TextFormat("TIME: %.1f s", GetElapsedGameTime()), offsetX, BOARD_OFFSET_Y + 90, 20, WHITE);
 
     // Batas area Next Block
-    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 100, 
-                      150, 100, WHITE);
+    DrawRectangleLines(offsetX - 5, BOARD_OFFSET_Y + 120, 
+                      165, 100, WHITE);
     
     // Label Next Block - HAPUS DARI SINI, PINDAH KE DrawNextBlock
-    DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 100, 15, WHITE);
+    DrawText("NEXT:", offsetX, BOARD_OFFSET_Y + 130, 15, WHITE);
     
     // Batas area Hold Block
-    DrawRectangleLines(offsetX, BOARD_OFFSET_Y + 230, 
-                      150, 100, WHITE);
+    DrawRectangleLines(offsetX - 5, BOARD_OFFSET_Y + 240, 
+                      165, 100, WHITE);
     
     // Label Hold Block
-    DrawText("HOLD:", offsetX, BOARD_OFFSET_Y + 230, 15, WHITE);
+    DrawText("HOLD:", offsetX, BOARD_OFFSET_Y + 250, 15, WHITE);
 }
 
 void DrawHoldBlock(TetrisBoard* board) {
@@ -149,7 +149,7 @@ void DrawHoldBlock(TetrisBoard* board) {
         
         // Posisi tengah untuk hold block (25 = offset untuk tengah kotak 150px)
         int blockOffsetX = offsetX + 25;
-        int blockOffsetY = BOARD_OFFSET_Y + 250;
+        int blockOffsetY = BOARD_OFFSET_Y + 270;
         
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
@@ -299,7 +299,7 @@ void DrawPauseOverlay(void) {
     
     // Posisi tengah untuk next block (25 = offset untuk tengah kotak 150px)
     int blockOffsetX = offsetX + 25;
-    int blockOffsetY = BOARD_OFFSET_Y + 120;
+    int blockOffsetY = BOARD_OFFSET_Y + 150;
     
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
