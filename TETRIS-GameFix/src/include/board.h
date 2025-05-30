@@ -53,7 +53,7 @@ typedef struct {
 } TetrisBoard;
 
 
-extern TetrisBoard *board;
+// extern TetrisBoard *board;
 
 // Fungsi inisialisasi papan permainan
 void InitBoard1(TetrisBoard* board);
