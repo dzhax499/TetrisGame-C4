@@ -1,5 +1,6 @@
+// FIXED: linkedlist_block.c - Bug rotation sistem diperbaiki
 // Nama file : linkedlist_block.c
-// Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list (FIXED)
+// Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list (FIXED - No Auto Rotation Bug)
 // Oleh      : Dzakir Tsabit 241511071
 
 #include "include/linkedlist_block.h"
@@ -12,7 +13,7 @@
 // Array untuk menyimpan linked list rotasi untuk setiap jenis blok
 static RotationList* rotationLists[7] = {NULL};
 
-// FIXED: Improved CreateRotationList with better error handling
+// FIXED: CreateRotationList dengan proper node indexing
 RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     if (count <= 0) {
         printf("ERROR: Invalid count %d in CreateRotationList\n", count);
@@ -28,6 +29,7 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     // Initialize list properties
     list->rotationCount = count;
     list->current = NULL;
+    list->currentRotationIndex = 0;
     
     // Create all nodes first
     RotationNode** nodes = (RotationNode**)malloc(count * sizeof(RotationNode*));
@@ -37,7 +39,7 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
         return NULL;
     }
     
-    // Create all nodes
+    // Create all nodes dengan rotationIndex yang benar
     for (int i = 0; i < count; i++) {
         nodes[i] = (RotationNode*)malloc(sizeof(RotationNode));
         if (!nodes[i]) {
@@ -51,8 +53,9 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
             return NULL;
         }
         
-        // Copy shape data
+        // Copy shape data dan set rotation index yang benar
         memcpy(nodes[i]->shape, shapes[i], sizeof(int) * 4 * 4);
+        nodes[i]->rotationIndex = i; // Index sesuai urutan pembuatan
     }
     
     // Link all nodes in a circular fashion
@@ -60,8 +63,9 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
         nodes[i]->next = nodes[(i + 1) % count];
     }
     
-    // Set current to first node (rotation 0)
+    // Set current to first node (rotation 0) dan pastikan consistent
     list->current = nodes[0];
+    list->currentRotationIndex = 0;
     
     // Clean up temporary array
     free(nodes);
@@ -107,12 +111,47 @@ RotationList* GetRotationList(int blockType) {
     return rotationLists[blockType];
 }
 
+// FIXED: RotateToNext dengan proper tracking
 void RotateToNext(RotationList* list) {
     if (list && list->current && list->current->next) {
         list->current = list->current->next;
+        list->currentRotationIndex = (list->currentRotationIndex + 1) % list->rotationCount;
+        printf("DEBUG: Rotated to index %d\n", list->currentRotationIndex);
     } else {
         printf("WARNING: Cannot rotate to next - invalid list or current node\n");
     }
+}
+
+// FIXED: SetRotation yang benar-benar tidak menyebabkan auto rotation
+void SetRotation(RotationList* list, int targetRotation) {
+    if (!list || !list->current) {
+        printf("ERROR: Invalid list in SetRotation\n");
+        return;
+    }
+    
+    // Normalize target rotation
+    targetRotation = targetRotation % list->rotationCount;
+    if (targetRotation < 0) targetRotation += list->rotationCount;
+    
+    // Jika sudah di target rotation, JANGAN BERUBAH
+    if (list->currentRotationIndex == targetRotation) {
+        return; // CRITICAL: Exit early jika sudah benar
+    }
+    
+    // FIXED: Navigasi langsung ke target rotation
+    // Hitung steps yang diperlukan untuk mencapai target
+    int stepsNeeded = targetRotation - list->currentRotationIndex;
+    if (stepsNeeded < 0) {
+        stepsNeeded += list->rotationCount; // Handle negative wrap-around
+    }
+    
+    // Navigate by exact steps
+    for (int i = 0; i < stepsNeeded; i++) {
+        list->current = list->current->next;
+    }
+    
+    list->currentRotationIndex = targetRotation;
+    printf("DEBUG: SetRotation to %d completed\n", targetRotation);
 }
 
 void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
@@ -132,7 +171,7 @@ void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
     memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
 }
 
-// FIXED: Improved FreeRotationList
+// FIXED: FreeRotationList yang aman
 void FreeRotationList(RotationList* list) {
     if (!list) return;
     
@@ -145,7 +184,6 @@ void FreeRotationList(RotationList* list) {
     RotationNode* current = startNode;
     
     // Break the circular link first
-    // Find the last node and break its connection to startNode
     RotationNode* prev = NULL;
     do {
         prev = current;
@@ -178,4 +216,10 @@ void CleanupRotationSystem(void) {
     }
     
     printf("Rotation system cleaned up successfully!\n");
+}
+
+// Get current rotation index
+int GetCurrentRotationIndex(RotationList* list) {
+    if (!list) return 0;
+    return list->currentRotationIndex;
 }
