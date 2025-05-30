@@ -1,5 +1,5 @@
 // Nama file : linkedlist_block.c
-// Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list
+// Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list (FIXED)
 // Oleh      : Dzakir Tsabit 241511071
 
 #include "include/linkedlist_block.h"
@@ -7,74 +7,72 @@
 #include "include/rotasi_data.h"
 #include <stdio.h>
 #include <string.h>
-
-// Array yang menyimpan bentuk semua tetromino dengan rotasi masing-masing
-// Dipisah berdasarkan jenis blok
-
+#include <stdlib.h>
 
 // Array untuk menyimpan linked list rotasi untuk setiap jenis blok
 static RotationList* rotationLists[7] = {NULL};
 
-// Fungsi untuk membuat circular linked list dari array posisi
+// FIXED: Improved CreateRotationList with better error handling
 RotationList* CreateRotationList(const int shapes[][4][4], int count) {
-    if (count <= 0) return NULL;
-    
-    RotationList* list;
-    list =  (RotationList*)malloc(sizeof(RotationList));
-    if (!list) {
-        printf("Gagal mengalokasikan memori untuk RotationList\n");
+    if (count <= 0) {
+        printf("ERROR: Invalid count %d in CreateRotationList\n", count);
         return NULL;
     }
     
-    // Buat node pertama
-    RotationNode* firstNode;
-    firstNode = (RotationNode*)malloc(sizeof(RotationNode));
-    if (!firstNode) {
-        printf("Gagal mengalokasikan memori untuk RotationNode\n");
+    RotationList* list = (RotationList*)malloc(sizeof(RotationList));
+    if (!list) {
+        printf("ERROR: Failed to allocate memory for RotationList\n");
+        return NULL;
+    }
+    
+    // Initialize list properties
+    list->rotationCount = count;
+    list->current = NULL;
+    
+    // Create all nodes first
+    RotationNode** nodes = (RotationNode**)malloc(count * sizeof(RotationNode*));
+    if (!nodes) {
+        printf("ERROR: Failed to allocate memory for nodes array\n");
         free(list);
         return NULL;
     }
     
-    // Salin bentuk pertama ke node pertama
-    memcpy(firstNode->shape, shapes[0], sizeof(int) * 4 * 4);
-    
-    // Node pertama menjadi node saat ini
-    list->current = firstNode;
-    list->rotationCount = count;
-    
-    // Node sebelumnya dimulai dari node pertama
-    RotationNode* prevNode;
-    prevNode = firstNode;
-    
-    // Buat node-node lain dan sambungkan
-    for (int i = 1; i < count; i++) {
-        RotationNode* newNode = (RotationNode*)malloc(sizeof(RotationNode));
-        if (!newNode) {
-            printf("Gagal mengalokasikan memori untuk RotationNode\n");
-            // Seharusnya kita membersihkan memori yang sudah dialokasikan sebelumnya di sini
-            // Tapi untuk menjaga kode tetap sederhana, kita lewati
+    // Create all nodes
+    for (int i = 0; i < count; i++) {
+        nodes[i] = (RotationNode*)malloc(sizeof(RotationNode));
+        if (!nodes[i]) {
+            printf("ERROR: Failed to allocate memory for RotationNode %d\n", i);
+            // Clean up previously allocated nodes
+            for (int j = 0; j < i; j++) {
+                free(nodes[j]);
+            }
+            free(nodes);
             free(list);
-            free(firstNode);
             return NULL;
         }
         
-        // Salin bentuk ke node baru
-        memcpy(newNode->shape, shapes[i], sizeof(int) * 4 * 4);
-        
-        // Sambungkan node sebelumnya ke node baru
-        prevNode->next = newNode;
-        prevNode = newNode;
+        // Copy shape data
+        memcpy(nodes[i]->shape, shapes[i], sizeof(int) * 4 * 4);
     }
     
-    // Buat circular dengan menghubungkan node terakhir ke node pertama
-    prevNode->next = firstNode;
+    // Link all nodes in a circular fashion
+    for (int i = 0; i < count; i++) {
+        nodes[i]->next = nodes[(i + 1) % count];
+    }
     
+    // Set current to first node (rotation 0)
+    list->current = nodes[0];
+    
+    // Clean up temporary array
+    free(nodes);
+    
+    printf("Successfully created rotation list with %d rotations\n", count);
     return list;
 }
 
-
 void InitRotationSystem(void) {
-
+    printf("Initializing rotation system...\n");
+    
     rotationLists[0] = CreateRotationList(I_TETROMINO, 2);  // I
     rotationLists[1] = CreateRotationList(J_TETROMINO, 4);  // J
     rotationLists[2] = CreateRotationList(L_TETROMINO, 4);  // L
@@ -83,49 +81,85 @@ void InitRotationSystem(void) {
     rotationLists[5] = CreateRotationList(T_TETROMINO, 4);  // T
     rotationLists[6] = CreateRotationList(Z_TETROMINO, 2);  // Z
 
-    if (rotationLists[0] == NULL) {
-    printf("ERROR: Failed to create rotation list for I_TETROMINO\n");
-    // Handle error, mungkin exit(1) jika kritis
-    exit(1);
+    // Verify all lists were created successfully
+    for (int i = 0; i < 7; i++) {
+        if (rotationLists[i] == NULL) {
+            printf("ERROR: Failed to create rotation list for block type %d\n", i);
+            exit(1);
+        } else {
+            printf("Block type %d: %d rotations\n", i, rotationLists[i]->rotationCount);
+        }
+    }
+    
+    printf("Rotation system initialized successfully!\n");
 }
-}
-
 
 RotationList* GetRotationList(int blockType) {
-    if (blockType < 0 || blockType >= 7) return NULL;
+    if (blockType < 0 || blockType >= 7) {
+        printf("ERROR: Invalid block type %d in GetRotationList\n", blockType);
+        return NULL;
+    }
+    
+    if (rotationLists[blockType] == NULL) {
+        printf("ERROR: Rotation list for block type %d is NULL\n", blockType);
+    }
+    
     return rotationLists[blockType];
 }
 
 void RotateToNext(RotationList* list) {
-    if (list && list->current) {
+    if (list && list->current && list->current->next) {
         list->current = list->current->next;
+    } else {
+        printf("WARNING: Cannot rotate to next - invalid list or current node\n");
     }
 }
 
 void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
-    if (list && list->current) { // Pemeriksaan sudah ada, pastikan selalu benar
-        memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
-    } else {
-        // Tambahkan penanganan atau log jika list atau list->current NULL
-        printf("WARNING: Attempted to get shape from NULL list or current node in AmbilBentukSaatIni\n");
-        // Mungkin isi shape dengan array kosong atau default
+    if (!list) {
+        printf("ERROR: list is NULL in AmbilBentukSaatIni\n");
         memset(shape, 0, sizeof(int) * 4 * 4);
+        return;
     }
+    
+    if (!list->current) {
+        printf("ERROR: list->current is NULL in AmbilBentukSaatIni\n");
+        memset(shape, 0, sizeof(int) * 4 * 4);
+        return;
+    }
+    
+    // Copy the current shape
+    memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
 }
 
+// FIXED: Improved FreeRotationList
 void FreeRotationList(RotationList* list) {
-    if (!list || !list->current) return;
+    if (!list) return;
+    
+    if (!list->current) {
+        free(list);
+        return;
+    }
     
     RotationNode* startNode = list->current;
     RotationNode* current = startNode;
     
-    list->current->next = NULL;
+    // Break the circular link first
+    // Find the last node and break its connection to startNode
+    RotationNode* prev = NULL;
+    do {
+        prev = current;
+        current = current->next;
+    } while (current != startNode);
     
+    // Break the circular link
+    prev->next = NULL;
+    
+    // Now free all nodes starting from startNode
+    current = startNode;
     while (current) {
         RotationNode* next = current->next;
         free(current);
-        
-        if (next == startNode) break; 
         current = next;
     }
     
@@ -134,10 +168,14 @@ void FreeRotationList(RotationList* list) {
 
 // Fungsi untuk membebaskan semua memori rotasi
 void CleanupRotationSystem(void) {
+    printf("Cleaning up rotation system...\n");
+    
     for (int i = 0; i < 7; i++) {
         if (rotationLists[i]) {
             FreeRotationList(rotationLists[i]);
             rotationLists[i] = NULL;
         }
     }
+    
+    printf("Rotation system cleaned up successfully!\n");
 }

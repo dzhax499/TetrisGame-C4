@@ -21,16 +21,16 @@
 //  #define PREVIEW_OFFSET_Y 100
 
 // Warna untuk setiap blok tetromino
-static const Color BLOCK_COLORS[] = {
-    BLANK,    // Ruang kosong (0)
-    SKYBLUE,  // Blok I (1)
-    DARKBLUE, // Blok J (2)
-    ORANGE,   // Blok L (3)
-    YELLOW,   // Blok O (4)
-    LIME,     // Blok S (5)
-    PURPLE,   // Blok T (6)
-    RED       // Blok Z (7)
-};
+// static const Color BLOCK_COLORS[] = {
+//     BLANK,    // Ruang kosong (0)
+//     SKYBLUE,  // Blok I (1)
+//     DARKBLUE, // Blok J (2)
+//     ORANGE,   // Blok L (3)
+//     YELLOW,   // Blok O (4)
+//     LIME,     // Blok S (5)
+//     PURPLE,   // Blok T (6)
+//     RED       // Blok Z (7)
+// };
 
 // Deklarasi variabel global untuk font dan tekstur
 static Font gameFont;

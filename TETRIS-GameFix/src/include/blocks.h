@@ -236,6 +236,6 @@ bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board);
 
 void PrintBlockShape(TetrisBlock *block);
 
-static void SyncRotationToState(RotationList *rotList, int targetRotation);
+// static void SyncRotationToState(RotationList *rotList, int targetRotation);
 
 #endif
