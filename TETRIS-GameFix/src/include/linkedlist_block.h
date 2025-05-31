@@ -1,6 +1,3 @@
-// Nama file : board_linkedlist.c
-// Deskripsi : Implementasi logika papan permainan Tetris menggunakan Linked List
-// Oleh      : Rizky Satria Gunawan 241511089
 #ifndef LINKEDLIST_BLOCK_H
 #define LINKEDLIST_BLOCK_H
 
