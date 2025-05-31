@@ -170,9 +170,9 @@ void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHei
 
     // Buat persegi panjang untuk panel leaderboard
     Rectangle panel = {
-        screenWidth / 2 - 250,
+        screenWidth / 2 - 300,
         screenHeight / 2 - 300,
-        500,
+        600,
         600
     };
 
@@ -186,10 +186,10 @@ void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHei
 
     // Gambar header tabel
     DrawText("RANK", panel.x + 20, panel.y + 80, 20, WHITE);
-    DrawText("NAME", panel.x + 80, panel.y + 80, 20, WHITE);
-    DrawText("LEVEL", panel.x + 200, panel.y + 80, 20, WHITE);
-    DrawText("SCORE", panel.x + 310, panel.y + 80, 20, WHITE);
-    DrawText("TIME", panel.x + 420, panel.y + 80, 20, WHITE);
+    DrawText("NAME", panel.x + 100, panel.y + 80, 20, WHITE);
+    DrawText("LEVEL", panel.x + 240, panel.y + 80, 20, WHITE);
+    DrawText("SCORE", panel.x + 360, panel.y + 80, 20, WHITE);
+    DrawText("TIME", panel.x + 475, panel.y + 80, 20, WHITE);
 
     // Gambar garis pemisah
     DrawLine(panel.x + 20, panel.y + 110, panel.x + panel.width - 20, panel.y + 110, WHITE);
@@ -203,25 +203,25 @@ void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHei
         // Rank
         char rankText[5];
         sprintf(rankText, "%d", rank);
-        DrawText(rankText, panel.x + 20, yPos, 20, WHITE);
+        DrawText(rankText, panel.x + 40, yPos, 20, WHITE);
 
         // Name
-        DrawText(current->name, panel.x + 80, yPos, 20, WHITE);
+        DrawText(current->name, panel.x + 100, yPos, 20, WHITE);
 
         // Level
         char levelText[5];
         sprintf(levelText, "%d", current->level);
-        DrawText(levelText, panel.x + 200, yPos, 20, WHITE);
+        DrawText(levelText, panel.x + 265, yPos, 20, WHITE);
 
         // Score
         char scoreText[20];
         sprintf(scoreText, "%d", current->score);
-        DrawText(scoreText, panel.x + 310, yPos, 20, WHITE);
+        DrawText(scoreText, panel.x + 365, yPos, 20, WHITE);
 
         // Time
         char timeText[10];
         sprintf(timeText, "%.2f", current->time);
-        DrawText(timeText, panel.x + 420, yPos, 20, WHITE);
+        DrawText(timeText, panel.x + 480, yPos, 20, WHITE);
 
         yPos += 40;
         current = current->next;
@@ -232,11 +232,11 @@ void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHei
     while (rank <= MAX_LEADERBOARD_ENTRIES) {
         char rankText[5];
         sprintf(rankText, "%d", rank);
-        DrawText(rankText, panel.x + 20, yPos, 20, WHITE);
-        DrawText("-", panel.x + 80, yPos, 20, WHITE);
-        DrawText("-", panel.x + 200, yPos, 20, WHITE);
-        DrawText("-", panel.x + 310, yPos, 20, WHITE);
-        DrawText("-", panel.x + 420, yPos, 20, WHITE);
+        DrawText(rankText, panel.x + 40, yPos, 20, WHITE);
+        DrawText("-", panel.x + 120, yPos, 20, WHITE);
+        DrawText("-", panel.x + 250, yPos, 20, WHITE);
+        DrawText("-", panel.x + 380, yPos, 20, WHITE);
+        DrawText("-", panel.x + 500, yPos, 20, WHITE);
         yPos += 40;
         rank++;
     }
