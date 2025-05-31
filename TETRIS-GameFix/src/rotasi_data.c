@@ -4,7 +4,7 @@
 
 // I Tetromino (Cyan) - 2 posisi unik
 const int I_TETROMINO[2][4][4] = {
-    // Horizontal (default position)
+    // Horizontal (default)
     {
         {0, 0, 0, 0},
         {1, 1, 1, 1},
@@ -84,7 +84,7 @@ const int L_TETROMINO[4][4][4] = {
     }
 };
 
-// O Tetromino (Yellow) - 1 posisi (square doesn't change when rotated)
+// O Tetromino (Yellow) - 1 posisi 
 const int O_TETROMINO[1][4][4] = {
     {
         {0, 1, 1, 0},
@@ -114,28 +114,28 @@ const int S_TETROMINO[2][4][4] = {
 
 // T Tetromino (Purple) - 4 posisi
 const int T_TETROMINO[4][4][4] = {
-    // Rotasi 0° (default - T shape pointing up)
+    // Rotasi 0° (default)
     {
         {0, 1, 0, 0},
         {1, 1, 1, 0},
         {0, 0, 0, 0},
         {0, 0, 0, 0}
     },
-    // Rotasi 90° (T pointing right)
+    // Rotasi 90°
     {
         {0, 1, 0, 0},
         {0, 1, 1, 0},
         {0, 1, 0, 0},
         {0, 0, 0, 0}
     },
-    // Rotasi 180° (T pointing down)
+    // Rotasi 180° 
     {
         {0, 0, 0, 0},
         {1, 1, 1, 0},
         {0, 1, 0, 0},
         {0, 0, 0, 0}
     },
-    // Rotasi 270° (T pointing left)
+    // Rotasi 270° 
     {
         {0, 1, 0, 0},
         {1, 1, 0, 0},

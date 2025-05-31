@@ -211,7 +211,7 @@ bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board)
         return true;
     }
 
-    // Try wall kick tests
+
     int wallKickIndex = initialRotation % 4;
     for (int testIndex = 0; testIndex < 5; testIndex++)
     {
@@ -288,7 +288,7 @@ void HardDropBlock(TetrisBlock *block, TetrisBoard *board)
     
     while (MoveBlockDown(block, board))
     {
-        // Keep dropping until it can't move down anymore
+        
     }
     PlaceBlock(block, board);
 }
@@ -329,7 +329,7 @@ static void UpdateBlockShape(TetrisBlock *block) {
     AmbilBentukSaatIni(rotList, block->shape);
 }
 
-// Other utility functions
+
 Color GetTetrominoColor(int blockType)
 {
     if (blockType < 0 || blockType >= 7)

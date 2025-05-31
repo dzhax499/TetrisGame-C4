@@ -48,6 +48,4 @@ void ResetHoldCount(TetrisBoard *board);
 int GetRemainingHolds(TetrisBoard *board);
 bool CanUseHold(TetrisBoard *board);
 
-// static void SyncRotationToState(RotationList *rotList, int targetRotation);
-
 #endif

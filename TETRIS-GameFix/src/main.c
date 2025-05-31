@@ -141,7 +141,7 @@ int main(void)
                     hasEnteredName = true;
                 }
 
-                EndDrawing(); continue; // Tahan loop sampai nama diisi
+                EndDrawing(); continue; 
             }
 
             if (!inGame)

@@ -18,10 +18,10 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count);
 void InitRotationSystem(void);
 RotationList* GetRotationList(int blockType);
 void RotateToNext(RotationList* list);
-void SetRotation(RotationList* list, int targetRotation);  // NEW
+void SetRotation(RotationList* list, int targetRotation);
 void AmbilBentukSaatIni(RotationList* list, int shape[4][4]);
 void FreeRotationList(RotationList* list);
 void CleanupRotationSystem(void);
-int GetCurrentRotationIndex(RotationList* list);  // NEW
+int GetCurrentRotationIndex(RotationList* list);
 
 #endif
