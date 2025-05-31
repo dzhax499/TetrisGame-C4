@@ -6,10 +6,13 @@
 #define TIMER_H
 
 #include <raylib.h>
-#include <time.h>
+#include <stdbool.h>
 
 void InitGameTimer(void);
 void UpdateGameTimer(void);
 float GetElapsedGameTime(void);
+void PauseGameTimer(void);
+void ResumeGameTimer(void);
+bool IsTimerPaused(void);
 
 #endif // TIMER_H
