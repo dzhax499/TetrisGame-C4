@@ -35,7 +35,7 @@ static const int WallKickTests[4][5][2] = {
     // L -> 0 (Dari kiri kembali ke posisi awal)
     {{0, 0}, {-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}
 };
-
+// Menginisialisasi sistem blok dan rotasi
 void InitBlocks(void)
 {
     // Inisialisasi random seed
@@ -45,6 +45,7 @@ void InitBlocks(void)
     InitRotationSystem();
 }
 
+// Menghasilkan blok Tetris acak dengan posisi dan rotasi awal
 TetrisBlock GenerateRandomBlock(void)
 {
     TetrisBlock block;
@@ -100,6 +101,7 @@ TetrisBlock GenerateRandomBlock(void)
     return block;
 }
 
+// Mengecek apakah posisi dan rotasi blok valid di papan
 // FIXED: IsValidBlockPosition yang tidak mengubah rotasi current
 bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int testY, int testRotation)
 {
@@ -152,6 +154,7 @@ bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int
     return true;
 }
 
+// Merotasi blok searah jarum jam jika memungkinkan
 // FIXED: RotateBlock yang hanya berubah saat dipanggil
 bool RotateBlock(TetrisBlock *block, TetrisBoard *board)
 {
@@ -182,6 +185,7 @@ bool RotateBlock(TetrisBlock *block, TetrisBoard *board)
     return false;
 }
 
+// Merotasi blok dengan wall kick (SRS) jika memungkinkan
 bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board)
 {
     if (!block || !board) return false;
@@ -236,6 +240,7 @@ bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board)
     return false;
 }
 
+// Menghitung jarak drop maksimal blok tanpa mengubah rotasi
 // FIXED: Calculate drop distance yang tidak mengubah rotasi
 int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board)
 {
@@ -252,6 +257,7 @@ int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board)
     return dropDistance;
 }
 
+// Menggeser blok secara horizontal jika memungkinkan
 bool MoveBlockHorizontal(TetrisBlock *block, TetrisBoard *board, int dx)
 {
     if (!block || !board) return false;
@@ -267,6 +273,7 @@ bool MoveBlockHorizontal(TetrisBlock *block, TetrisBoard *board, int dx)
     return false;
 }
 
+// Menggeser blok ke bawah satu baris jika memungkinkan
 bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board)
 {
     if (!block || !board) return false;
@@ -282,6 +289,7 @@ bool MoveBlockDown(TetrisBlock *block, TetrisBoard *board)
     return false;
 }
 
+// Menjatuhkan blok hingga posisi terbawah (hard drop)
 void HardDropBlock(TetrisBlock *block, TetrisBoard *board)
 {
     if (!block || !board) return;
@@ -293,6 +301,7 @@ void HardDropBlock(TetrisBlock *block, TetrisBoard *board)
     PlaceBlock(block, board);
 }
 
+// Menempatkan blok pada papan sesuai posisi dan bentuk saat ini
 // FIXED: PlaceBlock yang menggunakan current shape
 void PlaceBlock(TetrisBlock *block, TetrisBoard *board)
 {
@@ -318,6 +327,7 @@ void PlaceBlock(TetrisBlock *block, TetrisBoard *board)
     }
 }
 
+// Memperbarui bentuk blok sesuai rotasi saat ini
 // FIXED: UpdateBlockShape yang aman
 static void UpdateBlockShape(TetrisBlock *block) {
     if (!block) return;
@@ -329,7 +339,7 @@ static void UpdateBlockShape(TetrisBlock *block) {
     AmbilBentukSaatIni(rotList, block->shape);
 }
 
-
+// Mendapatkan warna blok berdasarkan tipe
 Color GetTetrominoColor(int blockType)
 {
     if (blockType < 0 || blockType >= 7)
@@ -339,6 +349,7 @@ Color GetTetrominoColor(int blockType)
     return TETROMINO_COLORS[blockType];
 }
 
+// Mereset rotasi blok ke posisi awal
 void ResetBlockRotation(TetrisBlock *block)
 {
     if (!block) return;
@@ -352,12 +363,14 @@ void ResetBlockRotation(TetrisBlock *block)
     UpdateBlockShape(block);
 }
 
+// Mengecek apakah blok bisa di-spawn pada posisi awal
 bool CanSpawnBlock(TetrisBlock *block, TetrisBoard *board)
 {
     if (!block || !board) return false;
     return IsValidBlockPosition(block, board, block->x, block->y, block->rotation);
 }
 
+// Mendapatkan ghost block (bayangan posisi hard drop)
 TetrisBlock GetGhostBlock(TetrisBlock *block, TetrisBoard *board)
 {
     TetrisBlock ghost = *block;
@@ -370,12 +383,14 @@ TetrisBlock GetGhostBlock(TetrisBlock *block, TetrisBoard *board)
     return ghost;
 }
 
+// Mengecek apakah terjadi tabrakan pada posisi tertentu
 bool HasCollisionAt(TetrisBlock *block, TetrisBoard *board, int x, int y)
 {
     if (!block || !board) return true;
     return !IsValidBlockPosition(block, board, x, y, block->rotation);
 }
 
+// Mendapatkan batas (min/max) x dan y dari bentuk blok saat ini
 void GetBlockBounds(TetrisBlock *block, int *minX, int *maxX, int *minY, int *maxY)
 {
     if (!block || !minX || !maxX || !minY || !maxY) return;
@@ -401,6 +416,7 @@ void GetBlockBounds(TetrisBlock *block, int *minX, int *maxX, int *minY, int *ma
     }
 }
 
+// Merotasi blok berlawanan arah jarum jam jika memungkinkan
 bool RotateBlockCounterClockwise(TetrisBlock *block, TetrisBoard *board)
 {
     if (!block || !board) return false;
@@ -424,11 +440,13 @@ bool RotateBlockCounterClockwise(TetrisBlock *block, TetrisBoard *board)
     return false;
 }
 
+// Menurunkan blok satu baris (soft drop)
 bool SoftDropBlock(TetrisBlock *block, TetrisBoard *board)
 {
     return MoveBlockDown(block, board);
 }
 
+// Menghitung skor berdasarkan jarak drop dan tipe drop
 int CalculateDropScore(int dropDistance, bool isHardDrop)
 {
     if (isHardDrop)
@@ -441,6 +459,7 @@ int CalculateDropScore(int dropDistance, bool isHardDrop)
     }
 }
 
+// Menampilkan bentuk blok di console (debug)
 void PrintBlockShape(TetrisBlock *block)
 {
     if (!block) return;
@@ -461,6 +480,7 @@ void PrintBlockShape(TetrisBlock *block)
     printf("\n");
 }
 
+// Melakukan hold pada blok saat ini (maksimal 3 kali)
 void HoldCurrentBlock(TetrisBoard *board)
 {
     if (!board) return;
@@ -507,19 +527,21 @@ void HoldCurrentBlock(TetrisBoard *board)
     }
 }
 
+// Mengecek apakah hold masih bisa digunakan
 bool CanUseHold(TetrisBoard *board)
 {
     if (!board) return false;
     return (board->hold_block.holdCount < 3);
 }
 
+// Mendapatkan sisa jumlah hold yang bisa digunakan
 // NEW: Function to get remaining hold count
 int GetRemainingHolds(TetrisBoard *board)
 {
     if (!board) return 0;
     return (3 - board->hold_block.holdCount);
 }
-
+// Mereset jumlah hold (untuk permainan baru)
 // NEW: Function to reset hold count (untuk new game)
 void ResetHoldCount(TetrisBoard *board)
 {
@@ -528,6 +550,7 @@ void ResetHoldCount(TetrisBoard *board)
     board->hold_block.hasHeld = false;
 }
 
+// Membersihkan sistem blok dan rotasi (free memory)
 void CleanupBlocks(void)
 {
     CleanupRotationSystem();

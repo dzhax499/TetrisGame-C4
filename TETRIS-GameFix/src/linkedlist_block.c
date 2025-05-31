@@ -13,6 +13,7 @@
 // Array untuk menyimpan linked list rotasi untuk setiap jenis blok
 static RotationList* rotationLists[7] = {NULL};
 
+// membuat circular linked list rotasi dari array bentuk
 // FIXED: CreateRotationList dengan proper node indexing
 RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     if (count <= 0) {
@@ -72,6 +73,7 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
     return list;
 }
 
+// menginisialisasi sistem rotasi untuk semua tipe blok
 void InitRotationSystem(void) {
     printf("Initializing rotation system...\n");
     
@@ -96,6 +98,7 @@ void InitRotationSystem(void) {
     printf("Rotation system initialized successfully!\n");
 }
 
+// mengambil pointer ke rotation list berdasarkan tipe blok
 RotationList* GetRotationList(int blockType) {
     if (blockType < 0 || blockType >= 7) {
         printf("ERROR: Invalid block type %d in GetRotationList\n", blockType);
@@ -108,7 +111,7 @@ RotationList* GetRotationList(int blockType) {
     
     return rotationLists[blockType];
 }
-
+// memutar ke rotasi berikutnya pada circular linked list
 // FIXED: RotateToNext dengan proper tracking
 void RotateToNext(RotationList* list) {
     if (list && list->current && list->current->next) {
@@ -119,7 +122,7 @@ void RotateToNext(RotationList* list) {
         printf("WARNING: Cannot rotate to next - invalid list or current node\n");
     }
 }
-
+// mengatur rotasi ke indeks tertentu tanpa auto-rotation
 // FIXED: SetRotation yang benar-benar tidak menyebabkan auto rotation
 void SetRotation(RotationList* list, int targetRotation) {
     if (!list || !list->current) {
@@ -151,6 +154,7 @@ void SetRotation(RotationList* list, int targetRotation) {
     printf("DEBUG: SetRotation to %d completed\n", targetRotation);
 }
 
+// mengambil bentuk (shape) blok pada rotasi saat ini
 void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
     if (!list) {
         printf("ERROR: list is NULL in AmbilBentukSaatIni\n");
@@ -167,7 +171,7 @@ void AmbilBentukSaatIni(RotationList* list, int shape[4][4]) {
     // Copy the current shape
     memcpy(shape, list->current->shape, sizeof(int) * 4 * 4);
 }
-
+// membebaskan seluruh node dan list rotasi
 // FIXED: FreeRotationList yang aman
 void FreeRotationList(RotationList* list) {
     if (!list) return;
@@ -200,8 +204,7 @@ void FreeRotationList(RotationList* list) {
     
     free(list);
 }
-
-// Fungsi untuk membebaskan semua memori rotasi
+// membebaskan semua memori sistem rotasi untuk semua tipe blok
 void CleanupRotationSystem(void) {
     printf("Cleaning up rotation system...\n");
     
@@ -215,6 +218,7 @@ void CleanupRotationSystem(void) {
     printf("Rotation system cleaned up successfully!\n");
 }
 
+// mendapatkan indeks rotasi saat ini dari rotation list
 int GetCurrentRotationIndex(RotationList* list) {
     if (!list) return 0;
     return list->currentRotationIndex;
