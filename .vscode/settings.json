@@ -64,6 +64,7 @@
     "game_sound.h": "c",
     "highscore.h": "c",
     "main_menu.h": "c",
-    "rendering.h": "c"
+    "rendering.h": "c",
+    "board_linkedlist.h": "c"
   }
 }
