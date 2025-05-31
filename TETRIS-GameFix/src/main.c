@@ -153,6 +153,8 @@ int main(void)
 
                 printf(">> InitBoard1\n");
                 InitBoardWithLinkedList(&board, linkedBoard);
+                ResetHoldCount(&board);
+                printf(">> Hold count reset to 0\n");
                 printf(">> InitScoring\n");
                 InitScoring(&scoreData);
                 printf(">> InitGameTimer\n");
@@ -492,8 +494,17 @@ int main(void)
 
             if (IsKeyPressed(KEY_C))
             {
-                HoldCurrentBlock(&board);
-                PlaySoundEffect(SOUND_CLICK);
+                 if (CanUseHold(&board))
+                {
+                    HoldCurrentBlock(&board);
+                    PlaySoundEffect(SOUND_CLICK);
+                    printf("Hold digunakan! Sisa: %d kali\n", GetRemainingHolds(&board));
+                }
+                else
+                {
+                    PlaySoundEffect(SOUND_GAME_OVER); // or create SOUND_ERROR
+                    printf("Hold sudah habis! Tidak bisa hold lagi.\n");
+                }
             }
 
             // Toggle music

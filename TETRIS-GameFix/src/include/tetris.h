@@ -41,14 +41,9 @@ typedef struct
 {
     TetrisBlock block;
     bool hasHeld;
+    int holdCount;
 } HoldBlock;
 
-// Fungsi load dan unload asset permainan
-void LoadGameAssets(void);
-void UnloadGameAssets(void);
 
-// Fungsi drawing tambahan
 void DrawPauseOverlay(void);
-void DrawGameOverScreen(int score);
-
 #endif

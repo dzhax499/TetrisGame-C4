@@ -465,10 +465,18 @@ void HoldCurrentBlock(TetrisBoard *board)
 {
     if (!board) return;
     
+    // NEW: Check if hold limit reached
+    if (board->hold_block.holdCount >= 3) {
+        // Tampilkan pesan bahwa hold sudah habis
+        printf("Hold sudah digunakan 3 kali! Tidak bisa hold lagi.\n");
+        return;
+    }
+    
     if (!board->hold_block.hasHeld)
     {
         board->hold_block.block = board->current_block;
         board->hold_block.hasHeld = true;
+        board->hold_block.holdCount++; // NEW: Increment counter
 
         ResetBlockRotation(&board->hold_block.block);
         board->hold_block.block.x = BOARD_WIDTH / 2 - 2;
@@ -479,6 +487,8 @@ void HoldCurrentBlock(TetrisBoard *board)
         board->current_block.y = 0;
 
         board->next_block = GenerateRandomBlock();
+        
+        printf("Hold digunakan! Sisa: %d kali\n", 3 - board->hold_block.holdCount);
     }
     else
     {
@@ -491,7 +501,31 @@ void HoldCurrentBlock(TetrisBoard *board)
 
         board->hold_block.block = tempBlock;
         ResetBlockRotation(&board->hold_block.block);
+        board->hold_block.holdCount++; 
+        
+        printf("Hold digunakan! Sisa: %d kali\n", 3 - board->hold_block.holdCount);
     }
+}
+
+bool CanUseHold(TetrisBoard *board)
+{
+    if (!board) return false;
+    return (board->hold_block.holdCount < 3);
+}
+
+// NEW: Function to get remaining hold count
+int GetRemainingHolds(TetrisBoard *board)
+{
+    if (!board) return 0;
+    return (3 - board->hold_block.holdCount);
+}
+
+// NEW: Function to reset hold count (untuk new game)
+void ResetHoldCount(TetrisBoard *board)
+{
+    if (!board) return;
+    board->hold_block.holdCount = 0;
+    board->hold_block.hasHeld = false;
 }
 
 void CleanupBlocks(void)

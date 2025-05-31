@@ -44,6 +44,9 @@ int CalculateDropDistance(TetrisBlock *block, TetrisBoard *board);
 bool RotateBlockWithWallKick(TetrisBlock *block, TetrisBoard *board);
 
 void PrintBlockShape(TetrisBlock *block);
+void ResetHoldCount(TetrisBoard *board);
+int GetRemainingHolds(TetrisBoard *board);
+bool CanUseHold(TetrisBoard *board);
 
 // static void SyncRotationToState(RotationList *rotList, int targetRotation);
 
