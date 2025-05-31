@@ -147,7 +147,7 @@ bool IsValidBlockPosition(TetrisBlock *block, TetrisBoard *board, int testX, int
             if (boardY < 0) continue; // Allow spawning above visible area
 
             // Check collision with existing blocks
-            if (GetBlockAt(board, boardY, boardX) != BLOCK_EMPTY) return false;
+            if (board->grid[boardY][boardX] != BLOCK_EMPTY) return false;
         }
     }
 
@@ -313,7 +313,7 @@ void PlaceBlock(TetrisBlock *block, TetrisBoard *board)
                 if (boardY >= 0 && boardY < BOARD_HEIGHT &&
                     boardX >= 0 && boardX < BOARD_WIDTH)
                 {
-                   SetBlockAt(board, boardY, boardX, (BlockType)(block->type + 1)); // +1 karena BLOCK_EMPTY adalah 0
+                    board->grid[boardY][boardX] = block->type + 1;
                 }
             }
         }
