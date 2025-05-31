@@ -66,14 +66,15 @@ void DrawBoard(TetrisBoard *board)
         for (int x = 0; x < BOARD_WIDTH; x++)
         {
             // **Dapatkan warna berdasarkan isi grid**
-            Color cellColor = GetBlockColor(board->grid[y][x]);
+            BlockType typeBlok = GetBlockAt(board, y, x);
+            Color cellColor = GetBlockColor(typeBlok);
 
             // **Sesuaikan posisi berdasarkan offset yang dipakai**
             int drawX = BOARD_OFFSET_X + x * BLOCK_SIZE;
             int drawY = BOARD_OFFSET_Y + y * BLOCK_SIZE;
 
             // **Gambar hanya jika bukan blok kosong**
-            if (board->grid[y][x] != BLOCK_EMPTY)
+            if (typeBlok != BLOCK_EMPTY)
             {
                 DrawRectangle(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, cellColor);
                 DrawRectangleLines(drawX, drawY, BLOCK_SIZE, BLOCK_SIZE, BLACK); // Outline
