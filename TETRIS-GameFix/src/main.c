@@ -33,14 +33,12 @@ LinkedBoard* linkedBoard = NULL;
 
 int main(void)
 {
-    // Debug: Print initialization start
     printf("Starting Tetris Game initialization...\n");
 
-    SetExitKey(0); // Nonaktifkan tombol keluar bawaan
+    SetExitKey(0); 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tetris Game");
     SetTargetFPS(60);
 
-    // Check if audio initialization succeeds
     InitAudioDevice();
     if (!IsAudioDeviceReady())
     {
@@ -348,7 +346,6 @@ int main(void)
                 StopBackgroundMusic();
                 PlaySoundEffect(SOUND_CLICK);
             }
-            // Tetap menggambar elemen permainan tanpa memperbarui logika
             DrawBoard(&board);
             DrawBlockShadow(&board.current_block, &board);
             DrawActiveTetromino(&board.current_block);
@@ -356,10 +353,8 @@ int main(void)
             DrawNextBlock(&board);
             DrawScore(&board, &scoreData);
 
-            // Tampilkan overlay menu jeda
             DrawPauseOverlay();
 
-            // Mendefinisikan tombol-tombol jeda
             Vector2 mousePoint = GetMousePosition();
             Rectangle resumeBtn = {
                 WINDOW_WIDTH / 2 - 100,
@@ -392,7 +387,6 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
             }
 
-            // Alternatif menggunakan tombol P untuk pindah ke menu jeda
             if (IsKeyPressed(KEY_P))
             {
                 SetMenuState(MENU_STATE_PAUSE);
