@@ -448,6 +448,15 @@ int main(void)
                         gameOver = true;
                         StopBackgroundMusic();
                         PlaySoundEffect(SOUND_GAME_OVER);
+
+                        // Simpan skor di sini, saat game over
+                        AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
+                    }
+                    else
+                    {
+                        // Reset fall timer for next block
+                        fallTimer = 0;
+                        PlaySoundEffect(SOUND_CLICK);
                     }
                 }
                 fallTimer = 0; // Reset timer
@@ -601,14 +610,22 @@ int main(void)
             {
                 DrawRectangleRec(restartBtn, Fade(GREEN, 0.8f));
                 DrawText("RESTART", restartBtn.x + (restartBtn.width / 2) - MeasureText("RESTART", 20) / 2,
-                         restartBtn.y + 15, 20, WHITE);
+                        restartBtn.y + 15, 20, WHITE);
+                printf("Kursor Disimpan diatas tombol\n");
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
+                    printf("kursor restart game dilepas\n");
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     InitGameTimer();
+                    
+                    // Generate new current and next block
+                    printf("Before GenerateRandomBlock\n");
+                    board.current_block = GenerateRandomBlock();
+                    board.next_block = GenerateRandomBlock();
+                    printf("After GenerateRandomBlock\n");
+
                     gameOver = false;
                     inGame = true;
                     wasPreviouslyInGame = true;
@@ -616,6 +633,7 @@ int main(void)
                     PlaySoundEffect(SOUND_CLICK);
                     PlayBackgroundMusic(MUSIC_GAMEPLAY);
                     SetMenuState(MENU_STATE_PLAY);
+                    printf("Restart game initiated\n");
                 }
             }
 
@@ -628,7 +646,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
+                    //AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     InitGameTimer();
@@ -651,7 +669,7 @@ int main(void)
 
                 if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
                 {
-                    AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
+                    //AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
                     InitBoard1(&board);
                     InitScoring(&scoreData);
                     gameOver = false;
@@ -662,9 +680,6 @@ int main(void)
                     PlaySoundEffect(SOUND_CLICK);
                 }
             }
-
-            AddOrUpdateLeaderboard(&leaderboard, scoreData.score, scoreData.level, playerName, GetElapsedGameTime());
-
 
             // Restart with R key
             if (IsKeyPressed(KEY_R))

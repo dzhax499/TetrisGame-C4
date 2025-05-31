@@ -3,17 +3,17 @@
 
 typedef struct RotationNode {
     int shape[4][4];
-    int rotationIndex;  // NEW: Track rotation index
+    int rotationIndex;
     struct RotationNode* next;
 } RotationNode;
 
 typedef struct RotationList {
     RotationNode* current;
     int rotationCount;
-    int currentRotationIndex;  // NEW: Track current rotation
+    int currentRotationIndex; 
 } RotationList;
 
-// Function declarations
+
 RotationList* CreateRotationList(const int shapes[][4][4], int count);
 void InitRotationSystem(void);
 RotationList* GetRotationList(int blockType);

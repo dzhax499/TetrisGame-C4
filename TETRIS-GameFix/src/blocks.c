@@ -55,8 +55,6 @@ TetrisBlock GenerateRandomBlock(void)
     block.type = rand() % 7;
     block.rotation = 0;  // ALWAYS start at rotation 0
     block.ukuranblok = 4;
-    block.efekmeledak = false;
-    block.waktumeledak = 0;
 
     // FIXED: Proper initial positioning
     switch(block.type) {
