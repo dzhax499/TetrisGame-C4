@@ -47,23 +47,26 @@ TETRIS-GameFix/
 │   │   ├── board_linkedlist.h   # Header papan linked list
 │   │   ├── game_sound.h         # Header sistem suara
 │   │   ├── linkedlist_block.h   # Header rotasi circular linked list
+│   │   ├── leaderboard.h        # Header leaderboard
 │   │   ├── main_menu.h          # Deklarasi menu utama
 │   │   ├── rendering.h          # Fungsi rendering
 │   │   ├── rotasi_data.h        # Data rotasi Tetromino
 │   │   ├── scoring.h            # Sistem skor
 │   │   ├── sound.h              # Sistem audio
+│   │   ├── timer.h              # sistem timer
 │   │   └── tetris.h             # Definisi umum & struktur global
 │   ├── blocks.c             # Implementasi logika blok
-│   ├── board.c              # Implementasi papan array
 │   ├── board_linkedlist.c   # Implementasi papan linked list
 │   ├── game_sound.c         # Implementasi sistem suara
 │   ├── linkedlist_block.c   # Implementasi rotasi circular linked list
+│   ├── leaderboard.c        # Implemantasi leaderboard
 │   ├── main.c               # Program utama
 │   ├── main_menu.c          # Implementasi menu utama
 │   ├── rendering.c          # Implementasi rendering
 │   ├── rotasi_data.c        # Data rotasi Tetromino
 │   ├── scoring.c            # Implementasi sistem skor
-│   └── sound.c              # Implementasi sistem audio
+│   ├── sound.c              # Implementasi sistem audio
+│   └── timer.c              # sistem timer
 ├── Makefile             # Build script
 └── README.md            # Dokumentasi proyek
 ```
@@ -131,6 +134,16 @@ TETRIS-GameFix/
 - 🔢 Definisi *konstanta global*
 - 🔲 Struktur dasar *blok Tetris*
 - 🖥 Definisi *ukuran window dan papan*
+
+### *timer.c/h*
+- ⏲ Pengelolaan *timer* untuk delay jatuh blok
+- ⏳ Timer untuk animasi, efek, dan transisi menu
+- 🕒 Fungsi reset, start, stop, dan cek waktu habis
+
+### *leaderboard.c/h*
+- 🏅 Pengelolaan *leaderboard*/daftar skor tertinggi
+- 💾 Penyimpanan dan pembacaan skor dari file
+- 📝 Fungsi menambah, mengurutkan, dan menampilkan skor pemain
 
 **Prasyarat**
 
