@@ -1,3 +1,8 @@
+// FIXED: linkedlist_block.h - Header rotasi blok Tetris dengan circular linked list
+// Nama file : linkedlist_block.h
+// Deskripsi : Deklarasi struktur dan fungsi rotasi blok Tetris berbasis circular linked list
+// Oleh      : Dzakit Tsabit 241511071 (github : dzhax4499)
+
 #ifndef LINKEDLIST_BLOCK_H
 #define LINKEDLIST_BLOCK_H
 

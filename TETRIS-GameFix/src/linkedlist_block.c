@@ -1,7 +1,7 @@
 // FIXED: linkedlist_block.c - Bug rotation sistem diperbaiki
 // Nama file : linkedlist_block.c
 // Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list (FIXED - No Auto Rotation Bug)
-// Oleh      : Dzakir Tsabit 241511071
+// Oleh      : Dzakir Tsabit 241511071 (github : dzhax4499)
 
 #include "include/linkedlist_block.h"
 #include "include/blocks.h"

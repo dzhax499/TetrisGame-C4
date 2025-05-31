@@ -1,7 +1,7 @@
 // FIXED: blocks.c - Auto rotation bug diperbaiki
 // Nama file : blocks.c
 // Deskripsi : Implementasi blok-blok game Tetris (FIXED - NO AUTO ROTATION BUG)
-// Oleh      : Dzakit Tsabit 241511071
+// Oleh      : Dzakit Tsabit 241511071 (github : dzhax4499)
 
 #include <string.h>
 #include <time.h>

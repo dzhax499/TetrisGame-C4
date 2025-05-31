@@ -1,4 +1,8 @@
-// Fixed rotasi_data.h - Corrected Tetris piece definitions
+// FIXED: rotasi_data.c - Data rotasi Tetromino Tetris lengkap dan benar
+// Nama file : rotasi_data.c
+// Deskripsi : Implementasi data array bentuk dan rotasi unik untuk setiap blok Tetris
+// Oleh      : Dzakit Tsabit 241511071 (github : dzhax4499)
+
 #ifndef ROTASI_DATA_H
 #define ROTASI_DATA_H
 
