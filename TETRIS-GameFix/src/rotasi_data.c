@@ -1,5 +1,7 @@
 // Fixed rotasi_data.h - Corrected Tetris piece definitions
-#include "include/rotasi_data.h"
+#ifndef ROTASI_DATA_H
+#define ROTASI_DATA_H
+
 // I Tetromino (Cyan) - 2 posisi unik
 const int I_TETROMINO[2][4][4] = {
     // Horizontal (default position)
@@ -162,3 +164,5 @@ const int Z_TETROMINO[2][4][4] = {
 
 // Jumlah rotasi unik untuk setiap blok
 const int ROTATION_COUNT[7] = {2, 4, 4, 1, 2, 4, 2};
+
+#endif // ROTASI_DATA_H

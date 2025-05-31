@@ -85,6 +85,7 @@ void InitRotationSystem(void) {
     rotationLists[5] = CreateRotationList(T_TETROMINO, 4);  // T
     rotationLists[6] = CreateRotationList(Z_TETROMINO, 2);  // Z
 
+    // Verify all lists were created successfully
     for (int i = 0; i < 7; i++) {
         if (rotationLists[i] == NULL) {
             printf("ERROR: Failed to create rotation list for block type %d\n", i);
