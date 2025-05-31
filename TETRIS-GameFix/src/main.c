@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "include/tetris.h"
-#include "include/board.h"
+#include "include/board_linkedlist.h"
 #include "include/blocks.h"
 #include "include/rendering.h"
 #include "include/scoring.h"
@@ -27,6 +27,8 @@
 bool paused = false;
 char playerName[50] = "";
 bool hasEnteredName = false;
+
+LinkedBoard* linkedBoard = NULL;
 
 int main(void)
 {
@@ -60,8 +62,7 @@ int main(void)
     printf(">> Alamat board utama di main: %p\n", &board);
     InitBlocks();
     printf(">> Inisialisasi blok-blok Tetris...\n");
-    InitBoard1(&board);
-    printf(">> Board initialized at address: %p\n", &board);
+    linkedBoard = InitLinkedBoard();
     ScoreData scoreData;
     printf(">> Initializing scoring...\n");
     InitScoring(&scoreData);
@@ -150,7 +151,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
 
                 printf(">> InitBoard1\n");
-                InitBoard1(&board);
+                InitBoardWithLinkedList(&board, linkedBoard);
                 printf(">> InitScoring\n");
                 InitScoring(&scoreData);
                 printf(">> InitGameTimer\n");
@@ -412,8 +413,7 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
-                    // Block has landed, place it
-                    PlaceBlock(&board.current_block, &board);
+                    PlaceBlockToLinkedBoard(&board.current_block, &board, linkedBoard);
 
                     // Generate new blocks
                     board.current_block = board.next_block;
@@ -481,12 +481,13 @@ int main(void)
             }
 
             // Clear full lines
-            int linesCleared = ClearFullLines(&board);
+            int linesCleared = ClearFullLinesLinked(&board, linkedBoard);
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
                 CheckLevelUp(&scoreData);
                 PlaySoundEffect(SOUND_LINE_CLEAR);
+                PrintLinkedBoard(linkedBoard);
             }
 
             printf(">> Mulai render elemen\n");
@@ -680,6 +681,10 @@ int main(void)
 
     // Cleanup
     printf("Cleaning up resources...\n");
+    if (linkedBoard) {
+        CleanupLinkedBoard(linkedBoard);
+        linkedBoard = NULL;
+    }
     UnloadMainMenu();
     UnloadGameSound();
     CloseAudioDevice();

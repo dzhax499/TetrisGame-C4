@@ -4,7 +4,7 @@
 //             Rizky Satria Gunawan 241511089
 
 #include "include/board.h"
-#include "include/blocks.h"  // Mengimpor definisi blok dari blocks.h
+#include "include/blocks.h" 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
