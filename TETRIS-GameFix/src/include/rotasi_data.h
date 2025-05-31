@@ -1,3 +1,8 @@
+// FIXED: rotasi_data.h - Header data rotasi Tetromino Tetris
+// Nama file : rotasi_data.h
+// Deskripsi : Deklarasi array bentuk dan jumlah rotasi unik untuk setiap blok Tetris
+// Oleh      : Dzakit Tsabit 241511071 (github : dzhax4499)
+
 #ifndef ROTASI_DATA_H
 #define ROTASI_DATA_H
 

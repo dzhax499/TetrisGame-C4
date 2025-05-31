@@ -1,7 +1,6 @@
 // Nama file : blocks.h
 // Deskripsi : Header untuk blok-blok game Tetris  
-// Oleh      : Dzakit Tsabit 241511071
-
+// Oleh      : Dzakit Tsabit 241511071 (github : dzhax4499)
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
@@ -47,7 +46,5 @@ void PrintBlockShape(TetrisBlock *block);
 void ResetHoldCount(TetrisBoard *board);
 int GetRemainingHolds(TetrisBoard *board);
 bool CanUseHold(TetrisBoard *board);
-
-// static void SyncRotationToState(RotationList *rotList, int targetRotation);
 
 #endif
