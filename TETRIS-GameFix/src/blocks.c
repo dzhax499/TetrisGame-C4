@@ -49,37 +49,33 @@ TetrisBlock GenerateRandomBlock(void)
 {
     TetrisBlock block;
     
-    // Inisialisasi semua field dengan nilai default
     memset(&block, 0, sizeof(TetrisBlock));
     
     block.type = rand() % 7;
-    block.rotation = 0;  // ALWAYS start at rotation 0
+    block.rotation = 0;
     block.ukuranblok = 4;
-    block.efekmeledak = false;
-    block.waktumeledak = 0;
 
-    // FIXED: Proper initial positioning
     switch(block.type) {
-        case 0: // I-piece
+        case 0: // I
             block.x = BOARD_WIDTH / 2 - 2;
             block.y = -1;
             break;
-        case 3: // O-piece
+        case 3: // O
             block.x = BOARD_WIDTH / 2 - 2;
             block.y = 0;
             break;
-        default: // J, L, S, T, Z pieces
+        default: // J, L, S, T, Z 
             block.x = BOARD_WIDTH / 2 - 2;
             block.y = 0;
             break;
     }
 
-    // CRITICAL FIX: Set rotation list to rotation 0 dan JANGAN panggil sync
+
     RotationList *rotList = GetRotationList(block.type);
     if (rotList == NULL)
     {
         printf("ERROR: rotList NULL saat generate blok type %d\n", block.type);
-        // Emergency fallback
+
         block.type = 0;
         memset(block.shape, 0, sizeof(block.shape));
         block.shape[1][0] = 1;
@@ -90,8 +86,7 @@ TetrisBlock GenerateRandomBlock(void)
     }
     else
     {
-        // FIXED: Pastikan rotList di posisi 0 tanpa memanggil sync yang berbahaya
-        SetRotation(rotList, 0); // Set ke rotation 0
+        SetRotation(rotList, 0); 
         block.rotationNode = rotList->current;
         UpdateBlockShape(&block);
     }

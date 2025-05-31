@@ -33,9 +33,6 @@ typedef struct
     int ukuranblok;  // Ukuran blok (4x4)
     Color color;     // Warna blok
 
-    bool efekmeledak; // efek ledakan aktif
-    int waktumeledak; // waktu animasi
-
     RotationNode *rotationNode;
 } TetrisBlock;
 
