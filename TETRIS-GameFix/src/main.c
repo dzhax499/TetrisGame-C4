@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "include/tetris.h"
-#include "include/board.h"
+#include "include/board_linkedlist.h"
 #include "include/blocks.h"
 #include "include/rendering.h"
 #include "include/scoring.h"
@@ -23,10 +23,13 @@
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
 #define HIGH_SCORE_FILE "assets/log/highscore.dat"
+static Texture2D backgroundTexture;
 
 bool paused = false;
 char playerName[50] = "";
 bool hasEnteredName = false;
+
+LinkedBoard* linkedBoard = NULL;
 
 int main(void)
 {
@@ -60,8 +63,7 @@ int main(void)
     printf(">> Alamat board utama di main: %p\n", &board);
     InitBlocks();
     printf(">> Inisialisasi blok-blok Tetris...\n");
-    InitBoard1(&board);
-    printf(">> Board initialized at address: %p\n", &board);
+    linkedBoard = InitLinkedBoard();
     ScoreData scoreData;
     printf(">> Initializing scoring...\n");
     InitScoring(&scoreData);
@@ -150,7 +152,7 @@ int main(void)
                 PlaySoundEffect(SOUND_CLICK);
 
                 printf(">> InitBoard1\n");
-                InitBoard1(&board);
+                InitBoardWithLinkedList(&board, linkedBoard);
                 printf(">> InitScoring\n");
                 InitScoring(&scoreData);
                 printf(">> InitGameTimer\n");
@@ -194,21 +196,32 @@ int main(void)
         {
             inGame = false;
 
-            ClearBackground(LIGHTGRAY);
-            DrawText("CREDITS", WINDOW_WIDTH / 2 - MeasureText("CREDITS", 40) / 2,
-                     WINDOW_HEIGHT / 2 - 150, 40, BLACK);
+            // Draw background texture
+            DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
+            backgroundTexture = LoadTexture("assets/textures/bg.png");
 
-            // Tampilkan nama dan ID anggota tim
-            DrawText("Dzakir Tsabit \t\t 241511071", WINDOW_WIDTH / 2 - MeasureText("Dzakir Tsabit 241511071", 20) / 2,
-                     WINDOW_HEIGHT / 2 - 50, 20, BLACK);
-            DrawText("Fatimah Hawwa \t\t 241511074", WINDOW_WIDTH / 2 - MeasureText("Fatimah Hawwa 241511074", 20) / 2,
-                     WINDOW_HEIGHT / 2 - 20, 20, BLACK);
-            DrawText("Ibnu Hilmi \t\t\t\t 241511079", WINDOW_WIDTH / 2 - MeasureText("Ibnu Hilmi 241511079", 20) / 2,
-                     WINDOW_HEIGHT / 2 - -10, 20, BLACK);
-            DrawText("Rizky Satria \t\t\t 241511089", WINDOW_WIDTH / 2 - MeasureText("Rizky Satria 241511089", 20) / 2,
-                     WINDOW_HEIGHT / 2 - -40, 20, BLACK);
-            DrawText("Varian Abidarma \t 241511091", WINDOW_WIDTH / 2 - MeasureText("Varian Abidarma 241511091", 20) / 2,
-                     WINDOW_HEIGHT / 2 - -70, 20, BLACK);
+            // Create panel for Credits
+            Rectangle panel = {
+                WINDOW_WIDTH / 2 - 250,
+                WINDOW_HEIGHT / 2 - 210,
+                500,
+                425
+            };
+
+            // Draw panel with background
+            DrawRectangleRec(panel, Fade(DARKBLUE, 0.9f));
+            DrawRectangleLinesEx(panel, 3, SKYBLUE);
+
+            // Draw title
+            DrawText("CREDITS", panel.x + panel.width/2 - MeasureText("CREDITS", 38)/2, 
+                     panel.y + 20, 40, YELLOW);
+            
+            // Display team members
+            DrawText("241511071     Dzakir Tsabit Asy-syafiq", panel.x + 50, panel.y + 100, 20, WHITE);
+            DrawText("241511074     Fatimah Hawwa Alkhansa", panel.x + 50, panel.y + 140, 20, WHITE);
+            DrawText("241511079     Ibnu Hilmi Athaillah", panel.x + 50, panel.y + 180, 20, WHITE);
+            DrawText("241511089     Rizky Satria Gunawan", panel.x + 50, panel.y + 220, 20, WHITE);
+            DrawText("241511091     Varian Abidarma Syuhada", panel.x + 50, panel.y + 260, 20, WHITE);
 
             // Tombol kembali ke menu utama
             Rectangle backBtnCR = {
@@ -248,30 +261,42 @@ int main(void)
         {
             inGame = false;
 
-            ClearBackground(LIGHTGRAY);
-            DrawText("HIGHSCORES", WINDOW_WIDTH / 2 - MeasureText("HIGHSCORES", 40) / 2,
-                     WINDOW_HEIGHT / 2 - 150, 40, BLACK);
+            DrawTextureEx(backgroundTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
+            backgroundTexture = LoadTexture("assets/textures/bg.png");
+
+            Rectangle panel = {
+                WINDOW_WIDTH / 2 - 200,
+                WINDOW_HEIGHT / 2 - 200,
+                400,
+                350
+            };
+
+            // Draw panel with background
+            DrawRectangleRec(panel, Fade(DARKBLUE, 0.9f));
+            DrawRectangleLinesEx(panel, 2, SKYBLUE);
+
+            DrawText("HIGHSCORES", panel.x + panel.width/2 - MeasureText("HIGHSCORE", 43)/2, 
+                     panel.y + 20, 40, YELLOW);
 
             // Baca dan tampilkan high score
             int highScore = LoadGameHighScore();
+            int yPos = panel.y + 100;
 
             if (highScore > 0)
             {
                 char scoreText[50];
                 sprintf(scoreText, "Highest Score: %d", highScore);
-                DrawText(scoreText, WINDOW_WIDTH / 2 - MeasureText(scoreText, 30) / 2,
-                         WINDOW_HEIGHT / 2 - 30, 30, BLACK);
+                DrawText(scoreText, panel.x + 50, yPos, 30, WHITE);
             }
             else
             {
-                DrawText("No high scores yet!", WINDOW_WIDTH / 2 - MeasureText("No high scores yet!", 30) / 2,
-                         WINDOW_HEIGHT / 2 - 30, 30, BLACK);
+                DrawText("No high scores yet!", panel.x + 50, yPos, 20, WHITE);
             }
 
             // Tombol kembali ke menu utama
             Rectangle backBtnHS = {
                 WINDOW_WIDTH / 2 - 100,
-                WINDOW_HEIGHT / 2 + 150,
+                WINDOW_HEIGHT / 2 + 50,
                 200,
                 50};
 
@@ -306,8 +331,6 @@ int main(void)
         {
             inGame = false;
             ClearBackground(LIGHTGRAY);
-            UpdateMainMenu();
-            DrawMainMenu();
             DisplayLeaderboard(&leaderboard, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
         else if (currentMenuState == MENU_STATE_EXIT)
@@ -412,8 +435,7 @@ int main(void)
             {
                 if (!MoveBlockDown(&board.current_block, &board))
                 {
-                    // Block has landed, place it
-                    PlaceBlock(&board.current_block, &board);
+                    PlaceBlockToLinkedBoard(&board.current_block, &board, linkedBoard);
 
                     // Generate new blocks
                     board.current_block = board.next_block;
@@ -481,12 +503,13 @@ int main(void)
             }
 
             // Clear full lines
-            int linesCleared = ClearFullLines(&board);
+            int linesCleared = ClearFullLinesLinked(&board, linkedBoard);
             if (linesCleared > 0)
             {
                 AddLineClearScore(&scoreData, linesCleared);
                 CheckLevelUp(&scoreData);
                 PlaySoundEffect(SOUND_LINE_CLEAR);
+                PrintLinkedBoard(linkedBoard);
             }
 
             printf(">> Mulai render elemen\n");
@@ -680,6 +703,10 @@ int main(void)
 
     // Cleanup
     printf("Cleaning up resources...\n");
+    if (linkedBoard) {
+        CleanupLinkedBoard(linkedBoard);
+        linkedBoard = NULL;
+    }
     UnloadMainMenu();
     UnloadGameSound();
     CloseAudioDevice();

@@ -9,7 +9,7 @@ INCLUDE_DIR = include
 BUILD_DIR = build
 
 # File source dan object
-SRC_FILES = $(SRC_DIR)/main.c $(SRC_DIR)/blocks.c $(SRC_DIR)/rendering.c $(SRC_DIR)/board.c $(SRC_DIR)/main_menu.c $(SRC_DIR)/scoring.c $(SRC_DIR)/game_sound.c $(SRC_DIR)/leaderboard.c $(SRC_DIR)/timer.c $(SRC_DIR)/linkedlist_block.c $(SRC_DIR)/rotasi_data.c
+SRC_FILES = $(SRC_DIR)/main.c $(SRC_DIR)/blocks.c $(SRC_DIR)/rendering.c $(SRC_DIR)/board.c $(SRC_DIR)/main_menu.c $(SRC_DIR)/scoring.c $(SRC_DIR)/game_sound.c $(SRC_DIR)/leaderboard.c $(SRC_DIR)/timer.c $(SRC_DIR)/linkedlist_block.c $(SRC_DIR)/rotasi_data.c $(SRC_DIR)/board_linkedlist.c
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
 # Nama output executable
