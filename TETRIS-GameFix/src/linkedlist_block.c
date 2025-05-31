@@ -1,7 +1,7 @@
 // FIXED: linkedlist_block.c - Bug rotation sistem diperbaiki
 // Nama file : linkedlist_block.c
 // Deskripsi : Implementasi rotasi blok Tetris menggunakan circular linked list (FIXED - No Auto Rotation Bug)
-// Oleh      : Dzakir Tsabit 241511071
+// Oleh      : Dzakir Tsabit 241511071 (github : dzhax4499)
 
 #include "include/linkedlist_block.h"
 #include "include/blocks.h"
@@ -25,13 +25,11 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
         printf("ERROR: Failed to allocate memory for RotationList\n");
         return NULL;
     }
-    
-    // Initialize list properties
+
     list->rotationCount = count;
     list->current = NULL;
     list->currentRotationIndex = 0;
     
-    // Create all nodes first
     RotationNode** nodes = (RotationNode**)malloc(count * sizeof(RotationNode*));
     if (!nodes) {
         printf("ERROR: Failed to allocate memory for nodes array\n");
@@ -58,16 +56,16 @@ RotationList* CreateRotationList(const int shapes[][4][4], int count) {
         nodes[i]->rotationIndex = i; // Index sesuai urutan pembuatan
     }
     
-    // Link all nodes in a circular fashion
+
     for (int i = 0; i < count; i++) {
         nodes[i]->next = nodes[(i + 1) % count];
     }
     
-    // Set current to first node (rotation 0) dan pastikan consistent
+
     list->current = nodes[0];
     list->currentRotationIndex = 0;
     
-    // Clean up temporary array
+   
     free(nodes);
     
     printf("Successfully created rotation list with %d rotations\n", count);
@@ -137,8 +135,7 @@ void SetRotation(RotationList* list, int targetRotation) {
     if (list->currentRotationIndex == targetRotation) {
         return; // CRITICAL: Exit early jika sudah benar
     }
-    
-    // FIXED: Navigasi langsung ke target rotation
+
     // Hitung steps yang diperlukan untuk mencapai target
     int stepsNeeded = targetRotation - list->currentRotationIndex;
     if (stepsNeeded < 0) {
@@ -218,7 +215,6 @@ void CleanupRotationSystem(void) {
     printf("Rotation system cleaned up successfully!\n");
 }
 
-// Get current rotation index
 int GetCurrentRotationIndex(RotationList* list) {
     if (!list) return 0;
     return list->currentRotationIndex;

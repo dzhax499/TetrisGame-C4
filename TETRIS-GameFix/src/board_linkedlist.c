@@ -1,6 +1,6 @@
 // Nama file : board_linkedlist.c
 // Deskripsi : Implementasi logika papan permainan Tetris menggunakan Linked List
-// Oleh      : Implementation dengan Linked List untuk manipulasi baris
+// Oleh      : Rizky Satria Gunawan 241511089
 // Catatan   : Menggunakan linked list untuk representasi baris-baris board
 
 #include "include/board_linkedlist.h"
