@@ -1,6 +1,6 @@
 // Nama file  : leaderboard.c
 // Deskripsi  : Mengelola daftar high score permainan
-// Oleh       : Fatimah Hawwa 241511074
+// Oleh       : Fatimah Hawwa 241511074 & Ibnu Hilmi Athaillah 241511079
 
 #include <raylib.h>
 #include <stdio.h>
@@ -16,21 +16,38 @@
 
 static Texture2D backgroundTexture;
 
-// Inisialisasi leaderboard
+/**
+ * Inisialisasi leaderboard
+ * Memuat tekstur latar belakang dan mempersiapkan struktur data leaderboard
+ * @param leaderboard Pointer ke struktur Leaderboard yang akan diinisialisasi
+ */
 void InitLeaderboard(Leaderboard* leaderboard) {
     backgroundTexture = LoadTexture("assets/textures/bg.png");
     leaderboard->highScores = NULL;
     LoadLeaderboard(leaderboard);
 }
 
-// Membersihkan memori leaderboard
+/**
+ * Membersihkan memori leaderboard
+ * Membebaskan semua memori yang dialokasikan untuk leaderboard dan membongkar tekstur
+ * @param leaderboard Pointer ke struktur Leaderboard yang akan dibersihkan
+ */
 void UnloadLeaderboard(Leaderboard* leaderboard) {
     // Membersihkan semua entri dalam linked list
     UnloadTexture (backgroundTexture);
     FreeLeaderboardList(leaderboard);
 }
 
-// Tambahkan skor ke daftar leaderboard
+/**
+ * Menambahkan skor baru ke daftar leaderboard
+ * Skor akan diurutkan secara descending (dari tinggi ke rendah)
+ * Maksimal 10 entri akan disimpan
+ * @param leaderboard Pointer ke struktur Leaderboard
+ * @param score Skor yang dicapai pemain
+ * @param level Level yang dicapai pemain
+ * @param name Nama pemain
+ * @param time Waktu bermain dalam detik
+ */
 void AddLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time) {
     LeaderboardEntry* newEntry = (LeaderboardEntry*)malloc(sizeof(LeaderboardEntry));
     if (!newEntry) {
@@ -84,6 +101,10 @@ void AddLeaderboard(Leaderboard* leaderboard, int score, int level, const char* 
     SaveLeaderboard(leaderboard);
 }
 
+/**
+ * Membebaskan semua memori yang dialokasikan untuk linked list leaderboard
+ * @param leaderboard Pointer ke struktur Leaderboard yang akan dibersihkan
+ */
 void FreeLeaderboardList(Leaderboard* leaderboard) {
     LeaderboardEntry* current = leaderboard->highScores;
     while (current) {
@@ -94,7 +115,11 @@ void FreeLeaderboardList(Leaderboard* leaderboard) {
     leaderboard->highScores = NULL;
 }
 
-// Simpan daftar leaderboard ke file
+/**
+ * Menyimpan daftar leaderboard ke file
+ * Data disimpan dalam format CSV: score,level,name,time
+ * @param leaderboard Pointer ke struktur Leaderboard yang akan disimpan
+ */
 void SaveLeaderboard(Leaderboard* leaderboard) {
     FILE* file = fopen(LEADERBOARD_FILE, "w");
     if (!file) {
@@ -110,7 +135,12 @@ void SaveLeaderboard(Leaderboard* leaderboard) {
     fclose(file);
 }
 
-// Muat daftar leaderboard dari file
+/**
+ * Memuat daftar leaderboard dari file
+ * Membaca file dalam format CSV dan mengisi struktur leaderboard
+ * Jika file tidak ada, akan membuat file baru yang kosong
+ * @param leaderboard Pointer ke struktur Leaderboard yang akan diisi
+ */
 void LoadLeaderboard(Leaderboard* leaderboard) {
     FreeLeaderboardList(leaderboard); // Kosongkan daftar sebelum memuat
     FILE* file = fopen(LEADERBOARD_FILE, "r");
@@ -133,6 +163,16 @@ void LoadLeaderboard(Leaderboard* leaderboard) {
     fclose(file);
 }
 
+/**
+ * Menambahkan atau memperbarui entri leaderboard untuk pemain tertentu
+ * Jika nama pemain sudah ada dan skor baru lebih tinggi, data akan diperbarui
+ * Jika nama pemain belum ada, entri baru akan ditambahkan
+ * @param leaderboard Pointer ke struktur Leaderboard
+ * @param score Skor yang dicapai pemain
+ * @param level Level yang dicapai pemain
+ * @param name Nama pemain
+ * @param time Waktu bermain dalam detik
+ */
 void AddOrUpdateLeaderboard(Leaderboard* leaderboard, int score, int level, const char* name, float time) {
     LeaderboardEntry* current = leaderboard->highScores;
     LeaderboardEntry* existingEntry = NULL;
@@ -160,7 +200,14 @@ void AddOrUpdateLeaderboard(Leaderboard* leaderboard, int score, int level, cons
     }
 }
 
-// Tampilkan daftar leaderboard di layar
+/**
+ * Menampilkan daftar leaderboard di layar
+ * Menggambar panel leaderboard dengan tabel yang berisi ranking, nama, level, skor, dan waktu
+ * Juga menyediakan tombol untuk kembali ke menu utama
+ * @param leaderboard Pointer ke struktur Leaderboard yang akan ditampilkan
+ * @param screenWidth Lebar layar dalam pixel
+ * @param screenHeight Tinggi layar dalam pixel
+ */
 void DisplayLeaderboard(Leaderboard* leaderboard, int screenWidth, int screenHeight) {
     // Muat ulang leaderboard untuk memastikan data terbaru
     LoadLeaderboard(leaderboard);
