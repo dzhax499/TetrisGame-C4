@@ -626,7 +626,6 @@ int main(void)
                     InitScoring(&scoreData);
                     InitGameTimer();
                     
-                    // Generate new current and next block
                     printf("Before GenerateRandomBlock\n");
                     board.current_block = GenerateRandomBlock();
                     board.next_block = GenerateRandomBlock();
